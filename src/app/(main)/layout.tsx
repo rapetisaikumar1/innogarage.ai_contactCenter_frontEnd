@@ -7,7 +7,7 @@ import { SoftphoneProvider, useSoftphone } from '@/hooks/useSoftphone';
 import Softphone from '@/components/voice/Softphone';
 import { User } from '@/types';
 
-// ─── Nav items with SVG icons ────────────────────────────────────────────────
+// ─── Nav items ───────────────────────────────────────────────────────────────
 const NAV_ITEMS = [
   {
     label: 'Dashboard', href: '/dashboard',
@@ -39,42 +39,42 @@ const NAV_ITEMS = [
   },
 ];
 
-// ─── SidebarBottom — must be inside SoftphoneProvider to use useSoftphone ────
+// ─── SidebarBottom (must be inside SoftphoneProvider) ─────────────────────────
 function SidebarBottom({ user }: { user: User }) {
   const sp = useSoftphone();
   const isReady = sp.status === 'ready';
   const isConnecting = sp.status === 'initializing';
 
   return (
-    <div className="border-t border-gray-100 flex-shrink-0">
+    <div className="border-t border-slate-700/60 flex-shrink-0">
       {/* Support Agent */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
-        <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0">
-          <svg className="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-700/60">
+        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0">
+          <svg className="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold text-gray-700">Support Agent</p>
-          <div className="flex items-center gap-1 mt-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
-            <span className="text-xs text-gray-400">Available</span>
+          <p className="text-xs font-semibold text-slate-200">Support Agent</p>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />
+            <span className="text-xs text-slate-400">Available</span>
           </div>
         </div>
       </div>
 
-      {/* Softphone status */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
-        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center flex-shrink-0">
-          <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      {/* Softphone */}
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-700/60">
+        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0">
+          <svg className="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
           </svg>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold text-gray-700">Softphone</p>
-          <div className="flex items-center gap-1 mt-0.5">
-            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isReady ? 'bg-green-500' : isConnecting ? 'bg-yellow-400 animate-pulse' : 'bg-red-400'}`} />
-            <span className="text-xs text-gray-400">
+          <p className="text-xs font-semibold text-slate-200">Softphone</p>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isReady ? 'bg-emerald-400' : isConnecting ? 'bg-amber-400 animate-pulse' : 'bg-red-400'}`} />
+            <span className="text-xs text-slate-400">
               {isReady ? 'Ready to receive calls' : isConnecting ? 'Connecting...' : 'Offline'}
             </span>
           </div>
@@ -83,14 +83,14 @@ function SidebarBottom({ user }: { user: User }) {
 
       {/* User */}
       <div className="flex items-center gap-3 px-4 py-3">
-        <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+        <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
           {user.name.charAt(0).toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-gray-800 truncate">{user.name}</p>
-          <p className="text-xs text-gray-400">{user.role}</p>
+          <p className="text-sm font-semibold text-slate-100 truncate">{user.name}</p>
+          <p className="text-xs text-slate-400 uppercase tracking-wide">{user.role}</p>
         </div>
-        <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-4 h-4 text-slate-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </div>
@@ -112,8 +112,11 @@ export default function MainLayout({ children }: { children: ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-400 text-sm">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-slate-400 text-sm">Loading...</p>
+        </div>
       </div>
     );
   }
@@ -122,50 +125,57 @@ export default function MainLayout({ children }: { children: ReactNode }) {
 
   return (
     <SoftphoneProvider>
-      <div className="h-screen flex overflow-hidden bg-gray-50">
-        {/* Sidebar — fixed height, sticky, does not scroll with content */}
-        <aside className="w-60 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 h-screen sticky top-0">
+      <div className="h-screen flex overflow-hidden bg-slate-50">
+        {/* Dark sidebar */}
+        <aside className="w-64 bg-slate-900 flex flex-col flex-shrink-0 h-screen sticky top-0">
           {/* Logo */}
-          <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0">
+          <div className="px-5 py-5 flex-shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-indigo-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/30">
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
               </div>
-              <span className="font-bold text-gray-900 text-base">Contact Center</span>
+              <div>
+                <p className="font-bold text-white text-sm leading-none">Contact Center</p>
+                <p className="text-xs text-slate-500 mt-0.5">Operations</p>
+              </div>
             </div>
           </div>
 
+          {/* Nav label */}
+          <div className="px-4 pb-2">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Menu</p>
+          </div>
+
           {/* Nav */}
-          <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
+          <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
               return (
                 <a
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
                     isActive
-                      ? 'bg-indigo-50 text-indigo-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/25'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
                   }`}
                 >
-                  <span className={isActive ? 'text-indigo-600' : 'text-gray-400'}>{item.icon}</span>
+                  <span className={isActive ? 'text-white' : 'text-slate-500'}>{item.icon}</span>
                   {item.label}
                 </a>
               );
             })}
           </nav>
 
-          {/* Bottom — inside SoftphoneProvider so useSoftphone() works */}
+          {/* Bottom status section */}
           <SidebarBottom user={user} />
         </aside>
 
-        {/* Main content — scrolls independently */}
-        <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+        {/* Main content */}
+        <main className="flex-1 overflow-y-auto bg-slate-50">{children}</main>
 
-        {/* Active call panel only — idle status moved to sidebar */}
         <Softphone />
       </div>
     </SoftphoneProvider>
