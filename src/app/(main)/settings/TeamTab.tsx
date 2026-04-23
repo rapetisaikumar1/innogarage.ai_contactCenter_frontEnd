@@ -5,8 +5,8 @@ import { useUsers, createUser, updateUser, UserProfile } from '@/hooks/useSettin
 
 const ROLE_LABELS: Record<string, string> = { ADMIN: 'Admin', MANAGER: 'Manager', AGENT: 'Agent' };
 const ROLE_COLORS: Record<string, string> = {
-  ADMIN: 'bg-purple-100 text-purple-700',
-  MANAGER: 'bg-blue-100 text-blue-700',
+  ADMIN: 'bg-gray-100 text-gray-700',
+  MANAGER: 'bg-gray-100 text-gray-700',
   AGENT: 'bg-gray-100 text-gray-700',
 };
 
@@ -47,34 +47,34 @@ function CreateUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
             <input type="text" value={form.name} onChange={(e) => update('name', e.target.value)} required minLength={2}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <input type="password" value={form.password} onChange={(e) => update('password', e.target.value)} required minLength={8}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-500" />
             <p className="text-xs text-gray-400 mt-1">Min 8 chars, one uppercase, one number</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
             <select value={form.role} onChange={(e) => update('role', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-500">
               <option value="AGENT">Agent</option>
               <option value="MANAGER">Manager</option>
               <option value="ADMIN">Admin</option>
             </select>
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-gray-600">{error}</p>}
 
           <div className="flex gap-2 pt-1">
             <button type="submit" disabled={saving}
-              className="flex-1 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50">
+              className="flex-1 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-black disabled:opacity-50">
               {saving ? 'Creating...' : 'Create User'}
             </button>
             <button type="button" onClick={onClose}
@@ -119,7 +119,7 @@ function UserRow({ user, onUpdated, isSelf }: { user: UserProfile; onUpdated: ()
     <tr className="hover:bg-gray-50">
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs font-bold flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 text-xs font-bold flex-shrink-0">
             {user.name.charAt(0).toUpperCase()}
           </div>
           <div>
@@ -132,12 +132,12 @@ function UserRow({ user, onUpdated, isSelf }: { user: UserProfile; onUpdated: ()
         {editRole && !isSelf ? (
           <div className="flex items-center gap-2">
             <select value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}
-              className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500">
+              className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-gray-500">
               <option value="AGENT">Agent</option>
               <option value="MANAGER">Manager</option>
               <option value="ADMIN">Admin</option>
             </select>
-            <button onClick={saveRole} disabled={saving} className="text-xs text-blue-600 hover:underline disabled:opacity-50">
+            <button onClick={saveRole} disabled={saving} className="text-xs text-gray-600 hover:underline disabled:opacity-50">
               {saving ? '...' : 'Save'}
             </button>
             <button onClick={() => { setEditRole(false); setSelectedRole(user.role); }} className="text-xs text-gray-400 hover:underline">
@@ -152,7 +152,7 @@ function UserRow({ user, onUpdated, isSelf }: { user: UserProfile; onUpdated: ()
         )}
       </td>
       <td className="px-4 py-3">
-        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${user.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${user.isActive ? 'bg-gray-100 text-gray-700' : 'bg-gray-100 text-gray-600'}`}>
           {user.isActive ? 'Active' : 'Inactive'}
         </span>
       </td>
@@ -161,8 +161,8 @@ function UserRow({ user, onUpdated, isSelf }: { user: UserProfile; onUpdated: ()
           <button onClick={toggleActive} disabled={saving}
             className={`text-xs px-3 py-1.5 rounded-lg border font-medium transition-colors disabled:opacity-50 ${
               user.isActive
-                ? 'border-red-200 text-red-600 hover:bg-red-50'
-                : 'border-green-200 text-green-700 hover:bg-green-50'
+                ? 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                : 'border-gray-200 text-gray-700 hover:bg-gray-50'
             }`}>
             {saving ? '...' : user.isActive ? 'Deactivate' : 'Activate'}
           </button>
@@ -197,7 +197,7 @@ export default function TeamTab() {
         <h3 className="text-sm font-semibold text-gray-700">Team Members</h3>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg hover:bg-black"
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -214,7 +214,7 @@ export default function TeamTab() {
           ))}
         </div>
       ) : error ? (
-        <p className="p-6 text-sm text-red-600">{error}</p>
+        <p className="p-6 text-sm text-gray-600">{error}</p>
       ) : (
         <table className="w-full">
           <thead>

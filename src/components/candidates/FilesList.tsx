@@ -90,12 +90,12 @@ export default function FilesList({ candidateId }: Props) {
           htmlFor="file-upload-input"
           className={`flex items-center justify-center gap-2 w-full border-2 border-dashed rounded-xl py-5 cursor-pointer transition-colors text-sm ${
             uploading
-              ? 'border-blue-300 bg-blue-50 cursor-not-allowed'
-              : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
+              ? 'border-gray-300 bg-gray-50 cursor-not-allowed'
+              : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
           }`}
         >
           {uploading ? (
-            <span className="text-blue-600">Uploading... {progress}%</span>
+            <span className="text-gray-600">Uploading... {progress}%</span>
           ) : (
             <>
               <span className="text-gray-400">📎</span>
@@ -109,14 +109,14 @@ export default function FilesList({ candidateId }: Props) {
         {uploading && (
           <div className="mt-2 h-1.5 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className="h-full bg-blue-500 transition-all duration-200"
+              className="h-full bg-gray-500 transition-all duration-200"
               style={{ width: `${progress}%` }}
             />
           </div>
         )}
 
         {uploadError && (
-          <p className="mt-1 text-xs text-red-600">{uploadError}</p>
+          <p className="mt-1 text-xs text-gray-600">{uploadError}</p>
         )}
       </div>
 
@@ -140,7 +140,7 @@ export default function FilesList({ candidateId }: Props) {
                     href={file.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm font-medium text-blue-600 hover:underline truncate block"
+                    className="text-sm font-medium text-gray-600 hover:underline truncate block"
                   >
                     {file.originalName}
                   </a>
@@ -152,7 +152,7 @@ export default function FilesList({ candidateId }: Props) {
                   <button
                     onClick={() => handleDelete(file)}
                     disabled={deletingId === file.id}
-                    className="text-xs text-red-500 hover:text-red-700 disabled:opacity-50 flex-shrink-0"
+                    className="text-xs text-gray-500 hover:text-gray-700 disabled:opacity-50 flex-shrink-0"
                   >
                     {deletingId === file.id ? 'Deleting...' : 'Delete'}
                   </button>

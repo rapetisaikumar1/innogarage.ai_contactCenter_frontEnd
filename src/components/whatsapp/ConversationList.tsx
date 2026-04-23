@@ -40,11 +40,11 @@ export default function ConversationList({ conversations, activeCandidateId }: P
             <Link
               href={`/inbox/${c.candidateId}`}
               className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors ${
-                isActive ? 'bg-blue-50 border-l-2 border-blue-500' : ''
+                isActive ? 'bg-gray-50 border-l-2 border-gray-500' : ''
               }`}
             >
               {/* Avatar */}
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 font-semibold text-sm">
                 {c.candidateName.charAt(0).toUpperCase()}
               </div>
 
@@ -56,7 +56,7 @@ export default function ConversationList({ conversations, activeCandidateId }: P
                 </div>
                 <div className="flex items-center gap-1 mt-0.5">
                   {c.lastDirection === 'OUTBOUND' && (
-                    <svg className="w-3 h-3 text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-3 h-3 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
                   )}
@@ -69,7 +69,7 @@ export default function ConversationList({ conversations, activeCandidateId }: P
 
               {/* Unread badge */}
               {c.unreadCount > 0 && (
-                <span className="flex-shrink-0 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                <span className="flex-shrink-0 bg-gray-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
                   {c.unreadCount}
                 </span>
               )}

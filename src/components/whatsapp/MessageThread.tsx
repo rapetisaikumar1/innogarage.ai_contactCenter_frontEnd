@@ -36,7 +36,7 @@ export default function MessageThread({ messages, bottomRef }: Props) {
               <div
                 className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap break-words ${
                   isOutbound
-                    ? 'bg-blue-500 text-white rounded-br-sm'
+                    ? 'bg-gray-500 text-white rounded-br-sm'
                     : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm shadow-sm'
                 }`}
               >

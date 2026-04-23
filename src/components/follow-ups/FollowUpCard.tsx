@@ -4,10 +4,10 @@ import { FollowUp, updateFollowUp, FollowUpStatus } from '@/hooks/useFollowUps';
 import { formatDateTime } from '@/utils/formatters';
 
 const STATUS_STYLES: Record<FollowUpStatus, string> = {
-  PENDING: 'bg-yellow-100 text-yellow-700',
-  COMPLETED: 'bg-green-100 text-green-700',
-  OVERDUE: 'bg-red-100 text-red-700',
-  RESCHEDULED: 'bg-blue-100 text-blue-700',
+  PENDING: 'bg-gray-100 text-gray-700',
+  COMPLETED: 'bg-gray-100 text-gray-700',
+  OVERDUE: 'bg-gray-100 text-gray-700',
+  RESCHEDULED: 'bg-gray-100 text-gray-700',
 };
 
 interface Props {
@@ -50,7 +50,7 @@ export default function FollowUpCard({ followUp, onUpdated, showCandidate = fals
         {followUp.status === 'PENDING' || followUp.status === 'OVERDUE' ? (
           <button
             onClick={handleComplete}
-            className="text-xs px-2 py-1 border border-green-300 text-green-700 rounded hover:bg-green-50"
+            className="text-xs px-2 py-1 border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
           >
             Done
           </button>

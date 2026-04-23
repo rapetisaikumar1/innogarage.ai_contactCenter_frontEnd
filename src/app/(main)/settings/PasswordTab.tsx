@@ -59,7 +59,7 @@ export default function PasswordTab() {
             value={form.currentPassword}
             onChange={(e) => update('currentPassword', e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
           />
         </div>
 
@@ -70,7 +70,7 @@ export default function PasswordTab() {
             value={form.newPassword}
             onChange={(e) => update('newPassword', e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
           />
           <p className="text-xs text-gray-400 mt-1">Min 8 chars, one uppercase, one number</p>
         </div>
@@ -82,17 +82,17 @@ export default function PasswordTab() {
             value={form.confirmPassword}
             onChange={(e) => update('confirmPassword', e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
           />
         </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        {success && <p className="text-sm text-green-600">Password changed successfully.</p>}
+        {error && <p className="text-sm text-gray-600">{error}</p>}
+        {success && <p className="text-sm text-gray-600">Password changed successfully.</p>}
 
         <button
           type="submit"
           disabled={saving}
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-black disabled:opacity-50 transition-colors"
         >
           {saving ? 'Saving...' : 'Change Password'}
         </button>

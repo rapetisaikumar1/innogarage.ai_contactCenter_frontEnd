@@ -11,7 +11,7 @@ export default function Softphone() {
   // Active call panel
   return (
     <div className="fixed bottom-4 right-4 z-50 w-80 bg-white border border-gray-200 shadow-2xl rounded-2xl overflow-hidden">
-      <div className="px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+      <div className="px-4 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white">
         <p className="text-xs uppercase tracking-wider opacity-80">
           {sp.callState === 'ringing-incoming' && 'Incoming call'}
           {sp.callState === 'connecting' && 'Calling…'}
@@ -28,13 +28,13 @@ export default function Softphone() {
           <>
             <button
               onClick={sp.acceptIncoming}
-              className="flex-1 py-2.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium"
+              className="flex-1 py-2.5 rounded-lg bg-gray-900 hover:bg-black text-white text-sm font-medium"
             >
               Accept
             </button>
             <button
               onClick={sp.rejectIncoming}
-              className="flex-1 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium"
+              className="flex-1 py-2.5 rounded-lg bg-gray-900 hover:bg-black text-white text-sm font-medium"
             >
               Reject
             </button>
@@ -48,7 +48,7 @@ export default function Softphone() {
                 onClick={sp.toggleMute}
                 className={`px-4 py-2.5 rounded-lg text-sm font-medium border ${
                   sp.isMuted
-                    ? 'bg-yellow-100 border-yellow-300 text-yellow-800'
+                    ? 'bg-gray-100 border-gray-300 text-gray-800'
                     : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -58,7 +58,7 @@ export default function Softphone() {
             <button
               onClick={sp.hangup}
               disabled={sp.callState === 'ending'}
-              className="flex-1 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white text-sm font-medium"
+              className="flex-1 py-2.5 rounded-lg bg-gray-900 hover:bg-black disabled:opacity-60 text-white text-sm font-medium"
             >
               Hang up
             </button>
@@ -67,7 +67,7 @@ export default function Softphone() {
       </div>
 
       {sp.errorMessage && (
-        <div className="px-4 pb-3 -mt-2 text-xs text-red-600">{sp.errorMessage}</div>
+        <div className="px-4 pb-3 -mt-2 text-xs text-gray-600">{sp.errorMessage}</div>
       )}
     </div>
   );

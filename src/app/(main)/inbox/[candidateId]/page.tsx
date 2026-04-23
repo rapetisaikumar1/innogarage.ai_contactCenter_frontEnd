@@ -57,7 +57,7 @@ export default function ConversationPage({ params }: Props) {
             <div className="h-5 w-32 bg-gray-200 rounded animate-pulse" />
           ) : (
             <>
-              <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm flex-shrink-0">
+              <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 font-semibold text-sm flex-shrink-0">
                 {(conversation?.candidateName ?? data?.messages[0]?.candidate.fullName ?? '?').charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">
@@ -70,7 +70,7 @@ export default function ConversationPage({ params }: Props) {
               </div>
               <Link
                 href={`/candidates/${candidateId}`}
-                className="ml-auto text-xs text-blue-600 hover:underline flex-shrink-0"
+                className="ml-auto text-xs text-gray-600 hover:underline flex-shrink-0"
               >
                 View profile →
               </Link>
@@ -81,7 +81,7 @@ export default function ConversationPage({ params }: Props) {
         {/* Messages */}
         <div className="flex-1 overflow-y-auto">
           {error ? (
-            <div className="flex items-center justify-center h-full text-red-500 text-sm">{error}</div>
+            <div className="flex items-center justify-center h-full text-gray-500 text-sm">{error}</div>
           ) : threadLoading ? (
             <div className="flex items-center justify-center h-full text-gray-400 text-sm">Loading messages…</div>
           ) : (

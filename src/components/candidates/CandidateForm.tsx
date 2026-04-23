@@ -62,7 +62,7 @@ export default function CandidateForm({ candidate, onSuccess, onCancel }: Props)
     }
   }
 
-  const inputClass = 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500';
+  const inputClass = 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500';
   const labelClass = 'block text-sm font-medium text-gray-700 mb-1';
 
   return (
@@ -112,14 +112,14 @@ export default function CandidateForm({ candidate, onSuccess, onCancel }: Props)
       </div>
 
       {error && (
-        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</p>
+        <p className="text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">{error}</p>
       )}
 
       <div className="flex gap-3 justify-end pt-2">
         <button type="button" onClick={onCancel} className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
           Cancel
         </button>
-        <button type="submit" disabled={isLoading} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+        <button type="submit" disabled={isLoading} className="px-4 py-2 text-sm bg-gray-900 text-white rounded-lg hover:bg-black disabled:opacity-50">
           {isLoading ? 'Saving...' : isEdit ? 'Update Candidate' : 'Add Candidate'}
         </button>
       </div>

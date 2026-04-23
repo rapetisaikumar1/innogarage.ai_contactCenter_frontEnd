@@ -56,7 +56,7 @@ export default function LogCallForm({ candidateId, phoneNumber, onSuccess, onCan
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
+      {error && <p className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">{error}</p>}
 
       {/* Direction */}
       <div>
@@ -69,7 +69,7 @@ export default function LogCallForm({ candidateId, phoneNumber, onSuccess, onCan
               onClick={() => setDirection(d)}
               className={`flex-1 py-2 text-sm rounded-lg border font-medium transition-colors ${
                 direction === d
-                  ? 'bg-blue-600 text-white border-blue-600'
+                  ? 'bg-gray-900 text-white border-gray-900'
                   : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
               }`}
             >
@@ -85,7 +85,7 @@ export default function LogCallForm({ candidateId, phoneNumber, onSuccess, onCan
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value as CallStatus)}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
         >
           {STATUSES.map((s) => (
             <option key={s.value} value={s.value}>{s.label}</option>
@@ -104,7 +104,7 @@ export default function LogCallForm({ candidateId, phoneNumber, onSuccess, onCan
               placeholder="0"
               value={durationMins}
               onChange={(e) => setDurationMins(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
             />
             <span className="text-xs text-gray-500 mt-0.5 block">Minutes</span>
           </div>
@@ -116,7 +116,7 @@ export default function LogCallForm({ candidateId, phoneNumber, onSuccess, onCan
               placeholder="0"
               value={durationSecs}
               onChange={(e) => setDurationSecs(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
             />
             <span className="text-xs text-gray-500 mt-0.5 block">Seconds</span>
           </div>
@@ -132,7 +132,7 @@ export default function LogCallForm({ candidateId, phoneNumber, onSuccess, onCan
           rows={3}
           maxLength={2000}
           placeholder="What was discussed?"
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 resize-none"
         />
       </div>
 
@@ -148,7 +148,7 @@ export default function LogCallForm({ candidateId, phoneNumber, onSuccess, onCan
         <button
           type="submit"
           disabled={submitting}
-          className="flex-1 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium"
+          className="flex-1 py-2 text-sm bg-gray-900 text-white rounded-lg hover:bg-black disabled:opacity-50 font-medium"
         >
           {submitting ? 'Saving…' : 'Log Call'}
         </button>
