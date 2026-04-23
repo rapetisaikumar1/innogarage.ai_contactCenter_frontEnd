@@ -108,6 +108,12 @@ export async function deleteCall(callId: string): Promise<void> {
   await api.delete<ApiResponse<{ deleted: boolean }>>(`/calls/${callId}`);
 }
 
+// ─── Initiate outbound call via Twilio Voice ──────────────────────────────────
+export async function initiateCall(candidateId: string): Promise<{ callSid: string }> {
+  const res = await api.post<ApiResponse<{ callSid: string }>>('/calls/initiate', { candidateId });
+  return res.data;
+}
+
 export function formatDuration(seconds: number | null): string {
   if (!seconds) return '—';
   const m = Math.floor(seconds / 60);

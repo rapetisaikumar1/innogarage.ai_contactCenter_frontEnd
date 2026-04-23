@@ -11,6 +11,7 @@ import CallsList from '@/components/calls/CallsList';
 import FollowUpCard from '@/components/follow-ups/FollowUpCard';
 import FollowUpForm from '@/components/follow-ups/FollowUpForm';
 import { useFollowUpsByCandidate } from '@/hooks/useFollowUps';
+import { initiateCall } from '@/hooks/useCalls';
 import { formatDate, formatDateTime, STATUS_LABELS } from '@/utils/formatters';
 import { CandidateStatus } from '@/types/candidate';
 import Link from 'next/link';
@@ -25,6 +26,25 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'notes' | 'files' | 'calls' | 'history'>('overview');
+  const [calling, setCalling] = useState(false);
+  const [callMessage, setCallMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  async function handleCall() {
+    if (!candidate) return;
+    setCalling(true);
+    setCallMessage(null);
+    try {
+      await initiateCall(candidate.id);
+      setCallMessage({ type: 'success', text: 'Call initiated! Check your phone.' });
+      setActiveTab('calls');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to initiate call';
+      setCallMessage({ type: 'error', text: msg });
+    } finally {
+      setCalling(false);
+      setTimeout(() => setCallMessage(null), 5000);
+    }
+  }
 
   async function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
     if (!candidate) return;
@@ -79,6 +99,17 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
               WhatsApp
             </Link>
             <button
+              onClick={handleCall}
+              disabled={calling}
+              className="px-3 py-1.5 text-sm border border-blue-300 text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              {calling ? 'Calling...' : 'Call'}
+            </button>
+            <button
               onClick={() => setShowEdit(true)}
               className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
             >
@@ -86,6 +117,13 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
             </button>
           </div>
         </div>
+
+        {/* Call feedback toast */}
+        {callMessage && (
+          <div className={`mt-3 px-4 py-2 rounded-lg text-sm ${callMessage.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+            {callMessage.text}
+          </div>
+        )}
 
         {/* Key info row */}
         <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-100 text-sm">
