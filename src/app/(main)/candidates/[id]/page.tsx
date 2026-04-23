@@ -11,7 +11,7 @@ import CallsList from '@/components/calls/CallsList';
 import FollowUpCard from '@/components/follow-ups/FollowUpCard';
 import FollowUpForm from '@/components/follow-ups/FollowUpForm';
 import { useFollowUpsByCandidate } from '@/hooks/useFollowUps';
-import { initiateCall } from '@/hooks/useCalls';
+import { useSoftphone } from '@/hooks/useSoftphone';
 import { formatDate, formatDateTime, STATUS_LABELS } from '@/utils/formatters';
 import { CandidateStatus } from '@/types/candidate';
 import Link from 'next/link';
@@ -28,17 +28,34 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
   const [activeTab, setActiveTab] = useState<'overview' | 'notes' | 'files' | 'calls' | 'history'>('overview');
   const [calling, setCalling] = useState(false);
   const [callMessage, setCallMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const softphone = useSoftphone();
 
   async function handleCall() {
     if (!candidate) return;
+    const to = candidate.phoneNumber || candidate.whatsappNumber;
+    if (!to) {
+      setCallMessage({ type: 'error', text: 'Candidate has no phone number' });
+      setTimeout(() => setCallMessage(null), 5000);
+      return;
+    }
+    if (softphone.status !== 'ready') {
+      setCallMessage({
+        type: 'error',
+        text: softphone.status === 'initializing'
+          ? 'Softphone is still connecting — please try again in a moment.'
+          : 'Softphone is not ready. Check microphone permissions and reload.',
+      });
+      setTimeout(() => setCallMessage(null), 5000);
+      return;
+    }
     setCalling(true);
     setCallMessage(null);
     try {
-      await initiateCall(candidate.id);
-      setCallMessage({ type: 'success', text: 'Call initiated! Check your phone.' });
+      await softphone.startCall(to, { candidateId: candidate.id });
+      setCallMessage({ type: 'success', text: 'Calling — speak through your browser microphone.' });
       setActiveTab('calls');
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to initiate call';
+      const msg = err instanceof Error ? err.message : 'Failed to start call';
       setCallMessage({ type: 'error', text: msg });
     } finally {
       setCalling(false);
