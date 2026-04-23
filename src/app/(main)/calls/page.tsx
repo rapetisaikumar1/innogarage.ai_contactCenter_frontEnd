@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useCalls, CallDirection, CallStatus, formatDuration } from '@/hooks/useCalls';
 import { formatDateTime } from '@/utils/formatters';
@@ -19,11 +20,23 @@ const STATUS_OPTIONS: { label: string; value: CallStatus | '' }[] = [
   { label: 'In Progress', value: 'IN_PROGRESS' },
 ];
 
-const STATUS_STYLES: Record<CallStatus, string> = {
-  COMPLETED: 'bg-green-100 text-green-700',
-  MISSED: 'bg-red-100 text-red-700',
-  FAILED: 'bg-orange-100 text-orange-700',
-  IN_PROGRESS: 'bg-blue-100 text-blue-700',
+const STATUS_STYLES: Record<CallStatus, { cls: string; icon: React.ReactNode }> = {
+  COMPLETED: {
+    cls: 'bg-green-100 text-green-700',
+    icon: <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>,
+  },
+  MISSED: {
+    cls: 'bg-red-100 text-red-700',
+    icon: <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>,
+  },
+  FAILED: {
+    cls: 'bg-orange-100 text-orange-700',
+    icon: <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>,
+  },
+  IN_PROGRESS: {
+    cls: 'bg-blue-100 text-blue-700',
+    icon: <svg className="w-3 h-3 animate-pulse" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" /></svg>,
+  },
 };
 
 export default function CallsPage() {
@@ -41,9 +54,9 @@ export default function CallsPage() {
     <div className="space-y-5 max-w-5xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-gray-800">Call Logs</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Call Logs</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            {data ? `${data.pagination.total} total calls` : 'Loading…'}
+            {data ? `${data.pagination.total} total calls recorded` : 'Loading…'}
           </p>
         </div>
         <button
@@ -107,41 +120,61 @@ export default function CallsPage() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Candidate</th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Direction</th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Status</th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Duration</th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Logged By</th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Date</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Candidate</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Direction</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Duration</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Logged By</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Date &amp; Time</th>
+                  <th className="px-6 py-3" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {data.calls.map((call) => (
-                  <tr key={call.id} className="hover:bg-gray-50">
+                  <tr key={call.id} className="hover:bg-gray-50 group">
                     <td className="px-6 py-4">
                       <Link
                         href={`/candidates/${call.candidateId}`}
-                        className="font-medium text-blue-600 hover:underline"
+                        className="font-medium text-blue-600 hover:underline text-sm"
                       >
                         {call.candidate.fullName}
                       </Link>
                       <p className="text-xs text-gray-400">{call.phoneNumber}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1 text-xs font-medium ${
-                        call.direction === 'OUTBOUND' ? 'text-blue-600' : 'text-gray-600'
+                      <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${
+                        call.direction === 'OUTBOUND' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-600'
                       }`}>
-                        {call.direction === 'OUTBOUND' ? '↗' : '↙'} {call.direction.toLowerCase()}
+                        {call.direction === 'OUTBOUND'
+                          ? <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" /></svg>
+                          : <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" /></svg>
+                        }
+                        {call.direction.charAt(0) + call.direction.slice(1).toLowerCase()}
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[call.status]}`}>
+                      <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[call.status].cls}`}>
+                        {STATUS_STYLES[call.status].icon}
                         {call.status.replace('_', ' ')}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-600">{formatDuration(call.duration)}</td>
-                    <td className="px-6 py-4 text-gray-500">{call.loggedBy.name}</td>
-                    <td className="px-6 py-4 text-gray-500">{formatDateTime(call.createdAt)}</td>
+                    <td className="px-6 py-4">
+                      <span className="text-xs font-mono font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded">
+                        {formatDuration(call.duration)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                        <svg className="w-3.5 h-3.5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                        {call.loggedBy.name}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{formatDateTime(call.createdAt)}</td>
+                    <td className="px-6 py-4 text-right">
+                      <Link href={`/candidates/${call.candidateId}`} className="inline-flex p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" /></svg>
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>

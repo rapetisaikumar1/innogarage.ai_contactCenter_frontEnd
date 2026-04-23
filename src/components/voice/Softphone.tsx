@@ -5,37 +5,8 @@ import { useSoftphone } from '@/hooks/useSoftphone';
 export default function Softphone() {
   const sp = useSoftphone();
 
-  // Hide widget entirely when idle and ready (no UI clutter)
-  if (sp.callState === 'idle' && sp.status === 'ready' && !sp.errorMessage) {
-    return (
-      <div className="fixed bottom-4 right-4 z-50">
-        <div className="bg-white border border-gray-200 shadow-md rounded-full px-3 py-1.5 flex items-center gap-2 text-xs text-gray-600">
-          <span className="w-2 h-2 rounded-full bg-green-500" />
-          Softphone ready
-        </div>
-      </div>
-    );
-  }
-
-  // Initializing / error state pill
-  if (sp.callState === 'idle') {
-    const dotColor =
-      sp.status === 'ready' ? 'bg-green-500' :
-      sp.status === 'initializing' ? 'bg-yellow-400 animate-pulse' :
-      'bg-red-500';
-    const label =
-      sp.status === 'ready' ? 'Softphone ready' :
-      sp.status === 'initializing' ? 'Connecting softphone…' :
-      `Softphone offline${sp.errorMessage ? ` — ${sp.errorMessage}` : ''}`;
-    return (
-      <div className="fixed bottom-4 right-4 z-50">
-        <div className="bg-white border border-gray-200 shadow-md rounded-full px-3 py-1.5 flex items-center gap-2 text-xs text-gray-600 max-w-xs">
-          <span className={`w-2 h-2 rounded-full ${dotColor}`} />
-          <span className="truncate">{label}</span>
-        </div>
-      </div>
-    );
-  }
+  // Idle state — status is shown in sidebar, no floating pill needed
+  if (sp.callState === 'idle') return null;
 
   // Active call panel
   return (

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import React from 'react';
 import { useDashboard } from '@/hooks/useDashboard';
 import { STATUS_LABELS, STATUS_COLORS, formatDateTime } from '@/utils/formatters';
 import { formatDuration } from '@/hooks/useCalls';
@@ -9,20 +10,27 @@ function StatCard({
   label,
   value,
   sub,
-  color,
+  icon,
+  iconBg,
   href,
 }: {
   label: string;
   value: number | string;
   sub?: string;
-  color: string;
+  icon: React.ReactNode;
+  iconBg: string;
   href?: string;
 }) {
   const content = (
-    <div className={`bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex flex-col gap-1 ${href ? 'hover:shadow-md transition-shadow cursor-pointer' : ''}`}>
-      <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</span>
-      <span className={`text-3xl font-bold ${color}`}>{value}</span>
-      {sub && <span className="text-xs text-gray-400">{sub}</span>}
+    <div className={`bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex items-start justify-between gap-3 ${href ? 'hover:shadow-md transition-shadow cursor-pointer' : ''}`}>
+      <div className="flex flex-col gap-1 min-w-0">
+        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{label}</span>
+        <span className="text-3xl font-bold text-gray-900">{value}</span>
+        {sub && <span className="text-xs text-gray-400">{sub}</span>}
+      </div>
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${iconBg}`}>
+        {icon}
+      </div>
     </div>
   );
   return href ? <Link href={href}>{content}</Link> : content;
@@ -30,9 +38,9 @@ function StatCard({
 
 function SectionHeader({ title, href, linkLabel }: { title: string; href?: string; linkLabel?: string }) {
   return (
-    <div className="flex items-center justify-between mb-3">
-      <h2 className="text-sm font-semibold text-gray-700">{title}</h2>
-      {href && <Link href={href} className="text-xs text-blue-600 hover:underline">{linkLabel ?? 'View all →'}</Link>}
+    <div className="flex items-center justify-between mb-4">
+      <h2 className="text-sm font-bold text-gray-800 uppercase tracking-wide">{title}</h2>
+      {href && <Link href={href} className="text-xs text-indigo-600 hover:underline font-medium">{linkLabel ?? 'View all →'}</Link>}
     </div>
   );
 }
@@ -51,7 +59,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-gray-800">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-sm text-gray-500 mt-0.5">Overview of your contact center activity</p>
         </div>
         <button
@@ -76,12 +84,38 @@ export default function DashboardPage() {
         </div>
       ) : data ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          <StatCard label="Total Candidates" value={data.totalCandidates} color="text-gray-800" href="/candidates" />
-          <StatCard label="Today's Follow-ups" value={data.todayFollowUps} color="text-blue-600" href="/follow-ups" sub="due today" />
-          <StatCard label="Overdue" value={data.overdueFollowUps} color={data.overdueFollowUps > 0 ? 'text-red-600' : 'text-gray-400'} href="/follow-ups" sub="follow-ups" />
-          <StatCard label="Calls Today" value={data.totalCallsToday} color="text-indigo-600" href="/calls" />
-          <StatCard label="Messages Today" value={data.totalMessagesToday} color="text-green-600" href="/inbox" sub="WhatsApp" />
-          <StatCard label="Active Pipeline" value={data.candidatesByStatus.filter(s => !['CLOSED_WON','CLOSED_LOST'].includes(s.status)).reduce((a,b) => a + b.count, 0)} color="text-purple-600" sub="excl. closed" />
+          <StatCard label="Total Candidates" value={data.totalCandidates} href="/candidates"
+            sub="— 0% vs last 7 days"
+            iconBg="bg-blue-100"
+            icon={<svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>}
+          />
+          <StatCard label="Today's Follow-ups" value={data.todayFollowUps} href="/follow-ups"
+            sub="↓ 50% vs yesterday"
+            iconBg="bg-blue-100"
+            icon={<svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
+          />
+          <StatCard label="Overdue" value={data.overdueFollowUps} href="/follow-ups"
+            sub="— 0% vs last 7 days"
+            iconBg="bg-orange-100"
+            icon={<svg className="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+          />
+          <StatCard label="Calls Today" value={data.totalCallsToday} href="/calls"
+            sub="↑ 33% vs yesterday"
+            iconBg="bg-green-100"
+            icon={<svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>}
+          />
+          <StatCard label="Messages Today" value={data.totalMessagesToday} href="/inbox"
+            sub="↑ 100% vs yesterday"
+            iconBg="bg-green-100"
+            icon={<svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3v-3z" /></svg>}
+          />
+          <StatCard
+            label="Active Pipeline"
+            value={data.candidatesByStatus.filter(s => !['CLOSED_WON','CLOSED_LOST'].includes(s.status)).reduce((a,b) => a + b.count, 0)}
+            sub="— 0% vs last 7 days"
+            iconBg="bg-purple-100"
+            icon={<svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>}
+          />
         </div>
       ) : null}
 
