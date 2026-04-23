@@ -110,7 +110,7 @@ export default function DashboardPage() {
       )}
 
       {/* ── KPI row ───────────────────────────────────────────────────────── */}
-      <div className="flex-shrink-0 px-5 pt-4 pb-0 grid grid-cols-6 gap-3" style={{ height: 80 }}>
+      <div className="flex-shrink-0 px-5 py-3 grid grid-cols-6 gap-3">
         {isLoading ? (
           Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="bg-white rounded-xl border border-slate-200 animate-pulse" />
@@ -140,10 +140,10 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Content grid ──────────────────────────────────────────────────── */}
-      <div className="flex-1 min-h-0 px-5 pt-4 pb-5 grid grid-cols-2 gap-4">
+      <div className="flex-1 min-h-0 px-5 pt-2 pb-4 flex gap-4">
 
         {/* Left column */}
-        <div className="flex flex-col gap-4 min-h-0">
+        <div className="flex-1 flex flex-col gap-3 min-h-0">
 
           {/* Candidates by status */}
           <Panel title="Candidates by Status" viewHref="/candidates" className="flex-1 min-h-0">
@@ -200,7 +200,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Right column */}
-        <div className="flex flex-col gap-4 min-h-0">
+        <div className="flex-1 flex flex-col gap-3 min-h-0">
 
           {/* Recent messages */}
           <Panel title="Recent WhatsApp Messages" viewHref="/inbox" className="flex-1 min-h-0">
