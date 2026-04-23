@@ -44,22 +44,22 @@ export default function SettingsPage() {
   return (
     <div>
       {/* Page header */}
-      <div className="px-8 pt-8 pb-6 border-b border-gray-200 bg-white">
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Settings</h1>
-        <p className="text-sm text-gray-500 mt-1">Manage your account and team settings</p>
+      <div className="px-8 pt-8 pb-6 border-b border-slate-200 bg-white">
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Settings</h1>
+        <p className="text-sm text-slate-500 mt-1">Manage your account and team settings</p>
       </div>
 
       <div className="p-8">
         {/* Tab navigation */}
-        <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-xl p-1 shadow-sm w-fit mb-7">
+        <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 shadow-sm w-fit mb-7">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                 activeTab === tab.id
-                  ? 'bg-gray-900 text-white shadow-sm'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-indigo-600 text-white shadow-sm'
+                  : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
               {tab.icon}
@@ -69,7 +69,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Tab content */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="p-7">
             {activeTab === 'profile' && <ProfileTab />}
             {activeTab === 'password' && <PasswordTab />}

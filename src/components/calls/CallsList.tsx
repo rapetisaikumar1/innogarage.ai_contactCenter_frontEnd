@@ -20,13 +20,13 @@ export default function CallsList({ candidateId, phoneNumber }: Props) {
         <span className="text-xs text-gray-500">{calls.length} call{calls.length !== 1 ? 's' : ''} logged</span>
         <button
           onClick={() => setShowForm(true)}
-          className="text-xs px-3 py-1.5 bg-gray-900 text-white rounded-lg hover:bg-black"
+          className="text-xs px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
           + Log Call
         </button>
       </div>
 
-      {error && <p className="text-sm text-gray-500 mb-3">{error}</p>}
+      {error && <p className="text-sm text-red-500 mb-3">{error}</p>}
 
       {isLoading ? (
         <div className="space-y-3">

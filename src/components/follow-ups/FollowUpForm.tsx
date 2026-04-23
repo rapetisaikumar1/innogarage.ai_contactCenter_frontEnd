@@ -44,14 +44,14 @@ export default function FollowUpForm({ candidateId, onSuccess, onCancel }: Props
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Due Date &amp; Time <span className="text-gray-500">*</span>
+          Due Date &amp; Time <span className="text-red-500">*</span>
         </label>
         <input
           type="datetime-local"
           value={dueAt}
           min={nowLocal}
           onChange={(e) => setDueAt(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
       <div>
@@ -61,10 +61,10 @@ export default function FollowUpForm({ candidateId, onSuccess, onCancel }: Props
           onChange={(e) => setRemarks(e.target.value)}
           rows={2}
           placeholder="Optional notes about this follow-up..."
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 resize-none"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
         />
       </div>
-      {error && <p className="text-sm text-gray-600">{error}</p>}
+      {error && <p className="text-sm text-red-600">{error}</p>}
       <div className="flex justify-end gap-2 pt-1">
         <button
           type="button"
@@ -76,7 +76,7 @@ export default function FollowUpForm({ candidateId, onSuccess, onCancel }: Props
         <button
           type="submit"
           disabled={submitting}
-          className="px-4 py-2 text-sm bg-gray-900 text-white rounded-lg hover:bg-black disabled:opacity-50"
+          className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
         >
           {submitting ? 'Scheduling...' : 'Schedule Follow-up'}
         </button>

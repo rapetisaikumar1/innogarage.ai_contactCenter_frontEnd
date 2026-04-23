@@ -39,7 +39,7 @@ export default function MessageInput({ onSend, disabled }: Props) {
   return (
     <div className="border-t border-gray-200 bg-white px-4 py-3">
       {error && (
-        <p className="text-xs text-gray-500 mb-2">{error}</p>
+        <p className="text-xs text-red-500 mb-2">{error}</p>
       )}
       <div className="flex items-end gap-2">
         <textarea
@@ -51,12 +51,12 @@ export default function MessageInput({ onSend, disabled }: Props) {
           disabled={disabled || sending}
           rows={2}
           maxLength={1600}
-          className="flex-1 resize-none rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-60 disabled:bg-gray-50"
+          className="flex-1 resize-none rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60 disabled:bg-gray-50"
         />
         <button
           onClick={handleSend}
           disabled={!text.trim() || sending || disabled}
-          className="flex-shrink-0 bg-gray-500 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl px-4 py-2.5 text-sm font-medium transition-colors"
+          className="flex-shrink-0 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl px-4 py-2.5 text-sm font-medium transition-colors"
         >
           {sending ? (
             <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">

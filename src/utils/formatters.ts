@@ -10,14 +10,14 @@ export const STATUS_LABELS: Record<string, string> = {
 };
 
 export const STATUS_COLORS: Record<string, string> = {
-  NEW: 'bg-gray-100 text-gray-700 ring-1 ring-inset ring-gray-200',
-  CONTACTED: 'bg-gray-100 text-gray-700 ring-1 ring-inset ring-gray-200',
-  INTERESTED: 'bg-gray-200 text-gray-800 ring-1 ring-inset ring-gray-300',
-  DOCUMENTS_PENDING: 'bg-white text-gray-700 ring-1 ring-inset ring-gray-300',
-  INTERVIEW_SCHEDULED: 'bg-gray-900 text-white ring-1 ring-inset ring-gray-900',
-  FOLLOW_UP_REQUIRED: 'bg-white text-gray-900 ring-1 ring-inset ring-gray-400',
-  CLOSED_WON: 'bg-gray-900 text-white ring-1 ring-inset ring-gray-900',
-  CLOSED_LOST: 'bg-gray-100 text-gray-500 ring-1 ring-inset ring-gray-200 line-through decoration-gray-400',
+  NEW: 'bg-gray-100 text-gray-700',
+  CONTACTED: 'bg-blue-100 text-blue-700',
+  INTERESTED: 'bg-yellow-100 text-yellow-700',
+  DOCUMENTS_PENDING: 'bg-orange-100 text-orange-700',
+  INTERVIEW_SCHEDULED: 'bg-purple-100 text-purple-700',
+  FOLLOW_UP_REQUIRED: 'bg-pink-100 text-pink-700',
+  CLOSED_WON: 'bg-green-100 text-green-700',
+  CLOSED_LOST: 'bg-red-100 text-red-700',
 };
 
 export function formatDate(dateStr: string): string {
