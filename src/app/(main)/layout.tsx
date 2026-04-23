@@ -122,10 +122,10 @@ export default function MainLayout({ children }: { children: ReactNode }) {
 
   return (
     <SoftphoneProvider>
-      <div className="min-h-screen flex bg-gray-50">
-        {/* Sidebar */}
-        <aside className="w-60 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
-          {/* Logo */}
+      <div className="h-screen flex overflow-hidden bg-gray-50">
+        {/* Sidebar — fixed height, sticky, does not scroll with content */}
+        <aside className="w-60 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 h-screen sticky top-0">
+          {/* Logo */
           <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center flex-shrink-0">
@@ -162,8 +162,8 @@ export default function MainLayout({ children }: { children: ReactNode }) {
           <SidebarBottom user={user} />
         </aside>
 
-        {/* Main content */}
-        <main className="flex-1 p-6 overflow-auto min-h-screen">{children}</main>
+        {/* Main content — scrolls independently */}
+        <main className="flex-1 p-6 overflow-y-auto">{children}</main>
 
         {/* Active call panel only — idle status moved to sidebar */}
         <Softphone />

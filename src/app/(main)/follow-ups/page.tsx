@@ -35,7 +35,7 @@ export default function FollowUpsPage() {
   const pagination = data?.pagination;
 
   return (
-    <div className="space-y-4 max-w-3xl">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Follow-ups</h1>

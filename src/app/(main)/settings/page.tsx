@@ -17,7 +17,7 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<Tab>('profile');
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="max-w-4xl space-y-6">
       <div>
         <h1 className="text-xl font-semibold text-gray-800">Settings</h1>
         <p className="text-sm text-gray-500 mt-0.5">Manage your account and team</p>

@@ -82,7 +82,7 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
   const assignedTo = candidate.assignments[0]?.user;
 
   return (
-    <div className="space-y-4 max-w-4xl">
+    <div className="space-y-4">
       {/* Back link */}
       <Link href="/candidates" className="text-sm text-blue-600 hover:underline">← Back to Candidates</Link>
 
