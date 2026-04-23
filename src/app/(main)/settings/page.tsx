@@ -70,11 +70,9 @@ export default function SettingsPage() {
 
         {/* Tab content */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-7">
-            {activeTab === 'profile' && <ProfileTab />}
-            {activeTab === 'password' && <PasswordTab />}
-            {activeTab === 'team' && <TeamTab />}
-          </div>
+          {activeTab === 'profile' && <ProfileTab />}
+          {activeTab === 'password' && <PasswordTab />}
+          {activeTab === 'team' && <TeamTab />}
         </div>
       </div>
     </div>
