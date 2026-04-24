@@ -111,11 +111,17 @@ export function useNotifications() {
         if (prev.some((n) => n.id === notification.id)) return prev;
         return [notification, ...prev];
       });
-      // Only play sound/alert for live notifications (not on initial page load)
       if (initialLoadDoneRef.current) {
         playNotificationSound();
         showBrowserNotification(notification.title, notification.body);
       }
+    },
+    // Fired when agent opens a conversation — marks those notifications read
+    'notifications:cleared': (data) => {
+      const { conversationId } = data as { conversationId: string };
+      setNotifications((prev) =>
+        prev.map((n) => n.conversationId === conversationId ? { ...n, isRead: true } : n)
+      );
     },
   });
 

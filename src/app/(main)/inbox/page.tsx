@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
-import { useInbox, useThread, sendWhatsAppMessage, assignConversationToSelf, ConversationSummary } from '@/hooks/useWhatsApp';
+import { useInbox, useThread, sendWhatsAppMessage, assignConversationToSelf, markConversationRead, ConversationSummary } from '@/hooks/useWhatsApp';
 import { useSocket } from '@/hooks/useSocket';
 import ConversationList from '@/components/whatsapp/ConversationList';
 import MessageThread from '@/components/whatsapp/MessageThread';
@@ -15,7 +15,6 @@ export default function InboxPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'MANAGER';
 
-  // For agents: unassigned + mine. For admins: all + by-status tabs.
   const [tab, setTab] = useState<TabKey>(isAdmin ? 'all' : 'unassigned');
 
   // Map tab to status filter sent to backend
@@ -28,14 +27,31 @@ export default function InboxPage() {
 
   const { data: threadData, isLoading: threadLoading, error: threadError, refetch: refetchThread, bottomRef } = useThread(selectedId ?? '');
 
-  // ── Filter list by tab (client-side for 'mine') + search ─────────────────
+  // ── Filter list: for 'unassigned' tab also hide any item that got assigned locally ─
   const filteredConversations = inbox.filter((c) => {
+    if (tab === 'unassigned' && c.status !== 'UNASSIGNED') return false;
     if (tab === 'mine' && (c.assignedAgentId !== user?.id || c.status !== 'ASSIGNED')) return false;
+    if (tab === 'assigned' && c.status !== 'ASSIGNED') return false;
+    if (tab === 'closed' && c.status !== 'CLOSED') return false;
     if (search && !c.candidateName?.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
 
   const conversation = inbox.find((c) => c.candidateId === selectedId);
+
+  // ── Select a conversation: mark its notifications read ───────────────────
+  function handleSelect(candidateId: string) {
+    setSelectedId(candidateId);
+    const conv = inbox.find((c) => c.candidateId === candidateId);
+    if (conv && conv.unreadCount > 0) {
+      // Clear badge locally immediately
+      setInbox((prev) =>
+        prev.map((c) => c.candidateId === candidateId ? { ...c, unreadCount: 0 } : c)
+      );
+      // Mark read on backend (also triggers notifications:cleared socket to bell)
+      markConversationRead(conv.conversationId);
+    }
+  }
 
   // ── Socket: live inbox updates ────────────────────────────────────────────
   const handleSocketUpdate = useCallback((data: unknown) => {
@@ -43,29 +59,17 @@ export default function InboxPage() {
     if (!payload.conversationId) return;
     setInbox((prev) =>
       prev.map((c) =>
-        c.conversationId === payload.conversationId
-          ? { ...c, ...payload }
-          : c
+        c.conversationId === payload.conversationId ? { ...c, ...payload } : c
       )
     );
   }, [setInbox]);
 
-  const handleNewUnassigned = useCallback(
-    (_data: unknown) => {
-      // New message came in — refresh inbox
-      refetch();
-    },
-    [refetch]
-  );
-
   const handleRemovedFromInbox = useCallback(
     (data: unknown) => {
       const payload = data as { conversationId: string };
-      // Remove from current user's view if they are an agent without the assignment
       if (!isAdmin) {
         setInbox((prev) => prev.filter((c) => c.conversationId !== payload.conversationId));
       } else {
-        // Admins just refresh
         refetch();
       }
     },
@@ -75,11 +79,36 @@ export default function InboxPage() {
   useSocket({
     'conversation:updated': handleSocketUpdate,
     'conversation:assigned': handleSocketUpdate,
-    'whatsapp:new_unassigned_message': handleNewUnassigned,
+    'whatsapp:new_unassigned_message': (_data) => {
+      // Bump unread count on the conversation item if it's not currently open
+      const payload = _data as { conversationId?: string };
+      const openConvId = inbox.find(c => c.candidateId === selectedId)?.conversationId;
+      if (payload.conversationId && payload.conversationId !== openConvId) {
+        setInbox((prev) =>
+          prev.map((c) =>
+            c.conversationId === payload.conversationId
+              ? { ...c, unreadCount: (c.unreadCount ?? 0) + 1 }
+              : c
+          )
+        );
+      }
+      refetch();
+    },
     'conversation:removed_from_inbox': handleRemovedFromInbox,
     'conversation:message_received': (_data) => {
-      // Refresh thread if open
       if (selectedId) refetchThread();
+      // Increment unread on the conversation if it's not currently open
+      const payload = _data as { conversationId?: string };
+      const openConvId = inbox.find(c => c.candidateId === selectedId)?.conversationId;
+      if (payload.conversationId && payload.conversationId !== openConvId) {
+        setInbox((prev) =>
+          prev.map((c) =>
+            c.conversationId === payload.conversationId
+              ? { ...c, unreadCount: (c.unreadCount ?? 0) + 1 }
+              : c
+          )
+        );
+      }
     },
   });
 
@@ -93,7 +122,6 @@ export default function InboxPage() {
     setAssigning(conversationId);
     try {
       await assignConversationToSelf(conversationId);
-      // Switch to 'mine' tab so the agent immediately sees their assigned conversation
       setTab('mine');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Already assigned';
@@ -199,7 +227,7 @@ export default function InboxPage() {
             <ConversationList
               conversations={filteredConversations}
               activeCandidateId={selectedId ?? undefined}
-              onSelect={setSelectedId}
+              onSelect={handleSelect}
               onAssign={handleAssign}
               assigningId={assigning}
               currentUserId={user?.id}

@@ -108,3 +108,8 @@ export async function sendWhatsAppMessage(
 export async function assignConversationToSelf(conversationId: string): Promise<void> {
   await api.post(`/whatsapp/conversations/${conversationId}/assign`, {});
 }
+
+// ─── Mark all notifications for a conversation as read ────────────────────────
+export async function markConversationRead(conversationId: string): Promise<void> {
+  await api.post(`/whatsapp/conversations/${conversationId}/read`, {}).catch(() => {});
+}
