@@ -7,6 +7,7 @@ import { SoftphoneProvider, useSoftphone } from '@/hooks/useSoftphone';
 import Softphone from '@/components/voice/Softphone';
 import NotificationBell from '@/components/layout/NotificationBell';
 import { User } from '@/types';
+import { useNotifications } from '@/hooks/useNotifications';
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
 const NAV_ITEMS = [
@@ -23,6 +24,39 @@ const AVAILABILITY_OPTIONS = [
   { value: 'away',      label: 'Away',      color: 'bg-slate-400'  },
   { value: 'offline',   label: 'Offline',   color: 'bg-red-500'    },
 ];
+
+// ─── Sidebar nav (needs unread count for WhatsApp badge) ─────────────────────
+function SidebarNav({ pathname }: { pathname: string }) {
+  const { unreadCount } = useNotifications();
+
+  return (
+    <nav className="flex-1 px-3 pt-4 space-y-0.5 overflow-y-auto pb-4">
+      {NAV_ITEMS.map((item) => {
+        const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+        const isInbox = item.href === '/inbox';
+        return (
+          <a
+            key={item.href}
+            href={item.href}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
+              isActive
+                ? 'bg-slate-100 text-slate-900 font-semibold'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+            }`}
+          >
+            <span className={isActive ? 'text-slate-900' : 'text-slate-400'}>{item.icon}</span>
+            <span className="flex-1">{item.label}</span>
+            {isInbox && unreadCount > 0 && (
+              <span className="min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </a>
+        );
+      })}
+    </nav>
+  );
+}
 
 // ─── Sidebar bottom: Agent + Softphone (inside SoftphoneProvider) ─────────────
 function SidebarBottom() {
@@ -238,25 +272,8 @@ export default function MainLayout({ children }: { children: ReactNode }) {
           </div>
 
           {/* Nav */}
-          <nav className="flex-1 px-3 pt-4 space-y-0.5 overflow-y-auto pb-4">
-            {NAV_ITEMS.map((item) => {
-              const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
-              return (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
-                    isActive
-                      ? 'bg-slate-100 text-slate-900 font-semibold'
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                  }`}
-                >
-                  <span className={isActive ? 'text-slate-900' : 'text-slate-400'}>{item.icon}</span>
-                  {item.label}
-                </a>
-              );
-            })}
-          </nav>
+          <SidebarNav pathname={pathname} />
+
 
           {/* Agent + Softphone */}
           <SidebarBottom />
