@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { ConversationSummary } from '@/hooks/useWhatsApp';
 
 function timeAgo(dateStr: string): string {
@@ -16,9 +15,10 @@ function timeAgo(dateStr: string): string {
 interface Props {
   conversations: ConversationSummary[];
   activeCandidateId?: string;
+  onSelect?: (candidateId: string) => void;
 }
 
-export default function ConversationList({ conversations, activeCandidateId }: Props) {
+export default function ConversationList({ conversations, activeCandidateId, onSelect }: Props) {
   if (conversations.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-gray-400 px-6 py-12">
@@ -37,14 +37,15 @@ export default function ConversationList({ conversations, activeCandidateId }: P
         const isActive = c.candidateId === activeCandidateId;
         return (
           <li key={c.candidateId}>
-            <Link
-              href={`/inbox/${c.candidateId}`}
-              className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors ${
-                isActive ? 'bg-blue-50 border-l-2 border-blue-500' : ''
+            <button
+              type="button"
+              onClick={() => onSelect?.(c.candidateId)}
+              className={`w-full text-left flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors ${
+                isActive ? 'bg-slate-100 border-l-2 border-slate-900' : ''
               }`}
             >
               {/* Avatar */}
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-white font-semibold text-sm">
                 {c.candidateName.charAt(0).toUpperCase()}
               </div>
 
@@ -56,7 +57,7 @@ export default function ConversationList({ conversations, activeCandidateId }: P
                 </div>
                 <div className="flex items-center gap-1 mt-0.5">
                   {c.lastDirection === 'OUTBOUND' && (
-                    <svg className="w-3 h-3 text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-3 h-3 text-slate-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
                   )}
@@ -69,11 +70,11 @@ export default function ConversationList({ conversations, activeCandidateId }: P
 
               {/* Unread badge */}
               {c.unreadCount > 0 && (
-                <span className="flex-shrink-0 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                <span className="flex-shrink-0 bg-slate-900 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
                   {c.unreadCount}
                 </span>
               )}
-            </Link>
+            </button>
           </li>
         );
       })}

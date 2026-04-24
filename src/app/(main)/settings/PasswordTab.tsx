@@ -92,7 +92,7 @@ export default function PasswordTab() {
         <button
           type="submit"
           disabled={saving}
-          className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+          className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-700 disabled:opacity-50 transition-colors"
         >
           {saving ? 'Saving...' : 'Change Password'}
         </button>

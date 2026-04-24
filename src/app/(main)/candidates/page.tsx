@@ -195,7 +195,7 @@ export default function CandidatesPage() {
                     <td className="px-6 py-4 text-right">
                       <Link
                         href={`/candidates/${c.id}`}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 rounded-lg hover:bg-slate-700 opacity-0 group-hover:opacity-100 transition-all"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 rounded-lg hover:bg-slate-700 transition-all"
                       >
                         View
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>

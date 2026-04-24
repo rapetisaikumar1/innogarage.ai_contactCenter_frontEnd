@@ -63,17 +63,6 @@ export default function FollowUpsPage() {
               </button>
             ))}
           </div>
-          <div className="w-px h-6 bg-slate-200" />
-          <button
-            onClick={handleOverdueToggle}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${
-              overdue
-                ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
-                : 'text-slate-600 border-slate-200 bg-white hover:bg-slate-50'
-            }`}
-          >
-            Overdue only
-          </button>
         </div>
 
         {/* Follow-up list card */}
@@ -107,9 +96,9 @@ export default function FollowUpsPage() {
                     {fu.candidate && (
                       <Link
                         href={`/candidates/${fu.candidate.id}`}
-                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 mb-1 inline-block transition-colors"
+                        className="text-sm font-semibold text-slate-900 hover:text-slate-700 mb-1 inline-block transition-colors"
                       >
-                        {fu.candidate.fullName} →
+                        {fu.candidate.fullName}
                       </Link>
                     )}
                     <FollowUpCard followUp={fu} onUpdated={refetch} showCandidate={false} />

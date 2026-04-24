@@ -3,10 +3,9 @@
 import { useState } from 'react';
 import React from 'react';
 import ProfileTab from './ProfileTab';
-import PasswordTab from './PasswordTab';
 import TeamTab from './TeamTab';
 
-type Tab = 'profile' | 'password' | 'team';
+type Tab = 'profile' | 'team';
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   {
@@ -15,15 +14,6 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-      </svg>
-    ),
-  },
-  {
-    id: 'password',
-    label: 'Change Password',
-    icon: (
-      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
       </svg>
     ),
   },
@@ -73,7 +63,6 @@ export default function SettingsPage() {
         {/* Tab content */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           {activeTab === 'profile' && <ProfileTab />}
-          {activeTab === 'password' && <PasswordTab />}
           {activeTab === 'team' && <TeamTab />}
         </div>
       </div>

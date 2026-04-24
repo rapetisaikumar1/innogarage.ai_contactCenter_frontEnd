@@ -3,11 +3,11 @@
 import { FollowUp, updateFollowUp, FollowUpStatus } from '@/hooks/useFollowUps';
 import { formatDateTime } from '@/utils/formatters';
 
-const STATUS_STYLES: Record<FollowUpStatus, { cls: string; dot: string; label: string }> = {
-  PENDING:     { cls: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',   dot: 'bg-amber-400',  label: 'Pending' },
-  COMPLETED:   { cls: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200', dot: 'bg-emerald-500', label: 'Completed' },
-  OVERDUE:     { cls: 'bg-red-50 text-red-700 ring-1 ring-red-200',         dot: 'bg-red-500',    label: 'Overdue' },
-  RESCHEDULED: { cls: 'bg-slate-100 text-slate-600 ring-1 ring-slate-200',  dot: 'bg-slate-400',  label: 'Rescheduled' },
+const STATUS_STYLES: Record<FollowUpStatus, { textCls: string; label: string }> = {
+  PENDING:     { textCls: 'text-amber-600 font-semibold',   label: 'Pending' },
+  COMPLETED:   { textCls: 'text-emerald-700 font-semibold', label: 'Completed' },
+  OVERDUE:     { textCls: 'text-red-600 font-semibold',     label: 'Overdue' },
+  RESCHEDULED: { textCls: 'text-slate-500 font-medium',     label: 'Rescheduled' },
 };
 
 interface Props {
@@ -35,10 +35,7 @@ export default function FollowUpCard({ followUp, onUpdated, showCandidate = fals
           <p className="text-sm font-semibold text-slate-800 truncate">{followUp.candidate.fullName}</p>
         )}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${style.cls}`}>
-            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${style.dot}`} />
-            {style.label}
-          </span>
+          <span className={`text-sm ${style.textCls}`}>{style.label}</span>
           <span className="text-xs text-slate-500">
             Due <span className="font-medium text-slate-700">{formatDateTime(followUp.dueAt)}</span>
           </span>
@@ -54,7 +51,7 @@ export default function FollowUpCard({ followUp, onUpdated, showCandidate = fals
       {(followUp.status === 'PENDING' || followUp.status === 'OVERDUE') && (
         <button
           onClick={handleComplete}
-          className="flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors"
+          className="flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-900 text-white hover:bg-slate-700 transition-colors"
         >
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />

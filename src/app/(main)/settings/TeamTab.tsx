@@ -74,7 +74,7 @@ function CreateUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
 
           <div className="flex gap-2 pt-1">
             <button type="submit" disabled={saving}
-              className="flex-1 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50">
+              className="flex-1 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-700 disabled:opacity-50">
               {saving ? 'Creating...' : 'Create User'}
             </button>
             <button type="button" onClick={onClose}
@@ -119,7 +119,7 @@ function UserRow({ user, onUpdated, isSelf }: { user: UserProfile; onUpdated: ()
     <tr className="hover:bg-gray-50">
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xs font-bold flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
             {user.name.charAt(0).toUpperCase()}
           </div>
           <div>
@@ -197,7 +197,7 @@ export default function TeamTab() {
         <h3 className="text-sm font-semibold text-gray-700">Team Members</h3>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white text-xs font-medium rounded-lg hover:bg-slate-700"
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import React from 'react';
 import Link from 'next/link';
 import { useCalls, CallDirection, CallStatus, formatDuration } from '@/hooks/useCalls';
 import { formatDateTime } from '@/utils/formatters';
@@ -19,25 +18,6 @@ const STATUS_OPTIONS: { label: string; value: CallStatus | '' }[] = [
   { label: 'Failed', value: 'FAILED' },
   { label: 'In Progress', value: 'IN_PROGRESS' },
 ];
-
-const STATUS_STYLES: Record<CallStatus, { cls: string; icon: React.ReactNode }> = {
-  COMPLETED: {
-    cls: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
-    icon: <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>,
-  },
-  MISSED: {
-    cls: 'bg-red-50 text-red-700 ring-1 ring-red-200',
-    icon: <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>,
-  },
-  FAILED: {
-    cls: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
-    icon: <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>,
-  },
-  IN_PROGRESS: {
-    cls: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
-    icon: <svg className="w-3 h-3 animate-pulse" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" /></svg>,
-  },
-};
 
 export default function CallsPage() {
   const [direction, setDirection] = useState<CallDirection | ''>('');
@@ -77,14 +57,14 @@ export default function CallsPage() {
           <select
             value={direction}
             onChange={(e) => { setDirection(e.target.value as CallDirection | ''); handleFilter(); }}
-            className="border border-slate-200 bg-white rounded-xl px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="border border-slate-200 bg-slate-900 text-white rounded-xl px-3 py-2 text-sm font-medium focus:outline-none transition cursor-pointer"
           >
             {DIRECTION_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
           <select
             value={status}
             onChange={(e) => { setStatus(e.target.value as CallStatus | ''); handleFilter(); }}
-            className="border border-slate-200 bg-white rounded-xl px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="border border-slate-200 bg-slate-900 text-white rounded-xl px-3 py-2 text-sm font-medium focus:outline-none transition cursor-pointer"
           >
             {STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
@@ -139,21 +119,17 @@ export default function CallsPage() {
                         <p className="text-xs text-slate-400 mt-0.5">{call.phoneNumber}</p>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border ${
-                          call.direction === 'OUTBOUND'
-                            ? 'border-slate-300 text-slate-700 bg-white'
-                            : 'border-slate-200 text-slate-600 bg-slate-50'
-                        }`}>
-                          {call.direction === 'OUTBOUND'
-                            ? <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 11l5-5m0 0l5 5m-5-5v12" /></svg>
-                            : <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 13l-5 5m0 0l-5-5m5 5V6" /></svg>
-                          }
-                          {call.direction.charAt(0) + call.direction.slice(1).toLowerCase()}
+                        <span className="text-sm text-slate-600">
+                          {call.direction === 'OUTBOUND' ? '↑ Outbound' : '↓ Inbound'}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLES[call.status].cls}`}>
-                          {STATUS_STYLES[call.status].icon}
+                        <span className={`text-sm font-medium ${
+                          call.status === 'MISSED' ? 'text-red-600' :
+                          call.status === 'FAILED' ? 'text-red-600' :
+                          call.status === 'COMPLETED' ? 'text-emerald-700' :
+                          'text-slate-600'
+                        }`}>
                           {call.status.replace('_', ' ')}
                         </span>
                       </td>
@@ -167,7 +143,7 @@ export default function CallsPage() {
                       <td className="px-6 py-4 text-right">
                         <Link
                           href={`/candidates/${call.candidateId}`}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 rounded-lg hover:bg-slate-700 opacity-0 group-hover:opacity-100 transition-all"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 rounded-lg hover:bg-slate-700 transition-all"
                         >
                           View
                           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
