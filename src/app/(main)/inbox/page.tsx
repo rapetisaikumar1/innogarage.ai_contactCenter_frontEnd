@@ -96,15 +96,22 @@ export default function InboxPage() {
     },
     'conversation:removed_from_inbox': handleRemovedFromInbox,
     'conversation:message_received': (_data) => {
-      if (selectedId) refetchThread();
-      // Increment unread only for INBOUND messages on conversations that are not currently open
       const payload = _data as { conversationId?: string; direction?: string };
       const openConvId = inbox.find(c => c.candidateId === selectedId)?.conversationId;
-      if (
+
+      if (selectedId) refetchThread();
+
+      if (payload.conversationId && payload.conversationId === openConvId) {
+        // New message arrived in the currently open chat — auto-mark as read so
+        // the badge stays at 0 while the agent is viewing it
+        const conv = inbox.find(c => c.conversationId === openConvId);
+        if (conv) markConversationRead(conv.conversationId);
+      } else if (
         payload.conversationId &&
         payload.conversationId !== openConvId &&
         payload.direction === 'INBOUND'
       ) {
+        // Inbound message on a conversation the agent is NOT viewing — increment badge
         setInbox((prev) =>
           prev.map((c) =>
             c.conversationId === payload.conversationId
@@ -112,6 +119,8 @@ export default function InboxPage() {
               : c
           )
         );
+        // Also refresh from server to stay in sync with DB count
+        refetch();
       }
     },
   });
