@@ -17,12 +17,17 @@ export interface Message {
 
 export interface ConversationSummary {
   candidateId: string;
+  conversationId: string;
   candidateName: string;
   whatsappNumber: string | null;
   lastMessage: string;
   lastMessageAt: string;
   lastDirection: 'INBOUND' | 'OUTBOUND';
   unreadCount: number;
+  status: 'UNASSIGNED' | 'ASSIGNED' | 'CLOSED';
+  assignedAgentId: string | null;
+  assignedAgentName: string | null;
+  isHighPriority: boolean;
 }
 
 interface ThreadResponse {
@@ -31,7 +36,7 @@ interface ThreadResponse {
 }
 
 // ─── Inbox hook ───────────────────────────────────────────────────────────────
-export function useInbox() {
+export function useInbox(statusFilter?: string) {
   const [inbox, setInbox] = useState<ConversationSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,18 +45,21 @@ export function useInbox() {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await api.get<ApiResponse<ConversationSummary[]>>('/whatsapp/inbox');
+      const url = statusFilter
+        ? `/whatsapp/inbox?status=${encodeURIComponent(statusFilter)}`
+        : '/whatsapp/inbox';
+      const res = await api.get<ApiResponse<ConversationSummary[]>>(url);
       setInbox(res.data);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load inbox');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [statusFilter]);
 
   useEffect(() => { fetchInbox(); }, [fetchInbox]);
 
-  return { inbox, isLoading, error, refetch: fetchInbox };
+  return { inbox, setInbox, isLoading, error, refetch: fetchInbox };
 }
 
 // ─── Thread hook (auto-scrolls to bottom on new messages) ────────────────────
@@ -94,4 +102,9 @@ export async function sendWhatsAppMessage(
 ): Promise<Message> {
   const res = await api.post<ApiResponse<Message>>('/whatsapp/send', { candidateId, message });
   return res.data;
+}
+
+// ─── Assign conversation to self ──────────────────────────────────────────────
+export async function assignConversationToSelf(conversationId: string): Promise<void> {
+  await api.post(`/whatsapp/conversations/${conversationId}/assign`, {});
 }

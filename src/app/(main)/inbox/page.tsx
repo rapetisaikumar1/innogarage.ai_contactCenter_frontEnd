@@ -1,33 +1,123 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
-import { useInbox, useThread, sendWhatsAppMessage } from '@/hooks/useWhatsApp';
+import { useAuth } from '@/hooks/useAuth';
+import { useInbox, useThread, sendWhatsAppMessage, assignConversationToSelf, ConversationSummary } from '@/hooks/useWhatsApp';
+import { useSocket } from '@/hooks/useSocket';
 import ConversationList from '@/components/whatsapp/ConversationList';
 import MessageThread from '@/components/whatsapp/MessageThread';
 import MessageInput from '@/components/whatsapp/MessageInput';
 
+type TabKey = 'unassigned' | 'mine' | 'closed' | 'all' | 'assigned';
+
 export default function InboxPage() {
-  const { inbox, isLoading, error, refetch } = useInbox();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'MANAGER';
+
+  // For agents: unassigned + mine. For admins: all + by-status tabs.
+  const [tab, setTab] = useState<TabKey>(isAdmin ? 'all' : 'unassigned');
+
+  // Map tab to status filter sent to backend
+  const statusFilter = tab === 'all' || tab === 'mine' ? undefined : tab.toUpperCase();
+  const { inbox, setInbox, isLoading, error, refetch } = useInbox(statusFilter);
+
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<'all' | 'unread'>('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [assigning, setAssigning] = useState<string | null>(null);
 
   const { data: threadData, isLoading: threadLoading, error: threadError, refetch: refetchThread, bottomRef } = useThread(selectedId ?? '');
 
-  const filtered = inbox.filter((c) => {
+  // ── Filter list by tab (client-side for 'mine') + search ─────────────────
+  const filteredConversations = inbox.filter((c) => {
+    if (tab === 'mine' && (c.assignedAgentId !== user?.id || c.status !== 'ASSIGNED')) return false;
     if (search && !c.candidateName?.toLowerCase().includes(search.toLowerCase())) return false;
-    if (filter === 'unread' && !c.unreadCount) return false;
     return true;
   });
 
   const conversation = inbox.find((c) => c.candidateId === selectedId);
+
+  // ── Socket: live inbox updates ────────────────────────────────────────────
+  const handleSocketUpdate = useCallback((data: unknown) => {
+    const payload = data as Partial<ConversationSummary> & { conversationId?: string };
+    if (!payload.conversationId) return;
+    setInbox((prev) =>
+      prev.map((c) =>
+        c.conversationId === payload.conversationId
+          ? { ...c, ...payload }
+          : c
+      )
+    );
+  }, [setInbox]);
+
+  const handleNewUnassigned = useCallback(
+    (_data: unknown) => {
+      // New message came in — refresh inbox
+      refetch();
+    },
+    [refetch]
+  );
+
+  const handleRemovedFromInbox = useCallback(
+    (data: unknown) => {
+      const payload = data as { conversationId: string };
+      // Remove from current user's view if they are an agent without the assignment
+      if (!isAdmin) {
+        setInbox((prev) => prev.filter((c) => c.conversationId !== payload.conversationId));
+      } else {
+        // Admins just refresh
+        refetch();
+      }
+    },
+    [isAdmin, setInbox, refetch]
+  );
+
+  useSocket({
+    'conversation:updated': handleSocketUpdate,
+    'conversation:assigned': handleSocketUpdate,
+    'whatsapp:new_unassigned_message': handleNewUnassigned,
+    'conversation:removed_from_inbox': handleRemovedFromInbox,
+    'conversation:message_received': (_data) => {
+      // Refresh thread if open
+      if (selectedId) refetchThread();
+    },
+  });
 
   async function handleSend(text: string) {
     if (!selectedId) return;
     await sendWhatsAppMessage(selectedId, text);
     await Promise.all([refetchThread(), refetch()]);
   }
+
+  async function handleAssign(conversationId: string) {
+    setAssigning(conversationId);
+    try {
+      await assignConversationToSelf(conversationId);
+      await refetch();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Already assigned';
+      alert(msg);
+    } finally {
+      setAssigning(null);
+    }
+  }
+
+  // ── Tab definitions ───────────────────────────────────────────────────────
+  const agentTabs: { key: TabKey; label: string }[] = [
+    { key: 'unassigned', label: 'Unassigned' },
+    { key: 'mine', label: 'My Conversations' },
+    { key: 'closed', label: 'Closed' },
+  ];
+  const adminTabs: { key: TabKey; label: string }[] = [
+    { key: 'all', label: 'All' },
+    { key: 'unassigned', label: 'Unassigned' },
+    { key: 'assigned', label: 'Assigned' },
+    { key: 'closed', label: 'Closed' },
+  ];
+  const tabs = isAdmin ? adminTabs : agentTabs;
+
+  const isConversationAssignable =
+    conversation?.status === 'UNASSIGNED' && !isAdmin;
 
   return (
     <div className="flex h-full overflow-hidden">
@@ -49,6 +139,24 @@ export default function InboxPage() {
           </button>
         </div>
 
+        {/* Tabs */}
+        <div className="flex gap-1 px-3 py-2 border-b border-slate-100 flex-shrink-0 overflow-x-auto">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => { setTab(t.key); setSelectedId(null); }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+                tab === t.key ? 'bg-slate-900 text-white' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+          <span className="ml-auto text-xs text-slate-400 self-center whitespace-nowrap">
+            {isLoading ? '…' : `${filteredConversations.length}`}
+          </span>
+        </div>
+
         {/* Search */}
         <div className="px-4 py-3 border-b border-slate-100 flex-shrink-0">
           <div className="relative">
@@ -63,24 +171,6 @@ export default function InboxPage() {
               className="w-full pl-9 pr-3 py-2 text-sm bg-slate-100 border-0 rounded-lg placeholder-slate-400 text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-300 transition"
             />
           </div>
-        </div>
-
-        {/* All / Unread filter */}
-        <div className="flex items-center gap-1 px-4 py-2 border-b border-slate-100 flex-shrink-0">
-          {(['all', 'unread'] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                filter === f ? 'bg-slate-900 text-white' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
-              }`}
-            >
-              {f === 'all' ? 'All' : 'Unread'}
-            </button>
-          ))}
-          <span className="ml-auto text-xs text-slate-400">
-            {isLoading ? '…' : `${filtered.length} chat${filtered.length !== 1 ? 's' : ''}`}
-          </span>
         </div>
 
         {/* List */}
@@ -99,16 +189,20 @@ export default function InboxPage() {
                 </div>
               ))}
             </div>
-          ) : filtered.length === 0 ? (
+          ) : filteredConversations.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-slate-400">
               <p className="text-sm font-medium text-slate-500">No chats found</p>
               {search && <p className="text-xs text-slate-400 mt-1">Try a different search term</p>}
             </div>
           ) : (
             <ConversationList
-              conversations={filtered}
+              conversations={filteredConversations}
               activeCandidateId={selectedId ?? undefined}
               onSelect={setSelectedId}
+              onAssign={handleAssign}
+              assigningId={assigning}
+              currentUserId={user?.id}
+              isAdmin={isAdmin}
             />
           )}
         </div>
@@ -141,20 +235,55 @@ export default function InboxPage() {
                   <div className="w-9 h-9 rounded-full bg-slate-900 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
                     {(conversation?.candidateName ?? threadData?.messages[0]?.candidate.fullName ?? '?').charAt(0).toUpperCase()}
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-900 truncate">
-                      {conversation?.candidateName ?? threadData?.messages[0]?.candidate.fullName ?? 'Candidate'}
-                    </p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm font-semibold text-slate-900 truncate">
+                        {conversation?.candidateName ?? threadData?.messages[0]?.candidate.fullName ?? 'Candidate'}
+                      </p>
+                      {/* Status badges */}
+                      {conversation?.isHighPriority && (
+                        <span className="px-2 py-0.5 bg-red-100 text-red-600 text-[10px] font-bold rounded-full uppercase tracking-wide flex-shrink-0">
+                          High Priority
+                        </span>
+                      )}
+                      {conversation?.status === 'UNASSIGNED' && (
+                        <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full uppercase tracking-wide flex-shrink-0">
+                          Unassigned
+                        </span>
+                      )}
+                      {conversation?.status === 'ASSIGNED' && conversation.assignedAgentName && (
+                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-medium rounded-full flex-shrink-0">
+                          {conversation.assignedAgentName}
+                        </span>
+                      )}
+                      {conversation?.status === 'CLOSED' && (
+                        <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-full uppercase tracking-wide flex-shrink-0">
+                          Closed
+                        </span>
+                      )}
+                    </div>
                     {conversation?.whatsappNumber && (
                       <p className="text-xs text-slate-500">{conversation.whatsappNumber}</p>
                     )}
                   </div>
-                  <Link
-                    href={`/candidates/${selectedId}`}
-                    className="ml-auto text-xs font-medium text-slate-600 hover:text-slate-900 flex-shrink-0 border border-slate-200 px-2.5 py-1 rounded-lg hover:bg-slate-50 transition-colors"
-                  >
-                    View profile →
-                  </Link>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {/* Assign to me button — agents only on unassigned */}
+                    {isConversationAssignable && conversation && (
+                      <button
+                        onClick={() => handleAssign(conversation.conversationId)}
+                        disabled={assigning === conversation.conversationId}
+                        className="px-3 py-1.5 text-xs font-semibold bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-60 transition-colors"
+                      >
+                        {assigning === conversation.conversationId ? 'Assigning…' : 'Assign to me'}
+                      </button>
+                    )}
+                    <Link
+                      href={`/candidates/${selectedId}`}
+                      className="text-xs font-medium text-slate-600 hover:text-slate-900 border border-slate-200 px-2.5 py-1 rounded-lg hover:bg-slate-50 transition-colors"
+                    >
+                      View profile →
+                    </Link>
+                  </div>
                 </>
               )}
             </div>
@@ -170,8 +299,22 @@ export default function InboxPage() {
               )}
             </div>
 
-            {/* Input */}
-            <MessageInput onSend={handleSend} disabled={threadLoading} />
+            {/* Input — disabled for agents who aren't assigned */}
+            {conversation?.status === 'CLOSED' ? (
+              <div className="px-5 py-3 bg-white border-t border-slate-200 text-center text-sm text-slate-400">
+                This conversation is closed
+              </div>
+            ) : !isAdmin && conversation?.status === 'UNASSIGNED' ? (
+              <div className="px-5 py-3 bg-white border-t border-slate-200 text-center text-sm text-slate-400">
+                Assign this conversation to reply
+              </div>
+            ) : !isAdmin && conversation?.assignedAgentId !== user?.id ? (
+              <div className="px-5 py-3 bg-white border-t border-slate-200 text-center text-sm text-slate-400">
+                You are not assigned to this conversation
+              </div>
+            ) : (
+              <MessageInput onSend={handleSend} disabled={threadLoading} />
+            )}
           </>
         )}
       </main>
