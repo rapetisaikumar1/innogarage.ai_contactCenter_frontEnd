@@ -93,7 +93,8 @@ export default function InboxPage() {
     setAssigning(conversationId);
     try {
       await assignConversationToSelf(conversationId);
-      await refetch();
+      // Switch to 'mine' tab so the agent immediately sees their assigned conversation
+      setTab('mine');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Already assigned';
       alert(msg);
