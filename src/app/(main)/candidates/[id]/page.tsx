@@ -77,7 +77,14 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
   }
 
   if (isLoading) return <div className="p-8 text-sm text-gray-500">Loading...</div>;
-  if (error || !candidate) return <div className="p-8 text-sm text-red-600">{error ?? 'Candidate not found'}</div>;
+  if (error || !candidate) return (
+    <div className="flex flex-col items-center justify-center py-24 gap-4">
+      <p className="text-sm text-slate-500">{error ?? 'Candidate not found'}</p>
+      <Link href="/candidates" className="px-4 py-2 text-sm font-semibold text-white bg-slate-900 rounded-xl hover:bg-slate-700 transition-colors">
+        ← Back to Candidates
+      </Link>
+    </div>
+  );
 
   const assignedTo = candidate.assignments[0]?.user;
 
