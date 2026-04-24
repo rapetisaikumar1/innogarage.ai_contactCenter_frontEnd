@@ -1,20 +1,15 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useNotifications } from '@/hooks/useNotifications';
 
 export default function NotificationBell() {
-  const { notifications, unreadCount, fetchNotifications, markRead, markAllRead } =
+  const { notifications, unreadCount, markRead, markAllRead } =
     useNotifications();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-
-  // Fetch on first open
-  useEffect(() => {
-    if (open) {
-      fetchNotifications();
-    }
-  }, [open, fetchNotifications]);
+  const router = useRouter();
 
   // Close on outside click
   useEffect(() => {
@@ -26,6 +21,12 @@ export default function NotificationBell() {
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
+
+  async function handleNotificationClick(n: { id: string; isRead: boolean; conversationId: string }) {
+    if (!n.isRead) await markRead(n.id);
+    setOpen(false);
+    router.push('/inbox');
+  }
 
   return (
     <div className="relative" ref={ref}>
@@ -79,7 +80,7 @@ export default function NotificationBell() {
               notifications.map((n) => (
                 <button
                   key={n.id}
-                  onClick={() => markRead(n.id)}
+                  onClick={() => handleNotificationClick(n)}
                   className={`w-full text-left px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition-colors ${
                     !n.isRead ? 'bg-blue-50/40' : ''
                   }`}

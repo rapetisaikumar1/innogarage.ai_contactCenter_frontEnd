@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') ?? 'http://localhost:4000';
@@ -26,17 +26,28 @@ function getOrCreateSocket(): Socket {
   return globalSocket;
 }
 
-type SocketEventHandler = (data: unknown) => void;
+export type SocketEventHandler = (data: unknown) => void;
 
-export function useSocket(
-  events: Record<string, SocketEventHandler>
-) {
-  const socketRef = useRef<Socket | null>(null);
-  // Keep events ref stable
+/**
+ * useSocket — attach socket.io event listeners that always call the LATEST handler.
+ *
+ * Each event gets one stable wrapper function (stored in wrappersRef) that
+ * delegates to eventsRef.current, so:
+ *  - The same function reference is passed to socket.on AND socket.off → clean teardown
+ *  - Handlers in the parent component can be inline/arrow functions without causing
+ *    duplicate listeners or stale closures
+ */
+export function useSocket(events: Record<string, SocketEventHandler>) {
+  // Always holds the latest event map — updated every render
   const eventsRef = useRef(events);
   eventsRef.current = events;
 
-  const connect = useCallback(() => {
+  // Stable wrapper functions: created once per event per hook instance
+  const wrappersRef = useRef<Record<string, (...args: unknown[]) => void>>({});
+
+  const socketRef = useRef<Socket | null>(null);
+
+  useEffect(() => {
     const token = getToken();
     if (!token) return;
 
@@ -44,33 +55,36 @@ export function useSocket(
     const socket = getOrCreateSocket();
     socketRef.current = socket;
 
-    // Attach all listeners
-    Object.entries(eventsRef.current).forEach(([event, handler]) => {
-      socket.on(event, handler as (...args: unknown[]) => void);
-    });
-  }, []);
-
-  const disconnect = useCallback(() => {
-    const socket = socketRef.current;
-    if (!socket) return;
-
-    // Remove listeners added by this hook instance
-    Object.entries(eventsRef.current).forEach(([event, handler]) => {
-      socket.off(event, handler as (...args: unknown[]) => void);
+    // For each event, create one stable wrapper (or reuse existing) that delegates
+    // to the latest handler in eventsRef. This means socket.off() will always
+    // receive the exact same function reference that socket.on() received.
+    Object.keys(events).forEach((event) => {
+      if (!wrappersRef.current[event]) {
+        wrappersRef.current[event] = (data: unknown) => {
+          eventsRef.current[event]?.(data);
+        };
+      }
+      socket.on(event, wrappersRef.current[event]);
     });
 
-    refCount--;
-    if (refCount <= 0) {
-      socket.disconnect();
-      globalSocket = null;
-      refCount = 0;
-    }
-    socketRef.current = null;
-  }, []);
+    return () => {
+      // Remove exactly what we attached
+      Object.keys(events).forEach((event) => {
+        if (wrappersRef.current[event]) {
+          socket.off(event, wrappersRef.current[event]);
+        }
+      });
 
-  useEffect(() => {
-    connect();
-    return () => { disconnect(); };
+      refCount--;
+      if (refCount <= 0) {
+        socket.disconnect();
+        globalSocket = null;
+        refCount = 0;
+      }
+      socketRef.current = null;
+    };
+    // Intentionally empty deps — run once on mount/unmount only.
+    // eventsRef always has the latest handlers without needing to re-subscribe.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

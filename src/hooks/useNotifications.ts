@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useSocket } from './useSocket';
 import { api } from '@/lib/api';
 import { ApiResponse } from '@/types';
@@ -18,21 +18,28 @@ export interface AppNotification {
 export function useNotifications() {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const fetchedRef = useRef(false);
+  // Use a ref so fetchNotifications identity stays stable regardless of loading state
+  const isLoadingRef = useRef(false);
 
   const fetchNotifications = useCallback(async () => {
-    if (isLoading) return;
+    if (isLoadingRef.current) return;
+    isLoadingRef.current = true;
     setIsLoading(true);
     try {
       const res = await api.get<ApiResponse<AppNotification[]>>('/whatsapp/notifications');
       setNotifications(res.data ?? []);
-      fetchedRef.current = true;
     } catch {
       // silently fail — not critical
     } finally {
+      isLoadingRef.current = false;
       setIsLoading(false);
     }
-  }, [isLoading]);
+  }, []); // stable — no deps
+
+  // Fetch on mount so the badge count is correct immediately
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
 
   const markRead = useCallback(async (id: string) => {
     setNotifications((prev) =>
@@ -51,7 +58,6 @@ export function useNotifications() {
     'notification:new': (data) => {
       const notification = data as AppNotification;
       setNotifications((prev) => {
-        // Avoid duplicates
         if (prev.some((n) => n.id === notification.id)) return prev;
         return [notification, ...prev];
       });
