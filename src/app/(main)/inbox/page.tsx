@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
-import { useInbox, useThread, sendWhatsAppMessage, assignConversationToSelf, markConversationRead, ConversationSummary } from '@/hooks/useWhatsApp';
+import { useInbox, useThread, sendWhatsAppMessage, assignConversationToSelf, ConversationSummary } from '@/hooks/useWhatsApp';
 import { useSocket } from '@/hooks/useSocket';
 import ConversationList from '@/components/whatsapp/ConversationList';
 import MessageThread from '@/components/whatsapp/MessageThread';
@@ -39,18 +39,9 @@ export default function InboxPage() {
 
   const conversation = inbox.find((c) => c.candidateId === selectedId);
 
-  // ── Select a conversation: mark its notifications read ───────────────────
+  // ── Select a conversation (no badge clearing — only clears on agent reply) ─
   function handleSelect(candidateId: string) {
     setSelectedId(candidateId);
-    const conv = inbox.find((c) => c.candidateId === candidateId);
-    if (conv && conv.unreadCount > 0) {
-      // Clear badge locally immediately
-      setInbox((prev) =>
-        prev.map((c) => c.candidateId === candidateId ? { ...c, unreadCount: 0 } : c)
-      );
-      // Mark read on backend (also triggers notifications:cleared socket to bell)
-      markConversationRead(conv.conversationId);
-    }
   }
 
   // ── Socket: live inbox updates ────────────────────────────────────────────
@@ -97,21 +88,9 @@ export default function InboxPage() {
     'conversation:removed_from_inbox': handleRemovedFromInbox,
     'conversation:message_received': (_data) => {
       const payload = _data as { conversationId?: string; direction?: string };
-      const openConvId = inbox.find(c => c.candidateId === selectedId)?.conversationId;
-
       if (selectedId) refetchThread();
-
-      if (payload.conversationId && payload.conversationId === openConvId) {
-        // New message arrived in the currently open chat — auto-mark as read so
-        // the badge stays at 0 while the agent is viewing it
-        const conv = inbox.find(c => c.conversationId === openConvId);
-        if (conv) markConversationRead(conv.conversationId);
-      } else if (
-        payload.conversationId &&
-        payload.conversationId !== openConvId &&
-        payload.direction === 'INBOUND'
-      ) {
-        // Inbound message on a conversation the agent is NOT viewing — increment badge
+      // Only increment badge for INBOUND messages
+      if (payload.conversationId && payload.direction === 'INBOUND') {
         setInbox((prev) =>
           prev.map((c) =>
             c.conversationId === payload.conversationId
@@ -119,8 +98,17 @@ export default function InboxPage() {
               : c
           )
         );
-        // Also refresh from server to stay in sync with DB count
-        refetch();
+      }
+    },
+    // Emitted by backend when agent sends a reply — zero out badges in real-time
+    'notifications:cleared': (_data) => {
+      const payload = _data as { conversationId?: string };
+      if (payload.conversationId) {
+        setInbox((prev) =>
+          prev.map((c) =>
+            c.conversationId === payload.conversationId ? { ...c, unreadCount: 0 } : c
+          )
+        );
       }
     },
   });
