@@ -10,13 +10,13 @@ export const STATUS_LABELS: Record<string, string> = {
 };
 
 export const STATUS_COLORS: Record<string, string> = {
-  NEW: 'bg-gray-100 text-gray-700',
-  CONTACTED: 'bg-blue-100 text-blue-700',
-  INTERESTED: 'bg-yellow-100 text-yellow-700',
+  NEW: 'bg-slate-100 text-slate-600',
+  CONTACTED: 'bg-sky-100 text-sky-700',
+  INTERESTED: 'bg-amber-100 text-amber-700',
   DOCUMENTS_PENDING: 'bg-orange-100 text-orange-700',
-  INTERVIEW_SCHEDULED: 'bg-purple-100 text-purple-700',
-  FOLLOW_UP_REQUIRED: 'bg-pink-100 text-pink-700',
-  CLOSED_WON: 'bg-green-100 text-green-700',
+  INTERVIEW_SCHEDULED: 'bg-violet-100 text-violet-700',
+  FOLLOW_UP_REQUIRED: 'bg-rose-100 text-rose-700',
+  CLOSED_WON: 'bg-emerald-100 text-emerald-700',
   CLOSED_LOST: 'bg-red-100 text-red-700',
 };
 

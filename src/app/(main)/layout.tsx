@@ -60,7 +60,7 @@ function SidebarBottom({ user }: { user: User }) {
         <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold text-slate-200">Agent</p>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 ring-2 ring-emerald-400/30" />
             <span className="text-xs text-slate-400">Available</span>
           </div>
         </div>
@@ -76,7 +76,7 @@ function SidebarBottom({ user }: { user: User }) {
         <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold text-slate-200">Softphone</p>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isReady ? 'bg-emerald-400' : isConnecting ? 'bg-amber-400 animate-pulse' : 'bg-red-400'}`} />
+            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isReady ? 'bg-emerald-400 ring-2 ring-emerald-400/30' : isConnecting ? 'bg-amber-400 animate-pulse ring-2 ring-amber-400/30' : 'bg-red-400 ring-2 ring-red-400/20'}`} />
             <span className="text-xs text-slate-400">
               {isReady ? 'Ready to receive calls' : isConnecting ? 'Connecting...' : 'Offline'}
             </span>
@@ -86,7 +86,7 @@ function SidebarBottom({ user }: { user: User }) {
 
       {/* User + Logout */}
       <div className="flex items-center gap-3 px-4 py-3">
-        <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
           {user.name.charAt(0).toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
@@ -96,7 +96,7 @@ function SidebarBottom({ user }: { user: User }) {
         <button
           onClick={handleLogout}
           title="Logout"
-          className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-red-400 hover:bg-slate-800 transition-colors"
+          className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all duration-150"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -141,7 +141,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
           <div className="px-5 py-5 flex-shrink-0 border-b border-slate-700/60">
             <div className="flex items-center gap-3">
               {/* Headphone logo icon matching the brand image */}
-              <div className="w-9 h-9 rounded-xl bg-indigo-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/30">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-violet-500/40">
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 18v-6a9 9 0 0118 0v6" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z" />
@@ -149,7 +149,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
               </div>
               <div className="min-w-0">
                 <p className="font-bold text-white text-sm leading-snug">Innogarage</p>
-                <p className="text-[11px] text-indigo-300 font-medium leading-snug">Contact Center</p>
+                <p className="text-[11px] text-violet-300 font-medium leading-snug">Contact Center</p>
               </div>
             </div>
           </div>
@@ -169,8 +169,8 @@ export default function MainLayout({ children }: { children: ReactNode }) {
                   href={item.href}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
                     isActive
-                      ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/25'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                      ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/30'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
                   }`}
                 >
                   <span className={isActive ? 'text-white' : 'text-slate-500'}>{item.icon}</span>
