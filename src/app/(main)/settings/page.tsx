@@ -44,12 +44,14 @@ export default function SettingsPage() {
   return (
     <div>
       {/* Page header */}
-      <div className="px-8 pt-8 pb-6 border-b border-slate-200 bg-white">
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Settings</h1>
-        <p className="text-sm text-slate-500 mt-1">Manage your account and team settings</p>
+      <div className="flex items-center px-6 py-4 border-b border-slate-200 bg-white">
+        <div>
+          <h1 className="text-lg font-bold text-slate-900 leading-tight">Settings</h1>
+          <p className="text-xs text-slate-400 mt-0.5">Manage your account and team settings</p>
+        </div>
       </div>
 
-      <div className="p-8">
+      <div className="p-6">
         {/* Tab navigation */}
         <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 shadow-sm w-fit mb-7">
           {TABS.map((tab) => (

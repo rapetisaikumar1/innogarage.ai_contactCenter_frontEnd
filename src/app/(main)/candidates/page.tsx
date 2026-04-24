@@ -58,18 +58,18 @@ export default function CandidatesPage() {
   return (
     <div>
       {/* Page header */}
-      <div className="flex items-start justify-between gap-4 px-8 pt-8 pb-6 border-b border-slate-200 bg-white">
+      <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-slate-200 bg-white">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Candidates</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-lg font-bold text-slate-900 leading-tight">Candidates</h1>
+          <p className="text-xs text-slate-400 mt-0.5">
             {data ? `${data.pagination.total} total candidates` : 'Manage and view all candidates'}
           </p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 shadow-sm shadow-indigo-200 transition-colors flex-shrink-0"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-violet-600 rounded-xl hover:from-indigo-700 hover:to-violet-700 shadow-sm shadow-indigo-300 transition-all flex-shrink-0"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           Add Candidate
@@ -89,7 +89,7 @@ export default function CandidatesPage() {
         </div>
       )}
 
-      <div className="p-8 space-y-5">
+      <div className="p-6 space-y-4">
 
         {/* Filters bar */}
         <div className="flex gap-3 items-center flex-wrap">
@@ -102,17 +102,17 @@ export default function CandidatesPage() {
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search by name, phone, email..."
-                className="w-full pl-10 pr-3 py-2.5 border border-slate-200 bg-white rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                className="w-full pl-10 pr-3 py-2 border border-slate-200 bg-white rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
               />
             </div>
-            <button type="submit" className="px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors">
+            <button type="submit" className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-sm font-semibold rounded-xl hover:from-indigo-700 hover:to-violet-700 transition-all">
               Search
             </button>
           </form>
           <select
             value={status}
             onChange={handleStatusChange}
-            className="border border-slate-200 bg-white rounded-xl px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="border border-slate-200 bg-white rounded-xl px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           >
             {STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>

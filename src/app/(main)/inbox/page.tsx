@@ -14,7 +14,7 @@ export default function InboxPage() {
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 flex-shrink-0">
           <div>
             <h1 className="text-base font-bold text-slate-900">WhatsApp Inbox</h1>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-400 mt-0.5">
               {isLoading ? 'Loading…' : `${inbox.length} conversation${inbox.length !== 1 ? 's' : ''}`}
             </p>
           </div>

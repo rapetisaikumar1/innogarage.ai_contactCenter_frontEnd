@@ -1,109 +1,196 @@
 'use client';
 
-import { useEffect, ReactNode } from 'react';
+import { useEffect, useRef, useState, ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { SoftphoneProvider, useSoftphone } from '@/hooks/useSoftphone';
 import Softphone from '@/components/voice/Softphone';
 import { User } from '@/types';
 
-// ─── Nav items ───────────────────────────────────────────────────────────────
+// ─── Nav items ────────────────────────────────────────────────────────────────
 const NAV_ITEMS = [
   {
     label: 'Dashboard', href: '/dashboard',
-    icon: <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>,
+    icon: (<svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>),
   },
   {
     label: 'Candidates', href: '/candidates',
-    icon: <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>,
+    icon: (<svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>),
   },
   {
     label: 'WhatsApp Inbox', href: '/inbox',
-    icon: <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3v-3z" /></svg>,
+    icon: (<svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3v-3z" /></svg>),
   },
   {
     label: 'Call Logs', href: '/calls',
-    icon: <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>,
+    icon: (<svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>),
   },
   {
     label: 'Follow-ups', href: '/follow-ups',
-    icon: <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>,
+    icon: (<svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>),
   },
   {
     label: 'Settings', href: '/settings',
-    icon: <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>,
+    icon: (<svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>),
   },
 ];
 
-// ─── SidebarBottom (must be inside SoftphoneProvider) ─────────────────────────
-function SidebarBottom({ user }: { user: User }) {
+const AVAILABILITY_OPTIONS = [
+  { value: 'available', label: 'Available', color: 'bg-emerald-500' },
+  { value: 'busy',      label: 'Busy',      color: 'bg-amber-500'  },
+  { value: 'away',      label: 'Away',      color: 'bg-slate-400'  },
+  { value: 'offline',   label: 'Offline',   color: 'bg-red-500'    },
+];
+
+// ─── Top navbar ───────────────────────────────────────────────────────────────
+function TopNav({ user }: { user: User }) {
   const sp = useSoftphone();
   const { logout } = useAuth();
   const router = useRouter();
-  const isReady = sp.status === 'ready';
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [availability, setAvailability] = useState('available');
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const isReady      = sp.status === 'ready';
   const isConnecting = sp.status === 'initializing';
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   function handleLogout() {
     logout();
     router.replace('/login');
   }
 
+  const currentAvail = AVAILABILITY_OPTIONS.find((o) => o.value === availability)!;
+
   return (
-    <div className="border-t border-slate-700/60 flex-shrink-0">
-      {/* Agent status */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-700/60">
-        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0">
-          <svg className="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold text-slate-200">Agent</p>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 ring-2 ring-emerald-400/30" />
-            <span className="text-xs text-slate-400">Available</span>
-          </div>
-        </div>
+    <header className="h-14 flex-shrink-0 flex items-center justify-between px-6 bg-white border-b border-slate-200 z-20">
+      {/* Softphone status */}
+      <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border ${
+        isReady      ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+        isConnecting ? 'bg-amber-50  text-amber-700  border-amber-200'  :
+                       'bg-red-50    text-red-700    border-red-200'
+      }`}>
+        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
+          isReady ? 'bg-emerald-500 ring-2 ring-emerald-200' :
+          isConnecting ? 'bg-amber-400 animate-pulse ring-2 ring-amber-200' :
+          'bg-red-500 ring-2 ring-red-200'
+        }`} />
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+        </svg>
+        {isReady ? 'Softphone Ready' : isConnecting ? 'Connecting…' : 'Softphone Offline'}
       </div>
 
-      {/* Softphone */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-700/60">
-        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0">
-          <svg className="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+      {/* Right */}
+      <div className="flex items-center gap-2">
+        {/* Bell */}
+        <button className="relative w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold text-slate-200">Softphone</p>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isReady ? 'bg-emerald-400 ring-2 ring-emerald-400/30' : isConnecting ? 'bg-amber-400 animate-pulse ring-2 ring-amber-400/30' : 'bg-red-400 ring-2 ring-red-400/20'}`} />
-            <span className="text-xs text-slate-400">
-              {isReady ? 'Ready to receive calls' : isConnecting ? 'Connecting...' : 'Offline'}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* User + Logout */}
-      <div className="flex items-center gap-3 px-4 py-3">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-          {user.name.charAt(0).toUpperCase()}
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-slate-100 truncate">{user.name}</p>
-          <p className="text-xs text-slate-400 uppercase tracking-wide">{user.role}</p>
-        </div>
-        <button
-          onClick={handleLogout}
-          title="Logout"
-          className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all duration-150"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white" />
         </button>
+
+        {/* Profile dropdown */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setDropdownOpen((v) => !v)}
+            className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-xl hover:bg-slate-100 transition-colors"
+          >
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+              {user.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="text-left hidden sm:block">
+              <p className="text-sm font-semibold text-slate-800 leading-tight">{user.name}</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${currentAvail.color}`} />
+                <p className="text-[10px] text-slate-500 leading-none">{currentAvail.label}</p>
+              </div>
+            </div>
+            <svg className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {/* Dropdown panel */}
+          {dropdownOpen && (
+            <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50">
+              {/* User info */}
+              <div className="px-4 py-3 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-base font-bold flex-shrink-0">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">{user.name}</p>
+                    <p className="text-xs text-slate-500 capitalize">{user.role?.toLowerCase()}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Availability */}
+              <div className="px-4 py-3 border-b border-slate-100">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Availability</p>
+                <div className="space-y-0.5">
+                  {AVAILABILITY_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setAvailability(opt.value)}
+                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+                        availability === opt.value
+                          ? 'bg-indigo-50 text-indigo-700'
+                          : 'text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${opt.color}`} />
+                      {opt.label}
+                      {availability === opt.value && (
+                        <svg className="w-4 h-4 ml-auto text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Links */}
+              <div className="pt-1">
+                <a
+                  href="/settings"
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Settings
+                </a>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Sign out
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </header>
   );
 }
 
@@ -114,9 +201,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      router.replace('/login');
-    }
+    if (!isLoading && !user) router.replace('/login');
   }, [user, isLoading, router]);
 
   if (isLoading) {
@@ -135,12 +220,12 @@ export default function MainLayout({ children }: { children: ReactNode }) {
   return (
     <SoftphoneProvider>
       <div className="h-screen flex overflow-hidden bg-slate-50">
-        {/* Dark sidebar */}
-        <aside className="w-64 bg-slate-900 flex flex-col flex-shrink-0 h-screen sticky top-0">
+
+        {/* ── Sidebar ─────────────────────────────────────────────────── */}
+        <aside className="w-60 bg-slate-900 flex flex-col flex-shrink-0 h-screen sticky top-0">
           {/* Logo */}
-          <div className="px-5 py-5 flex-shrink-0 border-b border-slate-700/60">
+          <div className="px-5 py-4 flex-shrink-0 border-b border-slate-700/60">
             <div className="flex items-center gap-3">
-              {/* Headphone logo icon matching the brand image */}
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-violet-500/40">
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 18v-6a9 9 0 0118 0v6" />
@@ -148,19 +233,17 @@ export default function MainLayout({ children }: { children: ReactNode }) {
                 </svg>
               </div>
               <div className="min-w-0">
-                <p className="font-bold text-white text-sm leading-snug">Innogarage</p>
-                <p className="text-[11px] text-violet-300 font-medium leading-snug">Contact Center</p>
+                <p className="font-bold text-white text-sm leading-tight">Innogarage</p>
+                <p className="text-[11px] text-violet-300 font-medium leading-tight">Contact Center</p>
               </div>
             </div>
           </div>
 
-          {/* Nav label */}
-          <div className="px-4 pt-4 pb-2">
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Menu</p>
-          </div>
-
           {/* Nav */}
-          <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
+          <div className="px-4 pt-5 pb-2">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Navigation</p>
+          </div>
+          <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto pb-4">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
               return (
@@ -179,17 +262,16 @@ export default function MainLayout({ children }: { children: ReactNode }) {
               );
             })}
           </nav>
-
-          {/* Bottom status section */}
-          <SidebarBottom user={user} />
         </aside>
 
-        {/* Main content */}
-        <main className="flex-1 overflow-y-auto bg-slate-50">{children}</main>
+        {/* ── Right: topnav + page content ────────────────────────────── */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          <TopNav user={user} />
+          <main className="flex-1 overflow-y-auto bg-slate-50">{children}</main>
+        </div>
 
         <Softphone />
       </div>
     </SoftphoneProvider>
   );
 }
-

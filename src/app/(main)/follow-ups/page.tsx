@@ -37,16 +37,16 @@ export default function FollowUpsPage() {
   return (
     <div>
       {/* Page header */}
-      <div className="flex items-start justify-between gap-4 px-8 pt-8 pb-6 border-b border-slate-200 bg-white">
+      <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-slate-200 bg-white">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Follow-ups</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-lg font-bold text-slate-900 leading-tight">Follow-ups</h1>
+          <p className="text-xs text-slate-400 mt-0.5">
             {data ? `${data.pagination.total} follow-up${data.pagination.total !== 1 ? 's' : ''} total` : 'Manage and track candidate follow-ups'}
           </p>
         </div>
       </div>
 
-      <div className="p-8 space-y-5">
+      <div className="p-6 space-y-4">
 
         {/* Filter tabs */}
         <div className="flex items-center gap-2 flex-wrap">

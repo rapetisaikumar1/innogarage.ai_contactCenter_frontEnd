@@ -51,40 +51,40 @@ export default function CallsPage() {
   return (
     <div>
       {/* Page header */}
-      <div className="flex items-start justify-between gap-4 px-8 pt-8 pb-6 border-b border-slate-200 bg-white">
+      <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-slate-200 bg-white">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Call Logs</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-lg font-bold text-slate-900 leading-tight">Call Logs</h1>
+          <p className="text-xs text-slate-400 mt-0.5">
             {data ? `${data.pagination.total} total calls recorded` : 'Loading…'}
           </p>
         </div>
         <button
           onClick={refetch}
           disabled={isLoading}
-          className="inline-flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-violet-600 rounded-xl hover:from-indigo-700 hover:to-violet-700 disabled:opacity-50 transition-all shadow-sm shadow-indigo-300"
         >
-          <svg className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
           Refresh
         </button>
       </div>
 
-      <div className="p-8 space-y-5">
+      <div className="p-6 space-y-4">
 
         {/* Filters */}
         <div className="flex gap-3 flex-wrap">
           <select
             value={direction}
             onChange={(e) => { setDirection(e.target.value as CallDirection | ''); handleFilter(); }}
-            className="border border-slate-200 bg-white rounded-xl px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="border border-slate-200 bg-white rounded-xl px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           >
             {DIRECTION_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
           <select
             value={status}
             onChange={(e) => { setStatus(e.target.value as CallStatus | ''); handleFilter(); }}
-            className="border border-slate-200 bg-white rounded-xl px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="border border-slate-200 bg-white rounded-xl px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           >
             {STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>

@@ -88,10 +88,10 @@ export default function DashboardPage() {
     <div className="h-full flex flex-col overflow-hidden bg-slate-50">
 
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
-      <div className="flex-shrink-0 flex items-center justify-between px-6 py-3 bg-white border-b border-slate-200">
+      <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 bg-white border-b border-slate-200">
         <div>
           <h1 className="text-lg font-bold text-slate-900 leading-tight">Dashboard</h1>
-          <p className="text-[11px] text-slate-400 leading-none mt-0.5">Overview of your contact center activity</p>
+          <p className="text-xs text-slate-400 leading-none mt-0.5">Overview of your contact center activity</p>
         </div>
         <div className="flex items-center gap-2.5">
           <button
