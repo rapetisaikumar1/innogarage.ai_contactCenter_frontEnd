@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import React from 'react';
 import { useDashboard } from '@/hooks/useDashboard';
+import { useAuth } from '@/hooks/useAuth';
 import { STATUS_LABELS, STATUS_COLORS, formatDateTime } from '@/utils/formatters';
 import { formatDuration } from '@/hooks/useCalls';
 
@@ -78,6 +79,7 @@ function Pulse({ rows = 4 }: { rows?: number }) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
+  const { user } = useAuth();
   const { data, isLoading, error, refetch } = useDashboard();
 
   const activePipeline = data?.candidatesByStatus
@@ -97,7 +99,7 @@ export default function DashboardPage() {
           <button
             onClick={refetch}
             disabled={isLoading}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-violet-600 rounded-xl hover:from-indigo-700 hover:to-violet-700 disabled:opacity-50 transition-all duration-150 shadow-sm shadow-indigo-300"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50 transition-colors"
           >
             <svg className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -105,6 +107,12 @@ export default function DashboardPage() {
             Refresh
           </button>
         </div>
+      </div>
+
+      {/* ── Welcome message ──────────────────────────────────────────── */}
+      <div className="flex-shrink-0 px-6 py-4 border-b border-slate-100 bg-white">
+        <h2 className="text-xl font-bold text-slate-900">Welcome back, {user?.name}! 👋</h2>
+        <p className="text-sm text-slate-500 mt-0.5">Here&apos;s what&apos;s happening with your contact center today.</p>
       </div>
 
       {error && (

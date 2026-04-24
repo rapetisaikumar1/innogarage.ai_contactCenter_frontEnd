@@ -8,9 +8,7 @@ import FollowUpCard from '@/components/follow-ups/FollowUpCard';
 const STATUS_OPTIONS: { label: string; value: FollowUpStatus | '' }[] = [
   { label: 'All', value: '' },
   { label: 'Pending', value: 'PENDING' },
-  { label: 'Overdue', value: 'OVERDUE' },
   { label: 'Completed', value: 'COMPLETED' },
-  { label: 'Rescheduled', value: 'RESCHEDULED' },
 ];
 
 export default function FollowUpsPage() {
@@ -57,8 +55,8 @@ export default function FollowUpsPage() {
                 onClick={() => handleStatusChange(opt.value)}
                 className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all ${
                   status === opt.value && !overdue
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'text-slate-600 hover:bg-slate-100'
+                    ? 'bg-slate-900 text-white shadow-sm'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`}
               >
                 {opt.label}
@@ -70,7 +68,7 @@ export default function FollowUpsPage() {
             onClick={handleOverdueToggle}
             className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${
               overdue
-                ? 'bg-red-600 text-white border-red-600 shadow-sm'
+                ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
                 : 'text-slate-600 border-slate-200 bg-white hover:bg-slate-50'
             }`}
           >
