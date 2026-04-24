@@ -97,10 +97,14 @@ export default function InboxPage() {
     'conversation:removed_from_inbox': handleRemovedFromInbox,
     'conversation:message_received': (_data) => {
       if (selectedId) refetchThread();
-      // Increment unread on the conversation if it's not currently open
-      const payload = _data as { conversationId?: string };
+      // Increment unread only for INBOUND messages on conversations that are not currently open
+      const payload = _data as { conversationId?: string; direction?: string };
       const openConvId = inbox.find(c => c.candidateId === selectedId)?.conversationId;
-      if (payload.conversationId && payload.conversationId !== openConvId) {
+      if (
+        payload.conversationId &&
+        payload.conversationId !== openConvId &&
+        payload.direction === 'INBOUND'
+      ) {
         setInbox((prev) =>
           prev.map((c) =>
             c.conversationId === payload.conversationId

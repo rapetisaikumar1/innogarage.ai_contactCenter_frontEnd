@@ -15,28 +15,14 @@ export interface AppNotification {
   createdAt: string;
 }
 
-// ── Play a short two-tone beep via Web Audio API (no audio file required) ─────
+// ── Play the notification sound using the bundled MP3 ───────────────────────────
 function playNotificationSound() {
   try {
-    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
-    const playTone = (freq: number, startAt: number, duration: number, gain: number) => {
-      const osc = ctx.createOscillator();
-      const gainNode = ctx.createGain();
-      osc.connect(gainNode);
-      gainNode.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, ctx.currentTime + startAt);
-      gainNode.gain.setValueAtTime(0, ctx.currentTime + startAt);
-      gainNode.gain.linearRampToValueAtTime(gain, ctx.currentTime + startAt + 0.01);
-      gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + startAt + duration);
-      osc.start(ctx.currentTime + startAt);
-      osc.stop(ctx.currentTime + startAt + duration);
-    };
-    playTone(880, 0, 0.15, 0.4);   // high note
-    playTone(1100, 0.18, 0.2, 0.3); // higher note
-    setTimeout(() => ctx.close(), 600);
+    const audio = new Audio('/notification.mp3');
+    audio.volume = 0.7;
+    audio.play().catch(() => {});
   } catch {
-    // AudioContext not available in SSR or blocked — silently ignore
+    // Audio not available — silently ignore
   }
 }
 

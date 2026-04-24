@@ -109,7 +109,7 @@ export default function ConversationList({
               {/* Right side: unread badge OR assign button */}
               <div className="flex-shrink-0 flex flex-col items-end gap-1">
                 {c.unreadCount > 0 && (
-                  <span className="bg-slate-900 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                  <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
                     {c.unreadCount}
                   </span>
                 )}
