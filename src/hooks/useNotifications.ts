@@ -102,12 +102,12 @@ export function useNotifications() {
         showBrowserNotification(notification.title, notification.body);
       }
     },
-    // Fired when agent opens a conversation — marks those notifications read
+    // Fired when agent replies to a conversation — backend sets clearedAt, so
+    // these notifications will NOT come back from the API on page refresh.
+    // Remove them from local state entirely so the bell count drops immediately.
     'notifications:cleared': (data) => {
       const { conversationId } = data as { conversationId: string };
-      setNotifications((prev) =>
-        prev.map((n) => n.conversationId === conversationId ? { ...n, isRead: true } : n)
-      );
+      setNotifications((prev) => prev.filter((n) => n.conversationId !== conversationId));
     },
   });
 
