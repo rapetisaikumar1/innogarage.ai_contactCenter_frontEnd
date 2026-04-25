@@ -63,6 +63,19 @@ export default function FollowUpsPage() {
               </button>
             ))}
           </div>
+          <button
+            onClick={handleOverdueToggle}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold border transition-all ${
+              overdue
+                ? 'bg-red-600 text-white border-red-600 shadow-sm'
+                : 'bg-white text-red-600 border-red-200 hover:bg-red-50'
+            }`}
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Overdue only
+          </button>
         </div>
 
         {/* Follow-up list card */}

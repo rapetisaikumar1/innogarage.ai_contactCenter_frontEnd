@@ -59,7 +59,7 @@ export default function PasswordTab() {
             value={form.currentPassword}
             onChange={(e) => update('currentPassword', e.target.value)}
             required
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
           />
         </div>
 
@@ -70,9 +70,9 @@ export default function PasswordTab() {
             value={form.newPassword}
             onChange={(e) => update('newPassword', e.target.value)}
             required
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
           />
-          <p className="text-xs text-gray-400 mt-1">Min 8 chars, one uppercase, one number</p>
+          <p className="text-xs text-slate-400 mt-1">Min 8 chars, one uppercase, one number</p>
         </div>
 
         <div>
@@ -82,12 +82,12 @@ export default function PasswordTab() {
             value={form.confirmPassword}
             onChange={(e) => update('confirmPassword', e.target.value)}
             required
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
           />
         </div>
 
         {error && <p className="text-sm text-red-600">{error}</p>}
-        {success && <p className="text-sm text-green-600">Password changed successfully.</p>}
+        {success && <p className="text-sm text-emerald-600">Password changed successfully.</p>}
 
         <button
           type="submit"

@@ -146,7 +146,7 @@ export default function ReassignModal({
                       type="button"
                       onClick={() => setSelectedId(agent.id)}
                       className={`w-full text-left flex items-center gap-3 px-5 py-3 transition-colors ${
-                        isSelected ? 'bg-violet-50' : 'hover:bg-slate-50'
+                        isSelected ? 'bg-slate-100' : 'hover:bg-slate-50'
                       }`}
                     >
                       {/* Avatar */}
@@ -169,7 +169,7 @@ export default function ReassignModal({
                       {/* Selection indicator */}
                       <div
                         className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
-                          isSelected ? 'border-violet-600 bg-violet-600' : 'border-slate-300'
+                          isSelected ? 'border-slate-900 bg-slate-900' : 'border-slate-300'
                         }`}
                       >
                         {isSelected && (

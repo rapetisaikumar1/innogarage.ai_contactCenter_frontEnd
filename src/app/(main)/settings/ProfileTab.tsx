@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useProfile, updateProfile, changePassword } from '@/hooks/useSettings';
 
 export default function ProfileTab() {
@@ -17,10 +17,12 @@ export default function ProfileTab() {
   const [pwError, setPwError] = useState<string | null>(null);
   const [pwSuccess, setPwSuccess] = useState(false);
 
-  if (data && name === '' && email === '') {
-    setName(data.name);
-    setEmail(data.email);
-  }
+  useEffect(() => {
+    if (data) {
+      setName(data.name);
+      setEmail(data.email);
+    }
+  }, [data]);
 
   const ROLE_LABELS: Record<string, string> = { ADMIN: 'Admin', MANAGER: 'Manager', AGENT: 'Agent' };
 
@@ -68,7 +70,7 @@ export default function ProfileTab() {
     return (
       <div className="p-6 space-y-3">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-10 bg-gray-100 rounded animate-pulse" />
+          <div key={i} className="h-10 bg-slate-100 rounded-lg animate-pulse" />
         ))}
       </div>
     );

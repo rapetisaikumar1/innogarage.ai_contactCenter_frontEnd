@@ -15,14 +15,13 @@ const AVAIL: Record<Availability, { label: string; dot: string; chip: string }> 
 // ─── Candidate status config ──────────────────────────────────────────────────
 function candidateStatusChip(status: string) {
   const map: Record<string, string> = {
-    NEW:                  'bg-sky-50    text-sky-700    ring-sky-200',
-    CONTACTED:            'bg-blue-50   text-blue-700   ring-blue-200',
-    INTERESTED:           'bg-violet-50 text-violet-700 ring-violet-200',
-    DOCUMENTS_PENDING:    'bg-amber-50  text-amber-700  ring-amber-200',
-    INTERVIEW_SCHEDULED:  'bg-purple-50 text-purple-700 ring-purple-200',
-    FOLLOW_UP_REQUIRED:   'bg-orange-50 text-orange-700 ring-orange-200',
-    CLOSED_WON:           'bg-emerald-50 text-emerald-700 ring-emerald-200',
-    CLOSED_LOST:          'bg-red-50    text-red-600    ring-red-200',
+    INITIAL_EVALUATION_DONE: 'bg-slate-100  text-slate-700  ring-slate-200',
+    AWAITING_RESUME:         'bg-amber-50   text-amber-700  ring-amber-200',
+    RESUME_SHARED:           'bg-sky-50     text-sky-700    ring-sky-200',
+    MARKETING_STARTED:       'bg-violet-50  text-violet-700 ring-violet-200',
+    CANDIDATE_GOT_OFFER:     'bg-emerald-50 text-emerald-700 ring-emerald-200',
+    BGC_ONGOING:             'bg-orange-50  text-orange-700 ring-orange-200',
+    STARTED_WORKING:         'bg-green-50   text-green-700  ring-green-200',
   };
   const cls = map[status] ?? 'bg-slate-100 text-slate-600 ring-slate-200';
   const label = status.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
@@ -80,7 +79,7 @@ function AgentRow({
       onClick={isAdmin ? onClick : undefined}
       className={`border-b border-slate-100 transition-colors duration-100 ${
         isAdmin ? 'cursor-pointer hover:bg-slate-50' : ''
-      } ${isSelected ? 'bg-violet-50 hover:bg-violet-50' : ''}`}
+      } ${isSelected ? 'bg-slate-100 hover:bg-slate-100' : ''}`}
     >
       <td className="px-5 py-3.5">
         <div className="flex items-center gap-3">
@@ -100,7 +99,7 @@ function AgentRow({
       {isAdmin && (
         <td className="px-5 py-3.5 text-right">
           {isSelected ? (
-            <span className="text-[11px] font-semibold text-violet-600 bg-violet-100 px-2.5 py-1 rounded-full">Viewing</span>
+            <span className="text-[11px] font-semibold text-slate-700 bg-slate-200 px-2.5 py-1 rounded-full">Viewing</span>
           ) : (
             <span className="text-[11px] text-slate-400 group-hover:text-slate-600">View candidates →</span>
           )}
@@ -148,7 +147,7 @@ function CandidatesPanel({
       <div className="flex-1 overflow-y-auto">
         {loading && (
           <div className="flex items-center justify-center h-40 text-slate-400 text-sm gap-2">
-            <div className="w-4 h-4 border-2 border-slate-300 border-t-violet-500 rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-900 rounded-full animate-spin" />
             Loading candidates…
           </div>
         )}
@@ -232,7 +231,7 @@ export default function AgentsPage() {
         <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center h-48 text-slate-400 text-sm gap-2">
-              <div className="w-5 h-5 border-2 border-slate-300 border-t-violet-500 rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-slate-300 border-t-slate-900 rounded-full animate-spin" />
               Loading agents…
             </div>
           ) : agents.length === 0 ? (

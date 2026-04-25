@@ -2,14 +2,13 @@ import { CandidateStatus } from '@/types/candidate';
 import { STATUS_LABELS, STATUS_COLORS } from '@/utils/formatters';
 
 const STATUS_DOTS: Record<string, string> = {
-  NEW: 'bg-slate-500',
-  CONTACTED: 'bg-sky-500',
-  INTERESTED: 'bg-amber-500',
-  DOCUMENTS_PENDING: 'bg-orange-500',
-  INTERVIEW_SCHEDULED: 'bg-violet-500',
-  FOLLOW_UP_REQUIRED: 'bg-rose-500',
-  CLOSED_WON: 'bg-emerald-500',
-  CLOSED_LOST: 'bg-red-500',
+  INITIAL_EVALUATION_DONE: 'bg-slate-500',
+  AWAITING_RESUME:         'bg-amber-500',
+  RESUME_SHARED:           'bg-sky-500',
+  MARKETING_STARTED:       'bg-violet-500',
+  CANDIDATE_GOT_OFFER:     'bg-emerald-500',
+  BGC_ONGOING:             'bg-orange-500',
+  STARTED_WORKING:         'bg-green-600',
 };
 
 interface Props {

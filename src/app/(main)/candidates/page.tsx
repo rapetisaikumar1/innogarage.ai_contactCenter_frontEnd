@@ -10,14 +10,13 @@ import Link from 'next/link';
 
 const STATUS_OPTIONS: Array<{ value: string; label: string }> = [
   { value: '', label: 'All Statuses' },
-  { value: 'NEW', label: 'New' },
-  { value: 'CONTACTED', label: 'Contacted' },
-  { value: 'INTERESTED', label: 'Interested' },
-  { value: 'DOCUMENTS_PENDING', label: 'Documents Pending' },
-  { value: 'INTERVIEW_SCHEDULED', label: 'Interview Scheduled' },
-  { value: 'FOLLOW_UP_REQUIRED', label: 'Follow-up Required' },
-  { value: 'CLOSED_WON', label: 'Closed Won' },
-  { value: 'CLOSED_LOST', label: 'Closed Lost' },
+  { value: 'INITIAL_EVALUATION_DONE', label: 'Initial Evaluation Done' },
+  { value: 'AWAITING_RESUME',         label: 'Awaiting Resume' },
+  { value: 'RESUME_SHARED',           label: 'Resume Shared' },
+  { value: 'MARKETING_STARTED',       label: 'Marketing Started' },
+  { value: 'CANDIDATE_GOT_OFFER',     label: 'Candidate Got Offer' },
+  { value: 'BGC_ONGOING',             label: 'BGC Ongoing' },
+  { value: 'STARTED_WORKING',         label: 'Started Working' },
 ];
 
 const AVATAR_PALETTES = [
@@ -102,7 +101,7 @@ export default function CandidatesPage() {
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search by name, phone, email..."
-                className="w-full pl-10 pr-3 py-2 border border-slate-200 bg-white rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                className="w-full pl-10 pr-3 py-2 border border-slate-200 bg-white rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition"
               />
             </div>
             <button type="submit" className="px-4 py-2 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-700 transition-colors">
@@ -112,7 +111,7 @@ export default function CandidatesPage() {
           <select
             value={status}
             onChange={handleStatusChange}
-            className="border border-slate-200 bg-white rounded-xl px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="border border-slate-200 bg-white rounded-xl px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-900 transition"
           >
             {STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
@@ -167,7 +166,7 @@ export default function CandidatesPage() {
                           {c.fullName.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <Link href={`/candidates/${c.id}`} className="font-semibold text-slate-800 hover:text-indigo-600 transition-colors text-sm">
+                          <Link href={`/candidates/${c.id}`} className="font-semibold text-slate-800 hover:text-slate-900 transition-colors text-sm">
                             {c.fullName}
                           </Link>
                           <p className="text-xs text-slate-400 mt-0.5">#C{String(idx + 1).padStart(3, '0')}</p>

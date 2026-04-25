@@ -8,7 +8,9 @@ import Softphone from '@/components/voice/Softphone';
 import NotificationBell from '@/components/layout/NotificationBell';
 import { User } from '@/types';
 import { useNotifications } from '@/hooks/useNotifications';
+import { updateMyAvailability, type Availability } from '@/hooks/useAgents';
 import Image from 'next/image';
+import Link from 'next/link';
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
 const NAV_ITEMS = [
@@ -20,11 +22,11 @@ const NAV_ITEMS = [
   { label: 'Agents', href: '/agents', icon: (<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>) },
 ];
 
-const AVAILABILITY_OPTIONS = [
-  { value: 'available', label: 'Available', color: 'bg-emerald-500' },
-  { value: 'busy',      label: 'Busy',      color: 'bg-amber-500'  },
-  { value: 'away',      label: 'Away',      color: 'bg-slate-400'  },
-  { value: 'offline',   label: 'Offline',   color: 'bg-red-500'    },
+const AVAILABILITY_OPTIONS: { value: Availability; label: string; color: string }[] = [
+  { value: 'AVAILABLE', label: 'Available', color: 'bg-emerald-500' },
+  { value: 'BUSY',      label: 'Busy',      color: 'bg-amber-500'  },
+  { value: 'AWAY',      label: 'Away',      color: 'bg-slate-400'  },
+  { value: 'OFFLINE',   label: 'Offline',   color: 'bg-red-500'    },
 ];
 
 // ─── Sidebar nav (needs unread count for WhatsApp badge) ─────────────────────
@@ -37,7 +39,7 @@ function SidebarNav({ pathname }: { pathname: string }) {
         const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
         const isInbox = item.href === '/inbox';
         return (
-          <a
+          <Link
             key={item.href}
             href={item.href}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
@@ -53,7 +55,7 @@ function SidebarNav({ pathname }: { pathname: string }) {
                 {unreadCount > 99 ? '99+' : unreadCount}
               </span>
             )}
-          </a>
+          </Link>
         );
       })}
     </nav>
@@ -94,10 +96,25 @@ function TopNav({ user }: { user: User }) {
   const { logout } = useAuth();
   const router     = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [availability, setAvailability] = useState('available');
+  const [availability, setAvailability] = useState<Availability>('AVAILABLE');
+  const [updatingAvailability, setUpdatingAvailability] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const currentAvail = AVAILABILITY_OPTIONS.find((o) => o.value === availability)!;
+
+  async function handleAvailabilityChange(next: Availability) {
+    if (next === availability || updatingAvailability) return;
+    const prev = availability;
+    setAvailability(next);
+    setUpdatingAvailability(true);
+    try {
+      await updateMyAvailability(next);
+    } catch {
+      setAvailability(prev);
+    } finally {
+      setUpdatingAvailability(false);
+    }
+  }
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -163,8 +180,9 @@ function TopNav({ user }: { user: User }) {
                   {AVAILABILITY_OPTIONS.map((opt) => (
                     <button
                       key={opt.value}
-                      onClick={() => setAvailability(opt.value)}
-                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+                      onClick={() => handleAvailabilityChange(opt.value)}
+                      disabled={updatingAvailability}
+                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50 ${
                         availability === opt.value ? 'bg-slate-100 text-slate-900' : 'text-slate-600 hover:bg-slate-50'
                       }`}
                     >
@@ -182,7 +200,7 @@ function TopNav({ user }: { user: User }) {
 
               {/* Links */}
               <div className="pt-1">
-                <a
+                <Link
                   href="/settings"
                   onClick={() => setDropdownOpen(false)}
                   className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
@@ -192,7 +210,7 @@ function TopNav({ user }: { user: User }) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   Settings
-                </a>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"

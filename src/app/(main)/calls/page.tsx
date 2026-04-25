@@ -57,14 +57,14 @@ export default function CallsPage() {
           <select
             value={direction}
             onChange={(e) => { setDirection(e.target.value as CallDirection | ''); handleFilter(); }}
-            className="border border-slate-200 bg-slate-900 text-white rounded-xl px-3 py-2 text-sm font-medium focus:outline-none transition cursor-pointer"
+            className="border border-slate-200 bg-white rounded-xl px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-900 transition cursor-pointer"
           >
             {DIRECTION_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
           <select
             value={status}
             onChange={(e) => { setStatus(e.target.value as CallStatus | ''); handleFilter(); }}
-            className="border border-slate-200 bg-slate-900 text-white rounded-xl px-3 py-2 text-sm font-medium focus:outline-none transition cursor-pointer"
+            className="border border-slate-200 bg-white rounded-xl px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-900 transition cursor-pointer"
           >
             {STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
@@ -113,7 +113,7 @@ export default function CallsPage() {
                   {data.calls.map((call) => (
                     <tr key={call.id} className="hover:bg-slate-50/80 transition-colors group">
                       <td className="px-6 py-4">
-                        <Link href={`/candidates/${call.candidateId}`} className="font-semibold text-slate-800 hover:text-indigo-600 transition-colors text-sm">
+                        <Link href={`/candidates/${call.candidateId}`} className="font-semibold text-slate-800 hover:text-slate-900 transition-colors text-sm">
                           {call.candidate.fullName}
                         </Link>
                         <p className="text-xs text-slate-400 mt-0.5">{call.phoneNumber}</p>
