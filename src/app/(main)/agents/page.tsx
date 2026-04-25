@@ -14,7 +14,8 @@ import {
 const AVAIL_CONFIG: Record<Availability, { label: string; dot: string; bg: string; text: string }> = {
   AVAILABLE: { label: 'Available', dot: 'bg-emerald-500', bg: 'bg-emerald-50', text: 'text-emerald-700' },
   BUSY:      { label: 'Busy',      dot: 'bg-amber-400',  bg: 'bg-amber-50',   text: 'text-amber-700'  },
-  OFFLINE:   { label: 'Offline',   dot: 'bg-slate-400',  bg: 'bg-slate-100',  text: 'text-slate-600'  },
+  AWAY:      { label: 'Away',      dot: 'bg-slate-400',  bg: 'bg-slate-100',  text: 'text-slate-600'  },
+  OFFLINE:   { label: 'Offline',   dot: 'bg-red-500',    bg: 'bg-red-50',     text: 'text-red-600'    },
 };
 
 function AvailabilityChip({ value }: { value: Availability }) {
@@ -174,19 +175,12 @@ export default function AgentsPage() {
   const { user } = useAuth();
   const { agents, loading, error, refetch } = useAgents();
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
-  const [myAvailability, setMyAvailability] = useState<Availability>('AVAILABLE');
 
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'MANAGER';
   const selectedAgent = agents.find((a) => a.id === selectedAgentId) ?? null;
 
   function handleSelectAgent(id: string) {
     setSelectedAgentId((prev) => (prev === id ? null : id));
-  }
-
-  function handleAvailabilityUpdate(a: Availability) {
-    setMyAvailability(a);
-    // Optimistically update agent list
-    refetch();
   }
 
   return (
@@ -199,9 +193,6 @@ export default function AgentsPage() {
             {isAdmin ? 'Manage agent availability and assigned candidates' : 'Your team status'}
           </p>
         </div>
-        {!isAdmin && (
-          <AvailabilitySelector current={myAvailability} onUpdate={handleAvailabilityUpdate} />
-        )}
       </div>
 
       {/* Error */}
@@ -221,8 +212,8 @@ export default function AgentsPage() {
           {/* Agent list */}
           <div className="space-y-3">
             {/* Stats row */}
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              {(['AVAILABLE', 'BUSY', 'OFFLINE'] as Availability[]).map((a) => {
+            <div className="grid grid-cols-4 gap-3 mb-4">
+              {(['AVAILABLE', 'BUSY', 'AWAY', 'OFFLINE'] as Availability[]).map((a) => {
                 const count = agents.filter((ag) => ag.availability === a).length;
                 const cfg = AVAIL_CONFIG[a];
                 return (

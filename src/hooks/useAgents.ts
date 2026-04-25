@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? '';
 
-export type Availability = 'AVAILABLE' | 'BUSY' | 'OFFLINE';
+export type Availability = 'AVAILABLE' | 'BUSY' | 'AWAY' | 'OFFLINE';
 
 export interface Agent {
   id: string;
@@ -45,8 +45,8 @@ export function useAgents() {
       setLoading(true);
       const res = await fetch(`${API}/api/agents`, { headers: getHeaders() });
       if (!res.ok) throw new Error('Failed to fetch agents');
-      const data = await res.json();
-      setAgents(data);
+      const json = await res.json();
+      setAgents(json.data ?? json);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unknown error');
     } finally {
@@ -72,7 +72,7 @@ export function useAgentCandidates(agentId: string | null) {
     setError(null);
     fetch(`${API}/api/agents/${agentId}/candidates`, { headers: getHeaders() })
       .then((r) => (r.ok ? r.json() : Promise.reject('Failed')))
-      .then(setCandidates)
+      .then((json) => setCandidates(json.data ?? json))
       .catch((e) => setError(e instanceof Error ? e.message : String(e)))
       .finally(() => setLoading(false));
   }, [agentId]);
@@ -87,5 +87,6 @@ export async function updateMyAvailability(availability: Availability): Promise<
     body: JSON.stringify({ availability }),
   });
   if (!res.ok) throw new Error('Failed to update availability');
-  return res.json();
+  const json = await res.json();
+  return json.data ?? json;
 }
