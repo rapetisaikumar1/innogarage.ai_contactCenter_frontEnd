@@ -8,6 +8,7 @@ import Softphone from '@/components/voice/Softphone';
 import NotificationBell from '@/components/layout/NotificationBell';
 import { User } from '@/types';
 import { useNotifications } from '@/hooks/useNotifications';
+import Image from 'next/image';
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
 const NAV_ITEMS = [
@@ -241,83 +242,15 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         <aside className="w-64 bg-white border-r border-slate-200 flex flex-col flex-shrink-0 overflow-hidden"
           style={{ height: '100vh', position: 'sticky', top: 0, alignSelf: 'flex-start' }}>
           {/* Logo */}
-          <div className="px-4 py-[14px] flex-shrink-0 border-b border-slate-100">
-            <div className="flex items-center gap-2.5">
-
-              {/* ── Icon: speech-bubble + headset ── */}
-              {/*
-                viewBox 0 0 100 100
-                Arc peak (t=0.5): y = 0.25*52 + 0.75*6 ≈ 17  →  sits ~11px above bubble top (y=28)
-                Ear cups: (1,44)→(9,60)  and  (89,44)→(97,60), each centered on arc endpoints (5,52) / (95,52)
-                Bubble: left=20 right=80 top=28 bottom=76, tail tip=(16,92)
-                Dots: x=34,49,64  y=52  (centered inside bubble)
-              */}
-              <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 flex-shrink-0">
-                <defs>
-                  <linearGradient id="ig-hs" x1="5" y1="0" x2="95" y2="0" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#7C3AED" />
-                    <stop offset="0.5" stopColor="#6366F1" />
-                    <stop offset="1" stopColor="#0D9488" />
-                  </linearGradient>
-                </defs>
-
-                {/* Speech bubble — rounded rect body with bottom-left tail */}
-                <path
-                  d="M27 28 H72 Q80 28 80 36 V68 Q80 76 72 76 H38 L16 92 L30 76 H28 Q20 76 20 68 V36 Q20 28 27 28 Z"
-                  fill="white"
-                  stroke="#DDE3EE"
-                  strokeWidth="1.5"
-                  strokeLinejoin="round"
-                />
-
-                {/* Headset band — gradient arc above and around the bubble */}
-                <path
-                  d="M5 52 C5 6 95 6 95 52"
-                  stroke="url(#ig-hs)"
-                  strokeWidth="6"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-
-                {/* Left ear cup */}
-                <rect x="1" y="44" width="8" height="16" rx="4" fill="#0F172A" />
-
-                {/* Right ear cup */}
-                <rect x="89" y="44" width="8" height="16" rx="4" fill="#0F172A" />
-
-                {/* Mic boom + tip */}
-                <path d="M97 54 Q101 64 95 72" stroke="#0F172A" strokeWidth="2.8" strokeLinecap="round" fill="none" />
-                <circle cx="94" cy="73" r="2.6" fill="#0F172A" />
-
-                {/* Three dots inside bubble */}
-                <circle cx="34" cy="52" r="3.2" fill="#0F172A" />
-                <circle cx="49" cy="52" r="3.2" fill="#0F172A" />
-                <circle cx="64" cy="52" r="3.2" fill="#0F172A" />
-              </svg>
-
-              {/* ── Brand text: gradient "innogarage" + "— CONTACT CENTER —" ── */}
-              <div className="min-w-0">
-                <p
-                  className="font-bold text-[14px] leading-none tracking-tight"
-                  style={{
-                    background: 'linear-gradient(to right, #2D1B69, #7C3AED 55%, #0D9488)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                  }}
-                >
-                  innogarage
-                </p>
-                <div className="flex items-center gap-1 mt-1.5">
-                  <div className="flex-shrink-0" style={{ width: '14px', height: '1.5px', background: '#7C3AED' }} />
-                  <p className="text-[7px] font-semibold uppercase tracking-[0.2em] text-slate-400 leading-none whitespace-nowrap">
-                    Contact Center
-                  </p>
-                  <div className="flex-shrink-0" style={{ width: '14px', height: '1.5px', background: '#0D9488' }} />
-                </div>
-              </div>
-
-            </div>
+          <div className="px-4 py-3 flex-shrink-0 border-b border-slate-100">
+            <Image
+              src="/logo.png"
+              alt="innogarage Contact Center"
+              width={192}
+              height={80}
+              className="w-full h-auto object-contain"
+              priority
+            />
           </div>
 
           {/* Nav */}
