@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useUsers, createUser, updateUser, UserProfile } from '@/hooks/useSettings';
+import { useAuth } from '@/hooks/useAuth';
 
 const ROLE_LABELS: Record<string, string> = { ADMIN: 'Admin', MANAGER: 'Manager', AGENT: 'Agent' };
 const ROLE_COLORS: Record<string, string> = {
@@ -174,21 +175,9 @@ function UserRow({ user, onUpdated, isSelf }: { user: UserProfile; onUpdated: ()
 
 export default function TeamTab() {
   const { data: users, isLoading, error, refetch } = useUsers();
+  const { user } = useAuth();
   const [showCreate, setShowCreate] = useState(false);
-  const [selfId, setSelfId] = useState<string | null>(null);
-
-  // Identify self from localStorage token
-  if (typeof window !== 'undefined' && selfId === null) {
-    try {
-      const token = localStorage.getItem('cc_token');
-      if (token) {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        setSelfId(payload.userId);
-      }
-    } catch {
-      // ignore
-    }
-  }
+  const selfId = user?.id ?? null;
 
   return (
     <div>
