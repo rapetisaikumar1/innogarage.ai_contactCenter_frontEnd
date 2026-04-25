@@ -244,59 +244,62 @@ export default function MainLayout({ children }: { children: ReactNode }) {
           <div className="px-4 py-4 flex-shrink-0 border-b border-slate-100">
             <div className="flex items-center gap-2.5">
 
-              {/* ── Brand icon: speech-bubble + gradient headset ── */}
-              <svg viewBox="0 0 52 56" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 flex-shrink-0">
+              {/* ── Brand icon: circular speech-bubble + gradient headset ── */}
+              <svg viewBox="0 0 68 58" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-11 h-9 flex-shrink-0">
                 <defs>
-                  <linearGradient id="ig-arc" x1="4" y1="4" x2="48" y2="4" gradientUnits="userSpaceOnUse">
+                  {/* Gradient matches the logo: violet left → teal right */}
+                  <linearGradient id="ig-band" x1="5" y1="0" x2="63" y2="0" gradientUnits="userSpaceOnUse">
                     <stop stopColor="#7C3AED" />
-                    <stop offset="0.5" stopColor="#8B5CF6" />
+                    <stop offset="0.5" stopColor="#9333EA" />
                     <stop offset="1" stopColor="#0D9488" />
                   </linearGradient>
                 </defs>
 
-                {/* Speech bubble */}
+                {/* Speech bubble — rounded rect with bottom-left tail */}
                 <path
-                  d="M7 3C7 2.4 7.5 2 8 2H44C44.6 2 45 2.4 45 3V34C45 34.6 44.6 35 44 35H30L22 47L14 35H8C7.5 35 7 34.6 7 34V3Z"
+                  d="M18 4H48Q54 4 54 10V37Q54 43 48 43H36L31 56L29 43H18Q12 43 12 37V10Q12 4 18 4Z"
                   fill="white"
-                  stroke="#CBD5E1"
+                  stroke="#E2E8F0"
                   strokeWidth="1.5"
                 />
 
-                {/* Headset arc — gradient purple → teal */}
+                {/* Three typing dots */}
+                <circle cx="24" cy="25" r="2.5" fill="#1E293B" />
+                <circle cx="33" cy="25" r="2.5" fill="#1E293B" />
+                <circle cx="42" cy="25" r="2.5" fill="#1E293B" />
+
+                {/* Headset band arc — gradient violet → teal, sits OVER the bubble */}
                 <path
-                  d="M13 22C13 13.2 18.8 6 26 6C33.2 6 39 13.2 39 22"
-                  stroke="url(#ig-arc)"
-                  strokeWidth="3.5"
+                  d="M9 27C9 14 19 4 33 4C47 4 57 14 57 27"
+                  stroke="url(#ig-band)"
+                  strokeWidth="4.5"
                   strokeLinecap="round"
                   fill="none"
                 />
 
-                {/* Left ear cup */}
-                <rect x="8.5" y="19" width="7" height="11" rx="3.5" fill="#0F172A" />
+                {/* Left ear cup — dark navy */}
+                <rect x="5" y="22" width="8" height="13" rx="4" fill="#1E293B" />
 
-                {/* Right ear cup */}
-                <rect x="36.5" y="19" width="7" height="11" rx="3.5" fill="#0F172A" />
+                {/* Right ear cup — dark navy */}
+                <rect x="55" y="22" width="8" height="13" rx="4" fill="#1E293B" />
 
-                {/* Mic boom */}
-                <path d="M43.5 27C46 27 48 29 48 31.5" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" />
-
-                {/* 3 typing dots */}
-                <circle cx="20" cy="23" r="2.2" fill="#0F172A" />
-                <circle cx="26" cy="23" r="2.2" fill="#0F172A" />
-                <circle cx="32" cy="23" r="2.2" fill="#0F172A" />
+                {/* Mic boom — curves from right ear cup */}
+                <path d="M63 27Q66 27 66 31" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round" fill="none" />
               </svg>
 
               {/* ── Brand text ── */}
               <div className="min-w-0">
-                <p className="font-extrabold text-slate-900 text-[15px] leading-none tracking-tight">
-                  innogarage
+                {/* "inno" dark navy + "garage" violet→teal gradient */}
+                <p className="font-extrabold text-[15px] leading-none tracking-tight">
+                  <span className="text-slate-900">inno</span><span className="bg-gradient-to-r from-violet-600 to-teal-500 bg-clip-text text-transparent">garage</span>
                 </p>
+                {/* "— CONTACT CENTER —" with brand-coloured accent lines */}
                 <div className="flex items-center gap-1 mt-1.5">
-                  <span className="h-px w-3 bg-violet-500 rounded-full flex-shrink-0" />
-                  <p className="text-[8.5px] font-bold uppercase tracking-[0.18em] text-slate-500 leading-none whitespace-nowrap">
+                  <span className="h-px w-4 bg-violet-500 rounded-full flex-shrink-0" />
+                  <p className="text-[8px] font-bold uppercase tracking-[0.22em] text-slate-500 leading-none whitespace-nowrap">
                     Contact Center
                   </p>
-                  <span className="h-px w-3 bg-teal-500 rounded-full flex-shrink-0" />
+                  <span className="h-px w-4 bg-teal-500 rounded-full flex-shrink-0" />
                 </div>
               </div>
 
