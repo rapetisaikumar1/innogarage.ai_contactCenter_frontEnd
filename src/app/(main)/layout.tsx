@@ -243,8 +243,8 @@ export default function MainLayout({ children }: { children: ReactNode }) {
           style={{ height: '100vh', position: 'sticky', top: 0, alignSelf: 'flex-start' }}>
           {/* Logo */}
           <div className="px-4 pt-3 pb-2.5 flex-shrink-0 border-b border-slate-100">
-            {/* Headset icon — top 58% of logo.png, text portion hidden */}
-            <div className="relative overflow-hidden w-full" style={{ height: '88px' }}>
+            {/* Headset icon — top 47% of logo.png, text portion hidden */}
+            <div className="relative overflow-hidden w-full" style={{ height: '70px' }}>
               <Image
                 src="/logo.png"
                 alt=""
