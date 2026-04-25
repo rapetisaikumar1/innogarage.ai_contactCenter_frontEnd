@@ -242,35 +242,15 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         <aside className="w-64 bg-white border-r border-slate-200 flex flex-col flex-shrink-0 overflow-hidden"
           style={{ height: '100vh', position: 'sticky', top: 0, alignSelf: 'flex-start' }}>
           {/* Logo */}
-          <div className="px-4 pt-3 pb-2.5 flex-shrink-0 border-b border-slate-100">
-            {/* Headset icon — icon-only crop of logo.png (no text portion) */}
+          <div className="px-3 py-3 flex-shrink-0 border-b border-slate-100">
             <Image
-              src="/logo-icon.png"
-              alt="innogarage headset icon"
-              width={192}
-              height={74}
+              src="/logo.png"
+              alt="innogarage Contact Center"
+              width={224}
+              height={149}
               className="w-full h-auto object-contain"
               priority
             />
-            {/* Gradient "innogarage" text */}
-            <p
-              className="font-bold text-[22px] leading-none tracking-tight mt-2 text-center"
-              style={{
-                background: 'linear-gradient(to right, #2D1B69, #7C3AED 55%, #0D9488)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              innogarage
-            </p>
-            <div className="flex items-center justify-center gap-1 mt-1.5">
-              <div className="flex-shrink-0" style={{ width: '14px', height: '1.5px', background: '#7C3AED' }} />
-              <p className="text-[7px] font-semibold uppercase tracking-[0.2em] text-slate-400 leading-none whitespace-nowrap">
-                Contact Center
-              </p>
-              <div className="flex-shrink-0" style={{ width: '14px', height: '1.5px', background: '#0D9488' }} />
-            </div>
           </div>
 
           {/* Nav */}
