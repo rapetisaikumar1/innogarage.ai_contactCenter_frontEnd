@@ -256,7 +256,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
             </div>
             {/* Gradient "innogarage" text */}
             <p
-              className="font-bold text-[15px] leading-none tracking-tight mt-2 text-center"
+              className="font-bold text-[22px] leading-none tracking-tight mt-2 text-center"
               style={{
                 background: 'linear-gradient(to right, #2D1B69, #7C3AED 55%, #0D9488)',
                 WebkitBackgroundClip: 'text',
