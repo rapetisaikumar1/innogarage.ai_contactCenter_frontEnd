@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-
-const API = process.env.NEXT_PUBLIC_API_URL ?? '';
+import { api } from '@/lib/api';
 
 export type Availability = 'AVAILABLE' | 'BUSY' | 'AWAY' | 'OFFLINE';
 
@@ -27,13 +26,6 @@ export interface AgentCandidate {
   lastMessageAt: string | null;
 }
 
-function getHeaders() {
-  const token = typeof window !== 'undefined' ? sessionStorage.getItem('cc_token') : null;
-  return {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-}
 
 export function useAgents() {
   const [agents, setAgents] = useState<Agent[]>([]);
@@ -43,10 +35,8 @@ export function useAgents() {
   const fetchAgents = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API}/api/agents`, { headers: getHeaders() });
-      if (!res.ok) throw new Error('Failed to fetch agents');
-      const json = await res.json();
-      setAgents(json.data ?? json);
+      const json = await api.get<{ data?: Agent[]; success?: boolean } | Agent[]>('/agents');
+      setAgents((json as { data?: Agent[] }).data ?? (json as Agent[]));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unknown error');
     } finally {
@@ -70,9 +60,8 @@ export function useAgentCandidates(agentId: string | null) {
     if (!agentId) { setCandidates([]); return; }
     setLoading(true);
     setError(null);
-    fetch(`${API}/api/agents/${agentId}/candidates`, { headers: getHeaders() })
-      .then((r) => (r.ok ? r.json() : Promise.reject('Failed')))
-      .then((json) => setCandidates(json.data ?? json))
+    api.get<{ data?: AgentCandidate[] } | AgentCandidate[]>(`/agents/${agentId}/candidates`)
+      .then((json) => setCandidates((json as { data?: AgentCandidate[] }).data ?? (json as AgentCandidate[])))
       .catch((e) => setError(e instanceof Error ? e.message : String(e)))
       .finally(() => setLoading(false));
   }, [agentId]);
@@ -81,12 +70,6 @@ export function useAgentCandidates(agentId: string | null) {
 }
 
 export async function updateMyAvailability(availability: Availability): Promise<Agent> {
-  const res = await fetch(`${API}/api/agents/availability`, {
-    method: 'PATCH',
-    headers: getHeaders(),
-    body: JSON.stringify({ availability }),
-  });
-  if (!res.ok) throw new Error('Failed to update availability');
-  const json = await res.json();
-  return json.data ?? json;
+  const json = await api.patch<{ data?: Agent } | Agent>('/agents/availability', { availability });
+  return (json as { data?: Agent }).data ?? (json as Agent);
 }
