@@ -5,10 +5,12 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useInbox, useThread, sendWhatsAppMessage, assignConversationToSelf, ConversationSummary } from '@/hooks/useWhatsApp';
 import { useSocket } from '@/hooks/useSocket';
+import { useSoftphone } from '@/hooks/useSoftphone';
 import ConversationList from '@/components/whatsapp/ConversationList';
 import MessageThread from '@/components/whatsapp/MessageThread';
 import MessageInput from '@/components/whatsapp/MessageInput';
 import ReassignModal from '@/components/whatsapp/ReassignModal';
+import TransferModal from '@/components/whatsapp/TransferModal';
 
 type TabKey = 'unassigned' | 'mine' | 'closed' | 'all' | 'assigned';
 
@@ -26,6 +28,22 @@ export default function InboxPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [assigning, setAssigning] = useState<string | null>(null);
   const [reassignOpen, setReassignOpen] = useState(false);
+  const [transferOpen, setTransferOpen] = useState(false);
+  const [calling, setCalling] = useState(false);
+
+  const softphone = useSoftphone();
+
+  async function handleCallCandidate() {
+    const number = conversation?.whatsappNumber;
+    if (!number) return;
+    if (softphone.status !== 'ready') return;
+    setCalling(true);
+    try {
+      await softphone.startCall(number, { candidateId: conversation?.candidateId });
+    } finally {
+      setCalling(false);
+    }
+  }
 
   const { data: threadData, isLoading: threadLoading, error: threadError, refetch: refetchThread, bottomRef } = useThread(selectedId ?? '');
 
@@ -318,6 +336,28 @@ export default function InboxPage() {
                         Reassign
                       </button>
                     )}
+                    {/* Transfer button — agents only on their own assigned conversations */}
+                    {!isAdmin && conversation?.status === 'ASSIGNED' && conversation.assignedAgentId === user?.id && (
+                      <button
+                        onClick={() => setTransferOpen(true)}
+                        className="px-3 py-1.5 text-xs font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
+                      >
+                        Transfer
+                      </button>
+                    )}
+                    {/* Call icon button — green, visible when candidate has a number */}
+                    {conversation?.whatsappNumber && (
+                      <button
+                        onClick={handleCallCandidate}
+                        disabled={calling || softphone.status !== 'ready'}
+                        title={softphone.status !== 'ready' ? 'Softphone not ready' : `Call ${conversation.whatsappNumber}`}
+                        className="w-8 h-8 flex items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+                      >
+                        <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.58a1 1 0 01-.24 1.01l-2.21 2.2z" />
+                        </svg>
+                      </button>
+                    )}
                     <Link
                       href={`/candidates/${selectedId}`}
                       className="text-xs font-medium text-slate-600 hover:text-slate-900 border border-slate-200 px-2.5 py-1 rounded-lg hover:bg-slate-50 transition-colors"
@@ -367,10 +407,16 @@ export default function InboxPage() {
           candidateName={conversation.candidateName ?? 'Candidate'}
           currentAgentId={conversation.assignedAgentId ?? null}
           onClose={() => setReassignOpen(false)}
-          onReassigned={() => {
-            // Backend already broadcasts conversation:updated. refetch to be safe.
-            refetch();
-          }}
+          onReassigned={() => refetch()}
+        />
+      )}
+      {transferOpen && conversation && conversation.status === 'ASSIGNED' && (
+        <TransferModal
+          conversationId={conversation.conversationId}
+          candidateName={conversation.candidateName ?? 'Candidate'}
+          currentAgentId={conversation.assignedAgentId ?? null}
+          onClose={() => setTransferOpen(false)}
+          onTransferred={() => refetch()}
         />
       )}
     </div>

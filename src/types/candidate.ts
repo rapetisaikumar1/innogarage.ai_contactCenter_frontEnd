@@ -1,12 +1,11 @@
 export type CandidateStatus =
-  | 'NEW'
-  | 'CONTACTED'
-  | 'INTERESTED'
-  | 'DOCUMENTS_PENDING'
-  | 'INTERVIEW_SCHEDULED'
-  | 'FOLLOW_UP_REQUIRED'
-  | 'CLOSED_WON'
-  | 'CLOSED_LOST';
+  | 'INITIAL_EVALUATION_DONE'
+  | 'AWAITING_RESUME'
+  | 'RESUME_SHARED'
+  | 'MARKETING_STARTED'
+  | 'CANDIDATE_GOT_OFFER'
+  | 'BGC_ONGOING'
+  | 'STARTED_WORKING';
 
 export interface CandidateAssignment {
   user: { id: string; name: string; email: string };

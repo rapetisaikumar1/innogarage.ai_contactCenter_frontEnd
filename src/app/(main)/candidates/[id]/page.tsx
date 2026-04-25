@@ -89,143 +89,159 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
   const assignedTo = candidate.assignments[0]?.user;
 
   return (
-    <div className="space-y-4">
-      {/* Back link */}
-      <Link href="/candidates" className="text-sm text-blue-600 hover:underline">← Back to Candidates</Link>
-
-      {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-xl font-semibold text-gray-800">{candidate.fullName}</h1>
-            <p className="text-sm text-gray-500 mt-0.5">{candidate.phoneNumber}{candidate.email ? ` · ${candidate.email}` : ''}</p>
-            {candidate.city && <p className="text-sm text-gray-500">{candidate.city}</p>}
-          </div>
-          <div className="flex items-center gap-3">
-            <select
-              value={candidate.status}
-              onChange={handleStatusChange}
-              disabled={updatingStatus}
-              className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              {ALL_STATUSES.map((s) => (
-                <option key={s} value={s}>{STATUS_LABELS[s]}</option>
-              ))}
-            </select>
-            <Link
-              href={`/inbox/${id}`}
-              className="px-3 py-1.5 text-sm border border-green-300 text-green-700 bg-green-50 rounded-lg hover:bg-green-100 flex items-center gap-1.5"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3v-3z" />
-              </svg>
-              WhatsApp
-            </Link>
-            <button
-              onClick={handleCall}
-              disabled={calling}
-              className="px-3 py-1.5 text-sm border border-blue-300 text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-              {calling ? 'Calling...' : 'Call'}
-            </button>
-            <button
-              onClick={() => setShowEdit(true)}
-              className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
-              Edit
-            </button>
-          </div>
-        </div>
-
-        {/* Call feedback toast */}
-        {callMessage && (
-          <div className={`mt-3 px-4 py-2 rounded-lg text-sm ${callMessage.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
-            {callMessage.text}
-          </div>
-        )}
-
-        {/* Key info row */}
-        <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-100 text-sm">
-          <div>
-            <span className="text-gray-500">Preferred Role</span>
-            <p className="font-medium text-gray-800 mt-0.5">{candidate.preferredRole ?? '—'}</p>
-          </div>
-          <div>
-            <span className="text-gray-500">Experience</span>
-            <p className="font-medium text-gray-800 mt-0.5">{candidate.experience ?? '—'}</p>
-          </div>
-          <div>
-            <span className="text-gray-500">Assigned To</span>
-            <p className="font-medium text-gray-800 mt-0.5">{assignedTo?.name ?? 'Unassigned'}</p>
-          </div>
-          <div>
-            <span className="text-gray-500">WhatsApp</span>
-            <p className="font-medium text-gray-800 mt-0.5">{candidate.whatsappNumber ?? '—'}</p>
-          </div>
-          <div>
-            <span className="text-gray-500">Source</span>
-            <p className="font-medium text-gray-800 mt-0.5">{candidate.source ?? '—'}</p>
-          </div>
-          <div>
-            <span className="text-gray-500">Added</span>
-            <p className="font-medium text-gray-800 mt-0.5">{formatDate(candidate.createdAt)}</p>
-          </div>
-        </div>
-
-        {candidate.skills && (
-          <div className="mt-3 pt-3 border-t border-gray-100 text-sm">
-            <span className="text-gray-500">Skills</span>
-            <p className="text-gray-800 mt-0.5">{candidate.skills}</p>
-          </div>
-        )}
-        {candidate.qualification && (
-          <div className="mt-2 text-sm">
-            <span className="text-gray-500">Qualification</span>
-            <p className="text-gray-800 mt-0.5">{candidate.qualification}</p>
-          </div>
-        )}
+    <div className="space-y-0 pb-8">
+      {/* ── Back link ────────────────────────────────────────────────────── */}
+      <div className="pb-4">
+        <Link
+          href="/candidates"
+          className="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 font-medium transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Candidates
+        </Link>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 border-b border-gray-200">
-        {(['overview', 'notes', 'files', 'calls', 'history'] as const).map((tab) => (
+      {/* ── Profile card ─────────────────────────────────────────────────── */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        {/* Top accent bar */}
+        <div className="h-1.5 bg-slate-900" />
+
+        <div className="px-6 pt-6 pb-7">
+          {/* Name row + actions */}
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-4">
+              {/* Avatar */}
+              <div className="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center text-white text-2xl font-bold flex-shrink-0 select-none">
+                {candidate.fullName.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-slate-900 leading-tight">{candidate.fullName}</h1>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
+                  {candidate.phoneNumber && (
+                    <span className="text-sm text-slate-500">{candidate.phoneNumber}</span>
+                  )}
+                  {candidate.email && (
+                    <>
+                      <span className="text-slate-300 select-none">·</span>
+                      <span className="text-sm text-slate-500">{candidate.email}</span>
+                    </>
+                  )}
+                  {candidate.city && (
+                    <>
+                      <span className="text-slate-300 select-none">·</span>
+                      <span className="text-sm text-slate-500">{candidate.city}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex items-center gap-2 flex-wrap justify-end">
+              <select
+                value={candidate.status}
+                onChange={handleStatusChange}
+                disabled={updatingStatus}
+                className="border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:opacity-50 cursor-pointer"
+              >
+                {ALL_STATUSES.map((s) => (
+                  <option key={s} value={s}>{STATUS_LABELS[s]}</option>
+                ))}
+              </select>
+              <button
+                onClick={() => setShowEdit(true)}
+                className="px-4 py-2 text-sm font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
+              >
+                Edit
+              </button>
+            </div>
+          </div>
+
+          {/* Call feedback toast */}
+          {callMessage && (
+            <div className={`mt-4 px-4 py-2.5 rounded-xl text-sm font-medium border ${callMessage.type === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
+              {callMessage.text}
+            </div>
+          )}
+
+          {/* Info grid */}
+          <div className="mt-6 pt-6 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+            <div>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Preferred Role</p>
+              <p className="mt-1 text-sm font-semibold text-slate-800">{candidate.preferredRole ?? '—'}</p>
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Experience</p>
+              <p className="mt-1 text-sm font-semibold text-slate-800">{candidate.experience ?? '—'}</p>
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Assigned To</p>
+              <p className="mt-1 text-sm font-semibold text-slate-800">{assignedTo?.name ?? 'Unassigned'}</p>
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Added</p>
+              <p className="mt-1 text-sm font-semibold text-slate-800">{formatDate(candidate.createdAt)}</p>
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">WhatsApp</p>
+              <p className="mt-1 text-sm font-semibold text-slate-800">{candidate.whatsappNumber ?? '—'}</p>
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Source</p>
+              <p className="mt-1 text-sm font-semibold text-slate-800">{candidate.source ?? '—'}</p>
+            </div>
+            {candidate.skills && (
+              <div>
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Skills</p>
+                <p className="mt-1 text-sm font-semibold text-slate-800">{candidate.skills}</p>
+              </div>
+            )}
+            {candidate.qualification && (
+              <div>
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Qualification</p>
+                <p className="mt-1 text-sm font-semibold text-slate-800">{candidate.qualification}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Tabs bar ─────────────────────────────────────────────────────── */}
+      <div className="mt-5 flex gap-0 border-b border-slate-200">
+        {(['overview', 'notes', 'files', 'calls', 'history'] as const).map((t) => (
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 text-sm font-medium capitalize border-b-2 transition-colors ${
-              activeTab === tab
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-800'
+            key={t}
+            onClick={() => setActiveTab(t)}
+            className={`px-5 py-3 text-sm font-semibold border-b-2 transition-colors ${
+              activeTab === t
+                ? 'border-slate-900 text-slate-900'
+                : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'
             }`}
           >
-            {tab === 'history' ? 'Status History' : tab === 'calls' ? 'Call Logs' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {t === 'history' ? 'Status History' : t === 'calls' ? 'Call Logs' : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
         ))}
       </div>
 
-      {/* Tab content */}
+      {/* ── Tab content ──────────────────────────────────────────────────── */}
       {activeTab === 'overview' && (
-        <div className="space-y-4">
-          {/* Follow-ups */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-gray-700">Follow-ups</h3>
+        <div className="mt-4">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Follow-ups</h3>
               <button
                 onClick={() => setShowFollowUpForm(true)}
-                className="text-xs px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="text-xs px-3 py-1.5 bg-slate-900 text-white rounded-lg hover:bg-slate-800 font-semibold transition-colors"
               >
                 + Schedule
               </button>
             </div>
             {followUps.length === 0 ? (
-              <p className="text-sm text-gray-400">No follow-ups scheduled.</p>
+              <p className="text-sm text-slate-400">No follow-ups scheduled.</p>
             ) : (
-              <div>
+              <div className="space-y-2">
                 {followUps.map((fu) => (
                   <FollowUpCard key={fu.id} followUp={fu} onUpdated={refetchFollowUps} />
                 ))}
@@ -236,39 +252,39 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
       )}
 
       {activeTab === 'notes' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Notes</h3>
+        <div className="mt-4 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-4">Notes</h3>
           <NotesList candidateId={id} />
         </div>
       )}
 
       {activeTab === 'files' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Files</h3>
+        <div className="mt-4 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-4">Files</h3>
           <FilesList candidateId={id} />
         </div>
       )}
 
       {activeTab === 'calls' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Call Logs</h3>
+        <div className="mt-4 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-4">Call Logs</h3>
           <CallsList candidateId={id} phoneNumber={candidate.phoneNumber} />
         </div>
       )}
 
       {activeTab === 'history' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Status History</h3>
+        <div className="mt-4 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-4">Status History</h3>
           {candidate.statusHistory.length === 0 ? (
-            <p className="text-sm text-gray-400">No status changes yet.</p>
+            <p className="text-sm text-slate-400">No status changes yet.</p>
           ) : (
             <ul className="space-y-3">
               {candidate.statusHistory.map((h) => (
                 <li key={h.id} className="flex items-center gap-3 text-sm">
                   <StatusBadge status={h.oldStatus} />
-                  <span className="text-gray-400">→</span>
+                  <span className="text-slate-400">→</span>
                   <StatusBadge status={h.newStatus} />
-                  <span className="text-gray-500 ml-auto">{h.changedBy.name} · {formatDateTime(h.changedAt)}</span>
+                  <span className="text-slate-500 ml-auto text-xs">{h.changedBy.name} · {formatDateTime(h.changedAt)}</span>
                 </li>
               ))}
             </ul>
@@ -276,11 +292,11 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
         </div>
       )}
 
-      {/* Follow-up Form Modal */}
+      {/* ── Follow-up Modal ───────────────────────────────────────────────── */}
       {showFollowUpForm && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Schedule Follow-up</h2>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+            <h2 className="text-base font-bold text-slate-900 mb-4">Schedule Follow-up</h2>
             <FollowUpForm
               candidateId={id}
               onSuccess={() => { setShowFollowUpForm(false); refetchFollowUps(); }}
@@ -290,11 +306,11 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
         </div>
       )}
 
-      {/* Edit Modal */}
+      {/* ── Edit Modal ────────────────────────────────────────────────────── */}
       {showEdit && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Edit Candidate</h2>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6">
+            <h2 className="text-base font-bold text-slate-900 mb-4">Edit Candidate</h2>
             <CandidateForm
               candidate={candidate}
               onSuccess={() => { setShowEdit(false); refetch(); }}
