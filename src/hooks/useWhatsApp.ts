@@ -109,6 +109,19 @@ export async function assignConversationToSelf(conversationId: string): Promise<
   await api.post(`/whatsapp/conversations/${conversationId}/assign`, {});
 }
 
+// ─── Reassign conversation to a specific agent (admin/manager only) ──────────
+export async function reassignConversation(
+  conversationId: string,
+  newAgentId: string
+): Promise<void> {
+  await api.post(`/whatsapp/conversations/${conversationId}/reassign`, { newAgentId });
+}
+
+// ─── Unassign conversation (admin/manager only) ──────────────────────────────
+export async function unassignConversation(conversationId: string): Promise<void> {
+  await api.post(`/whatsapp/conversations/${conversationId}/unassign`, {});
+}
+
 // ─── Mark all notifications for a conversation as read ────────────────────────
 export async function markConversationRead(conversationId: string): Promise<void> {
   await api.post(`/whatsapp/conversations/${conversationId}/read`, {}).catch(() => {});

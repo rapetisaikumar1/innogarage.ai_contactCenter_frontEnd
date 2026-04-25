@@ -8,6 +8,7 @@ import { useSocket } from '@/hooks/useSocket';
 import ConversationList from '@/components/whatsapp/ConversationList';
 import MessageThread from '@/components/whatsapp/MessageThread';
 import MessageInput from '@/components/whatsapp/MessageInput';
+import ReassignModal from '@/components/whatsapp/ReassignModal';
 
 type TabKey = 'unassigned' | 'mine' | 'closed' | 'all' | 'assigned';
 
@@ -24,6 +25,7 @@ export default function InboxPage() {
   const [search, setSearch] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [assigning, setAssigning] = useState<string | null>(null);
+  const [reassignOpen, setReassignOpen] = useState(false);
 
   const { data: threadData, isLoading: threadLoading, error: threadError, refetch: refetchThread, bottomRef } = useThread(selectedId ?? '');
 
@@ -307,6 +309,15 @@ export default function InboxPage() {
                         {assigning === conversation.conversationId ? 'Assigning…' : 'Assign to me'}
                       </button>
                     )}
+                    {/* Reassign button — admins/managers only on ASSIGNED conversations */}
+                    {isAdmin && conversation?.status === 'ASSIGNED' && (
+                      <button
+                        onClick={() => setReassignOpen(true)}
+                        className="px-3 py-1.5 text-xs font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
+                      >
+                        Reassign
+                      </button>
+                    )}
                     <Link
                       href={`/candidates/${selectedId}`}
                       className="text-xs font-medium text-slate-600 hover:text-slate-900 border border-slate-200 px-2.5 py-1 rounded-lg hover:bg-slate-50 transition-colors"
@@ -348,6 +359,20 @@ export default function InboxPage() {
           </>
         )}
       </main>
+
+      {/* ── Reassign modal (admin/manager only) ──────────────────────── */}
+      {reassignOpen && conversation && conversation.status === 'ASSIGNED' && (
+        <ReassignModal
+          conversationId={conversation.conversationId}
+          candidateName={conversation.candidateName ?? 'Candidate'}
+          currentAgentId={conversation.assignedAgentId ?? null}
+          onClose={() => setReassignOpen(false)}
+          onReassigned={() => {
+            // Backend already broadcasts conversation:updated. refetch to be safe.
+            refetch();
+          }}
+        />
+      )}
     </div>
   );
 }

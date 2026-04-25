@@ -28,7 +28,7 @@ export interface AgentCandidate {
 }
 
 function getHeaders() {
-  const token = sessionStorage.getItem('token');
+  const token = typeof window !== 'undefined' ? sessionStorage.getItem('cc_token') : null;
   return {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
