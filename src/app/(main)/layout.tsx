@@ -243,17 +243,15 @@ export default function MainLayout({ children }: { children: ReactNode }) {
           style={{ height: '100vh', position: 'sticky', top: 0, alignSelf: 'flex-start' }}>
           {/* Logo */}
           <div className="px-4 pt-3 pb-2.5 flex-shrink-0 border-b border-slate-100">
-            {/* Headset icon — top 47% of logo.png, text portion hidden */}
-            <div className="relative overflow-hidden w-full" style={{ height: '70px' }}>
-              <Image
-                src="/logo.png"
-                alt=""
-                fill
-                sizes="224px"
-                className="object-cover object-top"
-                priority
-              />
-            </div>
+            {/* Headset icon — icon-only crop of logo.png (no text portion) */}
+            <Image
+              src="/logo-icon.png"
+              alt="innogarage headset icon"
+              width={192}
+              height={74}
+              className="w-full h-auto object-contain"
+              priority
+            />
             {/* Gradient "innogarage" text */}
             <p
               className="font-bold text-[22px] leading-none tracking-tight mt-2 text-center"
