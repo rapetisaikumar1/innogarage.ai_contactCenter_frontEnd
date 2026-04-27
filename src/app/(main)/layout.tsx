@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { SoftphoneProvider, useSoftphone } from '@/hooks/useSoftphone';
 import Softphone from '@/components/voice/Softphone';
 import NotificationBell from '@/components/layout/NotificationBell';
+import TransferRequestAlert from '@/components/layout/TransferRequestAlert';
 import { User } from '@/types';
 import { useNotifications } from '@/hooks/useNotifications';
 import { updateMyAvailability, type Availability } from '@/hooks/useAgents';
@@ -286,6 +287,9 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         </div>
 
         <Softphone />
+
+        {/* Global transfer request alert — shown to Agent B when a transfer request arrives */}
+        <TransferRequestAlert />
       </div>
     </SoftphoneProvider>
   );
