@@ -88,7 +88,7 @@ export default function InboxPage() {
   }
 
   // ── Socket: live inbox updates ────────────────────────────────────────────
-  const handleSocketUpdate = useCallback((data: unknown) => {
+  const handleConversationOwnershipChange = useCallback((data: unknown) => {
     const payload = data as Partial<ConversationSummary> & { conversationId?: string };
     if (!payload.conversationId) return;
     setInbox((prev) =>
@@ -96,7 +96,8 @@ export default function InboxPage() {
         c.conversationId === payload.conversationId ? { ...c, ...payload } : c
       )
     );
-  }, [setInbox]);
+    refetch();
+  }, [setInbox, refetch]);
 
   const handleRemovedFromInbox = useCallback(
     (data: unknown) => {
@@ -111,8 +112,8 @@ export default function InboxPage() {
   );
 
   useSocket({
-    'conversation:updated': handleSocketUpdate,
-    'conversation:assigned': handleSocketUpdate,
+    'conversation:updated': handleConversationOwnershipChange,
+    'conversation:assigned': handleConversationOwnershipChange,
     'whatsapp:new_unassigned_message': (_data) => {
       // Bump unread count on the conversation item if it's not currently open
       const payload = _data as { conversationId?: string };

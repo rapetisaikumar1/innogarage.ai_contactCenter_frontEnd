@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
+import { useSocket } from './useSocket';
 import { Candidate, CandidateDetail, PaginatedCandidates } from '@/types/candidate';
 import { ApiResponse } from '@/types';
 
@@ -39,6 +40,17 @@ export function useCandidates(params: ListParams = {}) {
   }, [params.page, params.search, params.status, params.limit]);
 
   useEffect(() => { fetch(); }, [fetch]);
+
+  useSocket({
+    'conversation:updated': () => { fetch(); },
+    'conversation:assigned': () => { fetch(); },
+    'agent:notification:new': (data) => {
+      const notification = data as { type?: string };
+      if (notification.type === 'CANDIDATE_ASSIGNED' || notification.type === 'TRANSFER_ACCEPTED') {
+        fetch();
+      }
+    },
+  });
 
   return { data, isLoading, error, refetch: fetch };
 }
