@@ -134,8 +134,12 @@ function TopNav({ user }: { user: User }) {
   }
 
   return (
-    <header className="h-14 flex-shrink-0 flex items-center justify-end px-6 bg-white border-b border-slate-200 z-20">
-      <div className="flex items-center gap-2">
+    <header className="h-14 flex-shrink-0 flex items-center gap-4 px-6 bg-white border-b border-slate-200 z-20">
+      <div className="flex-1 flex justify-center min-w-0">
+        <TransferRequestAlert />
+      </div>
+
+      <div className="flex items-center gap-2 flex-shrink-0">
         {/* Bell */}
         <NotificationBell />
 
@@ -288,9 +292,6 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         </div>
 
         <Softphone />
-
-        {/* Global transfer request alert — shown to Agent B when a transfer request arrives */}
-        <TransferRequestAlert />
       </div>
     </SoftphoneProvider>
   );
