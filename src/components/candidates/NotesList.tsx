@@ -64,7 +64,7 @@ export default function NotesList({ candidateId }: Props) {
           <button
             type="submit"
             disabled={submitting || !content.trim()}
-            className="px-4 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            className="px-4 py-1.5 text-sm bg-black text-white rounded-lg hover:bg-gray-900 disabled:opacity-50"
           >
             {submitting ? 'Saving...' : 'Add Note'}
           </button>

@@ -22,9 +22,17 @@ export default function NotificationBell() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  async function handleNotificationClick(n: { id: string; isRead: boolean; conversationId: string }) {
+  async function handleNotificationClick(n: { id: string; isRead: boolean; conversationId: string; type?: string; metadata?: Record<string, unknown> | null }) {
     if (!n.isRead) await markRead(n.id);
     setOpen(false);
+    // Transfer-related notifications → navigate to candidate page
+    if (n.type && ['TRANSFER_REQUEST', 'TRANSFER_ACCEPTED', 'TRANSFER_REJECTED', 'CANDIDATE_ASSIGNED'].includes(n.type)) {
+      const candidateId = n.metadata?.candidateId as string | undefined;
+      if (candidateId) {
+        router.push(`/candidates/${candidateId}`);
+        return;
+      }
+    }
     router.push('/inbox');
   }
 

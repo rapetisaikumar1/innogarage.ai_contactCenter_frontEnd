@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useCandidates } from '@/hooks/useCandidates';
+import { useAuth } from '@/hooks/useAuth';
 import StatusBadge from '@/components/candidates/StatusBadge';
 import CandidateForm from '@/components/candidates/CandidateForm';
 import { formatDate } from '@/utils/formatters';
@@ -35,6 +36,7 @@ function avatarColors(name: string) {
 }
 
 export default function CandidatesPage() {
+  const { user } = useAuth();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
@@ -61,7 +63,9 @@ export default function CandidatesPage() {
         <div>
           <h1 className="text-lg font-bold text-slate-900 leading-tight">Candidates</h1>
           <p className="text-xs text-slate-400 mt-0.5">
-            {data ? `${data.pagination.total} total candidates` : 'Manage and view all candidates'}
+            {data
+              ? `${data.pagination.total} ${user?.role === 'AGENT' ? 'assigned' : 'total'} candidate${data.pagination.total !== 1 ? 's' : ''}`
+              : user?.role === 'AGENT' ? 'Your assigned candidates' : 'Manage and view all candidates'}
           </p>
         </div>
         <button

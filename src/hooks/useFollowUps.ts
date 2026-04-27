@@ -53,7 +53,6 @@ export function useFollowUpsByCandidate(candidateId: string) {
 export function useFollowUps(params: {
   page?: number;
   status?: FollowUpStatus | '';
-  overdue?: boolean;
 }) {
   const [data, setData] = useState<PaginatedFollowUps | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -66,7 +65,6 @@ export function useFollowUps(params: {
       const query = new URLSearchParams();
       if (params.page) query.set('page', String(params.page));
       if (params.status) query.set('status', params.status);
-      if (params.overdue) query.set('overdue', 'true');
       const res = await api.get<ApiResponse<PaginatedFollowUps>>(`/follow-ups?${query.toString()}`);
       setData(res.data);
     } catch (err: unknown) {
@@ -74,7 +72,7 @@ export function useFollowUps(params: {
     } finally {
       setIsLoading(false);
     }
-  }, [params.page, params.status, params.overdue]);
+  }, [params.page, params.status]);
 
   useEffect(() => { fetchFollowUps(); }, [fetchFollowUps]);
 

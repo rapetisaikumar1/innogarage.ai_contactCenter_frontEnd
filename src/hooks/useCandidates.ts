@@ -80,3 +80,43 @@ export async function updateCandidateStatus(id: string, status: string): Promise
   const res = await api.patch<ApiResponse<Candidate>>(`/candidates/${id}/status`, { status });
   return res.data;
 }
+
+export async function assignCandidate(candidateId: string, userId: string): Promise<Candidate> {
+  const res = await api.post<ApiResponse<Candidate>>(`/candidates/${candidateId}/assign`, { userId });
+  return res.data;
+}
+
+// ── Transfer requests ─────────────────────────────────────────────────────────
+
+export interface TransferRequest {
+  id: string;
+  candidateId: string;
+  fromAgentId: string;
+  toAgentId: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  createdAt: string;
+  fromAgent: { id: string; name: string };
+  toAgent: { id: string; name: string };
+}
+
+export async function getPendingTransferRequest(candidateId: string): Promise<TransferRequest | null> {
+  const res = await api.get<ApiResponse<TransferRequest | null>>(`/candidates/${candidateId}/transfer-request/pending`);
+  return res.data;
+}
+
+export async function createTransferRequest(candidateId: string, toAgentId: string): Promise<TransferRequest> {
+  const res = await api.post<ApiResponse<TransferRequest>>(`/candidates/${candidateId}/transfer-request`, { toAgentId });
+  return res.data;
+}
+
+export async function respondToTransferRequest(
+  candidateId: string,
+  requestId: string,
+  action: 'accept' | 'reject',
+): Promise<TransferRequest> {
+  const res = await api.patch<ApiResponse<TransferRequest>>(
+    `/candidates/${candidateId}/transfer-request/${requestId}/respond`,
+    { action },
+  );
+  return res.data;
+}

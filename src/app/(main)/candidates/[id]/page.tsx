@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { use } from 'react';
-import { useCandidateDetail, updateCandidateStatus } from '@/hooks/useCandidates';
+import { useCandidateDetail, updateCandidateStatus, getPendingTransferRequest, respondToTransferRequest, TransferRequest } from '@/hooks/useCandidates';
 import StatusBadge from '@/components/candidates/StatusBadge';
 import CandidateForm from '@/components/candidates/CandidateForm';
+import TransferRequestModal from '@/components/candidates/TransferRequestModal';
 import NotesList from '@/components/candidates/NotesList';
 import FilesList from '@/components/candidates/FilesList';
 import CallsList from '@/components/calls/CallsList';
@@ -12,6 +13,7 @@ import FollowUpCard from '@/components/follow-ups/FollowUpCard';
 import FollowUpForm from '@/components/follow-ups/FollowUpForm';
 import { useFollowUpsByCandidate } from '@/hooks/useFollowUps';
 import { useSoftphone } from '@/hooks/useSoftphone';
+import { useAuth } from '@/hooks/useAuth';
 import { formatDate, formatDateTime, STATUS_LABELS } from '@/utils/formatters';
 import { CandidateStatus } from '@/types/candidate';
 import Link from 'next/link';
@@ -22,6 +24,7 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
   const { id } = use(params);
   const { candidate, isLoading, error, refetch } = useCandidateDetail(id);
   const { followUps, refetch: refetchFollowUps } = useFollowUpsByCandidate(id);
+  const { user } = useAuth();
   const [showEdit, setShowEdit] = useState(false);
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
@@ -29,6 +32,29 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
   const [calling, setCalling] = useState(false);
   const [callMessage, setCallMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const softphone = useSoftphone();
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [pendingTransfer, setPendingTransfer] = useState<TransferRequest | null | undefined>(undefined);
+  const [respondingTransfer, setRespondingTransfer] = useState(false);
+
+  // Load pending transfer request whenever candidate changes
+  useEffect(() => {
+    if (!id) return;
+    getPendingTransferRequest(id).then(setPendingTransfer).catch(() => setPendingTransfer(null));
+  }, [id]);
+
+  async function handleRespondTransfer(action: 'accept' | 'reject') {
+    if (!pendingTransfer) return;
+    setRespondingTransfer(true);
+    try {
+      await respondToTransferRequest(id, pendingTransfer.id, action);
+      setPendingTransfer(null);
+      refetch();
+    } catch {
+      // ignore
+    } finally {
+      setRespondingTransfer(false);
+    }
+  }
 
   async function handleCall() {
     if (!candidate) return;
@@ -87,6 +113,11 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
   );
 
   const assignedTo = candidate.assignments[0]?.user;
+
+  // Transfer button state for agents
+  const isAssignedAgent = user?.role === 'AGENT' && assignedTo?.id === user?.id;
+  const isTransferTarget = pendingTransfer?.toAgentId === user?.id;
+  const isTransferRequester = pendingTransfer?.fromAgentId === user?.id;
 
   return (
     <div className="space-y-0 pb-8">
@@ -156,6 +187,42 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
               >
                 Edit
               </button>
+
+              {/* Transfer request buttons — only shown to the assigned agent */}
+              {isAssignedAgent && !pendingTransfer && (
+                <button
+                  onClick={() => setShowTransferModal(true)}
+                  className="px-4 py-2 text-sm font-semibold bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+                >
+                  Transfer
+                </button>
+              )}
+              {isAssignedAgent && isTransferRequester && pendingTransfer && (
+                <span
+                  title={`Transfer requested to ${pendingTransfer.toAgent.name}`}
+                  className="px-4 py-2 text-sm font-semibold bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed opacity-60 select-none"
+                >
+                  Transfer Requested
+                </span>
+              )}
+              {isTransferTarget && pendingTransfer && (
+                <>
+                  <button
+                    onClick={() => handleRespondTransfer('accept')}
+                    disabled={respondingTransfer}
+                    className="px-4 py-2 text-sm font-semibold bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+                  >
+                    Accept Transfer
+                  </button>
+                  <button
+                    onClick={() => handleRespondTransfer('reject')}
+                    disabled={respondingTransfer}
+                    className="px-4 py-2 text-sm font-semibold bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+                  >
+                    Reject
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -169,11 +236,11 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
           {/* Info grid */}
           <div className="mt-6 pt-6 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
             <div>
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Preferred Role</p>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Preferred Technology</p>
               <p className="mt-1 text-sm font-semibold text-slate-800">{candidate.preferredRole ?? '—'}</p>
             </div>
             <div>
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Experience</p>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Visa Status</p>
               <p className="mt-1 text-sm font-semibold text-slate-800">{candidate.experience ?? '—'}</p>
             </div>
             <div>
@@ -189,15 +256,9 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
               <p className="mt-1 text-sm font-semibold text-slate-800">{candidate.whatsappNumber ?? '—'}</p>
             </div>
             <div>
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Source</p>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Country</p>
               <p className="mt-1 text-sm font-semibold text-slate-800">{candidate.source ?? '—'}</p>
             </div>
-            {candidate.skills && (
-              <div>
-                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Skills</p>
-                <p className="mt-1 text-sm font-semibold text-slate-800">{candidate.skills}</p>
-              </div>
-            )}
             {candidate.qualification && (
               <div>
                 <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Qualification</p>
@@ -318,6 +379,20 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
             />
           </div>
         </div>
+      )}
+
+      {/* ── Transfer Request Modal ─────────────────────────────────────────── */}
+      {showTransferModal && assignedTo && (
+        <TransferRequestModal
+          candidateId={id}
+          candidateName={candidate.fullName}
+          currentAgentId={assignedTo.id}
+          onClose={() => setShowTransferModal(false)}
+          onSuccess={() => {
+            setShowTransferModal(false);
+            getPendingTransferRequest(id).then(setPendingTransfer).catch(() => setPendingTransfer(null));
+          }}
+        />
       )}
     </div>
   );

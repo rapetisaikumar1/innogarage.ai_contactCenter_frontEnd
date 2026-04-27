@@ -39,7 +39,7 @@ export interface DashboardStats {
   }[];
 }
 
-export function useDashboard() {
+export function useDashboard(dateRange?: { from: string; to: string }) {
   const [data, setData] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,14 +48,18 @@ export function useDashboard() {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await api.get<ApiResponse<DashboardStats>>('/dashboard');
+      const query = new URLSearchParams();
+      if (dateRange?.from) query.set('from', dateRange.from);
+      if (dateRange?.to) query.set('to', dateRange.to);
+      const qs = query.toString();
+      const res = await api.get<ApiResponse<DashboardStats>>(`/dashboard${qs ? `?${qs}` : ''}`);
       setData(res.data);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load dashboard');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [dateRange?.from, dateRange?.to]);
 
   useEffect(() => { fetchStats(); }, [fetchStats]);
 

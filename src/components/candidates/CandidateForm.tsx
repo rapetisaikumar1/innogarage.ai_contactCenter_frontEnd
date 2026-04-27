@@ -17,7 +17,6 @@ const EMPTY_FORM = {
   email: '',
   city: '',
   qualification: '',
-  skills: '',
   experience: '',
   preferredRole: '',
   source: '',
@@ -32,7 +31,6 @@ export default function CandidateForm({ candidate, onSuccess, onCancel }: Props)
     email: candidate?.email ?? EMPTY_FORM.email,
     city: candidate?.city ?? EMPTY_FORM.city,
     qualification: candidate?.qualification ?? EMPTY_FORM.qualification,
-    skills: candidate?.skills ?? EMPTY_FORM.skills,
     experience: candidate?.experience ?? EMPTY_FORM.experience,
     preferredRole: candidate?.preferredRole ?? EMPTY_FORM.preferredRole,
     source: candidate?.source ?? EMPTY_FORM.source,
@@ -93,22 +91,17 @@ export default function CandidateForm({ candidate, onSuccess, onCancel }: Props)
           <input name="qualification" value={form.qualification ?? ''} onChange={handleChange} className={inputClass} />
         </div>
         <div>
-          <label className={labelClass}>Preferred Role</label>
+          <label className={labelClass}>Preferred Technology</label>
           <input name="preferredRole" value={form.preferredRole ?? ''} onChange={handleChange} className={inputClass} />
         </div>
         <div>
-          <label className={labelClass}>Experience</label>
-          <input name="experience" value={form.experience ?? ''} onChange={handleChange} className={inputClass} placeholder="e.g. 2 years" />
+          <label className={labelClass}>Visa Status</label>
+          <input name="experience" value={form.experience ?? ''} onChange={handleChange} className={inputClass} placeholder="e.g. H1B, OPT, GC" />
         </div>
         <div>
-          <label className={labelClass}>Source</label>
-          <input name="source" value={form.source ?? ''} onChange={handleChange} className={inputClass} placeholder="e.g. WhatsApp, Referral" />
+          <label className={labelClass}>Country</label>
+          <input name="source" value={form.source ?? ''} onChange={handleChange} className={inputClass} placeholder="e.g. USA, India" />
         </div>
-      </div>
-
-      <div>
-        <label className={labelClass}>Skills</label>
-        <textarea name="skills" value={form.skills ?? ''} onChange={handleChange} rows={2} className={inputClass} placeholder="e.g. JavaScript, React, Node.js" />
       </div>
 
       {error && (
@@ -119,7 +112,7 @@ export default function CandidateForm({ candidate, onSuccess, onCancel }: Props)
         <button type="button" onClick={onCancel} className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
           Cancel
         </button>
-        <button type="submit" disabled={isLoading} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+        <button type="submit" disabled={isLoading} className="px-4 py-2 text-sm bg-black text-white rounded-lg hover:bg-gray-900 disabled:opacity-50">
           {isLoading ? 'Saving...' : isEdit ? 'Update Candidate' : 'Add Candidate'}
         </button>
       </div>

@@ -13,6 +13,10 @@ export interface AppNotification {
   body: string;
   isRead: boolean;
   createdAt: string;
+  /** present on agent notifications */
+  metadata?: Record<string, unknown> | null;
+  /** used internally to distinguish notification sources for markRead routing */
+  _source?: 'whatsapp' | 'agent';
 }
 
 // ── Play the notification sound using the bundled MP3 ───────────────────────────
@@ -60,8 +64,19 @@ export function useNotifications() {
     isLoadingRef.current = true;
     setIsLoading(true);
     try {
-      const res = await api.get<ApiResponse<AppNotification[]>>('/whatsapp/notifications');
-      setNotifications(res.data ?? []);
+      const [whatsappRes, agentRes] = await Promise.all([
+        api.get<ApiResponse<AppNotification[]>>('/whatsapp/notifications').catch(() => ({ data: [] as AppNotification[] })),
+        api.get<ApiResponse<AppNotification[]>>('/agent-notifications').catch(() => ({ data: [] as AppNotification[] })),
+      ]);
+
+      const whatsapp = (whatsappRes.data ?? []).map((n) => ({ ...n, _source: 'whatsapp' as const }));
+      const agent = (agentRes.data ?? []).map((n) => ({ ...n, _source: 'agent' as const }));
+
+      // Merge and sort by createdAt desc
+      const merged = [...whatsapp, ...agent].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+      setNotifications(merged);
       initialLoadDoneRef.current = true;
     } catch {
       // silently fail
@@ -78,21 +93,42 @@ export function useNotifications() {
   }, [fetchNotifications]);
 
   const markRead = useCallback(async (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-    );
-    await api.post(`/whatsapp/notifications/${id}/read`, {}).catch(() => {});
+    setNotifications((prev) => {
+      const target = prev.find((n) => n.id === id);
+      if (!target) return prev;
+      const source = target._source ?? 'whatsapp';
+      if (source === 'agent') {
+        api.post(`/agent-notifications/${id}/read`, {}).catch(() => {});
+      } else {
+        api.post(`/whatsapp/notifications/${id}/read`, {}).catch(() => {});
+      }
+      return prev.map((n) => (n.id === id ? { ...n, isRead: true } : n));
+    });
   }, []);
 
   const markAllRead = useCallback(async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-    await api.post('/whatsapp/notifications/read-all', {}).catch(() => {});
+    await Promise.all([
+      api.post('/whatsapp/notifications/read-all', {}).catch(() => {}),
+      api.post('/agent-notifications/read-all', {}).catch(() => {}),
+    ]);
   }, []);
 
   // Real-time: new notification arrives via socket
   useSocket({
     'notification:new': (data) => {
-      const notification = data as AppNotification;
+      const notification = { ...(data as AppNotification), _source: 'whatsapp' as const };
+      setNotifications((prev) => {
+        if (prev.some((n) => n.id === notification.id)) return prev;
+        return [notification, ...prev];
+      });
+      if (initialLoadDoneRef.current) {
+        playNotificationSound();
+        showBrowserNotification(notification.title, notification.body);
+      }
+    },
+    'agent:notification:new': (data) => {
+      const notification = { ...(data as AppNotification), _source: 'agent' as const };
       setNotifications((prev) => {
         if (prev.some((n) => n.id === notification.id)) return prev;
         return [notification, ...prev];
