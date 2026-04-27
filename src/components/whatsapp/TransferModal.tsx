@@ -2,14 +2,15 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useAgents, type Agent } from '@/hooks/useAgents';
-import { reassignConversation } from '@/hooks/useWhatsApp';
+import { createTransferRequest } from '@/hooks/useCandidates';
 
 interface Props {
   conversationId: string;
+  candidateId: string;
   candidateName: string;
   currentAgentId: string | null;
   onClose: () => void;
-  onTransferred: () => void;
+  onRequestSent: () => void;
 }
 
 const AVAIL_DOT: Record<Agent['availability'], string> = {
@@ -27,11 +28,12 @@ const AVAIL_LABEL: Record<Agent['availability'], string> = {
 };
 
 export default function TransferModal({
-  conversationId,
+  conversationId: _conversationId,
+  candidateId,
   candidateName,
   currentAgentId,
   onClose,
-  onTransferred,
+  onRequestSent,
 }: Props) {
   const { agents, loading, error } = useAgents();
   const [search, setSearch] = useState('');
@@ -69,11 +71,11 @@ export default function TransferModal({
     setSubmitting(true);
     setSubmitError(null);
     try {
-      await reassignConversation(conversationId, selectedId);
-      onTransferred();
+      await createTransferRequest(candidateId, selectedId);
+      onRequestSent();
       onClose();
     } catch (e) {
-      setSubmitError(e instanceof Error ? e.message : 'Transfer failed');
+      setSubmitError(e instanceof Error ? e.message : 'Transfer request failed');
     } finally {
       setSubmitting(false);
     }
@@ -199,7 +201,7 @@ export default function TransferModal({
             disabled={!selectedId || submitting}
             className="px-4 py-2 text-sm font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {submitting ? 'Transferring…' : 'Transfer'}
+            {submitting ? 'Sending Request…' : 'Send Transfer Request'}
           </button>
         </div>
       </div>

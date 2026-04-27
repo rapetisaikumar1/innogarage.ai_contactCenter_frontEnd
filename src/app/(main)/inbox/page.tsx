@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useInbox, useThread, sendWhatsAppMessage, assignConversationToSelf, ConversationSummary } from '@/hooks/useWhatsApp';
 import { useSocket } from '@/hooks/useSocket';
 import { useSoftphone } from '@/hooks/useSoftphone';
+import { getPendingTransferRequest, respondToTransferRequest, TransferRequest } from '@/hooks/useCandidates';
 import ConversationList from '@/components/whatsapp/ConversationList';
 import MessageThread from '@/components/whatsapp/MessageThread';
 import MessageInput from '@/components/whatsapp/MessageInput';
@@ -30,6 +31,8 @@ export default function InboxPage() {
   const [reassignOpen, setReassignOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
   const [calling, setCalling] = useState(false);
+  const [pendingTransfer, setPendingTransfer] = useState<TransferRequest | null>(null);
+  const [respondingTransfer, setRespondingTransfer] = useState(false);
 
   const softphone = useSoftphone();
 
@@ -58,6 +61,26 @@ export default function InboxPage() {
   });
 
   const conversation = inbox.find((c) => c.candidateId === selectedId);
+
+  // ── Load pending transfer whenever selected conversation changes ──────────
+  useEffect(() => {
+    if (!selectedId) { setPendingTransfer(null); return; }
+    getPendingTransferRequest(selectedId).then(setPendingTransfer).catch(() => setPendingTransfer(null));
+  }, [selectedId]);
+
+  async function handleRespondTransfer(action: 'accept' | 'reject') {
+    if (!pendingTransfer || !selectedId) return;
+    setRespondingTransfer(true);
+    try {
+      await respondToTransferRequest(selectedId, pendingTransfer.id, action);
+      setPendingTransfer(null);
+      refetch();
+    } catch {
+      // ignore
+    } finally {
+      setRespondingTransfer(false);
+    }
+  }
 
   // ── Select a conversation (no badge clearing — only clears on agent reply) ─
   function handleSelect(candidateId: string) {
@@ -336,14 +359,42 @@ export default function InboxPage() {
                         Reassign
                       </button>
                     )}
-                    {/* Transfer button — agents only on their own assigned conversations */}
-                    {!isAdmin && conversation?.status === 'ASSIGNED' && conversation.assignedAgentId === user?.id && (
+                    {/* Transfer controls — agents only on their own assigned conversations */}
+                    {!isAdmin && conversation?.status === 'ASSIGNED' && conversation.assignedAgentId === user?.id && !pendingTransfer && (
                       <button
                         onClick={() => setTransferOpen(true)}
                         className="px-3 py-1.5 text-xs font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
                       >
                         Transfer
                       </button>
+                    )}
+                    {/* Transfer Requested — faded, unclickable, shows target agent on hover */}
+                    {!isAdmin && pendingTransfer && pendingTransfer.fromAgentId === user?.id && (
+                      <span
+                        title={`Transfer requested to ${pendingTransfer.toAgent.name}`}
+                        className="px-3 py-1.5 text-xs font-semibold bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed opacity-60 select-none"
+                      >
+                        Transfer Requested
+                      </span>
+                    )}
+                    {/* Accept / Reject — shown to the target agent */}
+                    {!isAdmin && pendingTransfer && pendingTransfer.toAgentId === user?.id && (
+                      <>
+                        <button
+                          onClick={() => handleRespondTransfer('accept')}
+                          disabled={respondingTransfer}
+                          className="px-3 py-1.5 text-xs font-semibold bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+                        >
+                          Accept Transfer
+                        </button>
+                        <button
+                          onClick={() => handleRespondTransfer('reject')}
+                          disabled={respondingTransfer}
+                          className="px-3 py-1.5 text-xs font-semibold bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+                        >
+                          Reject
+                        </button>
+                      </>
                     )}
                     {/* Call icon button — green, visible when candidate has a number */}
                     {conversation?.whatsappNumber && (
@@ -410,13 +461,17 @@ export default function InboxPage() {
           onReassigned={() => refetch()}
         />
       )}
-      {transferOpen && conversation && conversation.status === 'ASSIGNED' && (
+      {transferOpen && conversation && conversation.status === 'ASSIGNED' && selectedId && (
         <TransferModal
           conversationId={conversation.conversationId}
+          candidateId={selectedId}
           candidateName={conversation.candidateName ?? 'Candidate'}
           currentAgentId={conversation.assignedAgentId ?? null}
           onClose={() => setTransferOpen(false)}
-          onTransferred={() => refetch()}
+          onRequestSent={() => {
+            setTransferOpen(false);
+            getPendingTransferRequest(selectedId).then(setPendingTransfer).catch(() => {});
+          }}
         />
       )}
     </div>
