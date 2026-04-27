@@ -32,7 +32,8 @@ const AVAILABILITY_OPTIONS: { value: Availability; label: string; color: string 
 
 // ─── Sidebar nav (needs unread count for WhatsApp badge) ─────────────────────
 function SidebarNav({ pathname }: { pathname: string }) {
-  const { unreadCount } = useNotifications();
+  // Inbox badge: only WhatsApp messages — ignore transfer / assignment notifications
+  const { whatsappUnreadCount } = useNotifications();
 
   return (
     <nav className="flex-1 px-3 pt-4 space-y-0.5 overflow-y-auto pb-4">
@@ -51,9 +52,9 @@ function SidebarNav({ pathname }: { pathname: string }) {
           >
             <span className={isActive ? 'text-slate-900' : 'text-slate-400'}>{item.icon}</span>
             <span className="flex-1">{item.label}</span>
-            {isInbox && unreadCount > 0 && (
+            {isInbox && whatsappUnreadCount > 0 && (
               <span className="min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
-                {unreadCount > 99 ? '99+' : unreadCount}
+                {whatsappUnreadCount > 99 ? '99+' : whatsappUnreadCount}
               </span>
             )}
           </Link>

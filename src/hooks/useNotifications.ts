@@ -148,10 +148,16 @@ export function useNotifications() {
   });
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
+  // Inbox badge should ONLY count WhatsApp message notifications — not
+  // transfer requests, candidate assignments, or other agent notifications.
+  const whatsappUnreadCount = notifications.filter(
+    (n) => !n.isRead && n._source === 'whatsapp',
+  ).length;
 
   return {
     notifications,
     unreadCount,
+    whatsappUnreadCount,
     isLoading,
     fetchNotifications,
     markRead,
