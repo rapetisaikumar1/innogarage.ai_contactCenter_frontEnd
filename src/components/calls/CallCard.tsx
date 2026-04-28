@@ -8,8 +8,7 @@ import { useState } from 'react';
 const STATUS_STYLES: Record<CallStatus, string> = {
   COMPLETED: 'bg-green-100 text-green-700',
   MISSED: 'bg-red-100 text-red-700',
-  FAILED: 'bg-orange-100 text-orange-700',
-  IN_PROGRESS: 'bg-blue-100 text-blue-700',
+  IN_CALL: 'bg-blue-100 text-blue-700',
 };
 
 interface Props {
@@ -61,7 +60,7 @@ export default function CallCard({ call, onDeleted }: Props) {
           <span className="text-xs text-gray-500">{formatDuration(call.duration)}</span>
         </div>
         {call.notes && <p className="text-xs text-gray-600 mt-0.5 truncate">{call.notes}</p>}
-        <p className="text-xs text-gray-400 mt-0.5">{call.loggedBy.name} · {formatDateTime(call.createdAt)}</p>
+        <p className="text-xs text-gray-400 mt-0.5">{call.loggedBy?.name ?? 'System'} · {formatDateTime(call.createdAt)}</p>
       </div>
 
       {/* Delete */}

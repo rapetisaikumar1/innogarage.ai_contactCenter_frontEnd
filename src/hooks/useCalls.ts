@@ -3,12 +3,12 @@ import { api } from '@/lib/api';
 import { ApiResponse } from '@/types';
 
 export type CallDirection = 'INBOUND' | 'OUTBOUND';
-export type CallStatus = 'COMPLETED' | 'MISSED' | 'FAILED' | 'IN_PROGRESS';
+export type CallStatus = 'COMPLETED' | 'MISSED' | 'IN_CALL';
 
 export interface Call {
   id: string;
   candidateId: string;
-  loggedById: string;
+  loggedById: string | null;
   direction: CallDirection;
   phoneNumber: string;
   duration: number | null;
@@ -17,7 +17,7 @@ export interface Call {
   notes: string | null;
   createdAt: string;
   candidate: { id: string; fullName: string; phoneNumber: string };
-  loggedBy: { id: string; name: string };
+  loggedBy: { id: string; name: string } | null;
 }
 
 export interface CallsPage {

@@ -13,8 +13,7 @@ interface Props {
 const STATUSES: { value: CallStatus; label: string }[] = [
   { value: 'COMPLETED', label: 'Completed' },
   { value: 'MISSED', label: 'Missed' },
-  { value: 'FAILED', label: 'Failed' },
-  { value: 'IN_PROGRESS', label: 'In Progress' },
+  { value: 'IN_CALL', label: 'In Call' },
 ];
 
 export default function LogCallForm({ candidateId, phoneNumber, onSuccess, onCancel }: Props) {

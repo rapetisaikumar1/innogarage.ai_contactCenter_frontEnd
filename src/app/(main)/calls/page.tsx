@@ -15,8 +15,7 @@ const STATUS_OPTIONS: { label: string; value: CallStatus | '' }[] = [
   { label: 'All Statuses', value: '' },
   { label: 'Completed', value: 'COMPLETED' },
   { label: 'Missed', value: 'MISSED' },
-  { label: 'Failed', value: 'FAILED' },
-  { label: 'In Progress', value: 'IN_PROGRESS' },
+  { label: 'In Call', value: 'IN_CALL' },
 ];
 
 export default function CallsPage() {
@@ -126,9 +125,8 @@ export default function CallsPage() {
                       <td className="px-6 py-4">
                         <span className={`text-sm font-medium ${
                           call.status === 'MISSED' ? 'text-red-600' :
-                          call.status === 'FAILED' ? 'text-red-600' :
                           call.status === 'COMPLETED' ? 'text-emerald-700' :
-                          'text-slate-600'
+                          'text-blue-700'
                         }`}>
                           {call.status.replace('_', ' ')}
                         </span>
@@ -138,7 +136,7 @@ export default function CallsPage() {
                           {formatDuration(call.duration)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600">{call.loggedBy.name}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{call.loggedBy?.name ?? 'System'}</td>
                       <td className="px-6 py-4 text-sm text-slate-500 whitespace-nowrap">{formatDateTime(call.createdAt)}</td>
                       <td className="px-6 py-4 text-right">
                         <Link

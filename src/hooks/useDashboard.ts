@@ -28,7 +28,7 @@ export interface DashboardStats {
     duration: number | null;
     createdAt: string;
     candidate: { id: string; fullName: string };
-    loggedBy: { id: string; name: string };
+    loggedBy: { id: string; name: string } | null;
   }[];
   recentMessages: {
     candidateId: string;
