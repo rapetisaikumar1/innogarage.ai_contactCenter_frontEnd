@@ -40,6 +40,65 @@ type DeleteDialogProps = {
 
 const DEFAULT_CATEGORY: TechnologyCategory = 'MARKETING_AUTOMATION_ADOBE_STACK';
 
+const CATEGORY_STYLES: Record<
+  TechnologyCategory,
+  {
+    header: string;
+    badge: string;
+    dot: string;
+    accent: string;
+  }
+> = {
+  MARKETING_AUTOMATION_ADOBE_STACK: {
+    header: 'bg-sky-50',
+    badge: 'border border-sky-200 bg-sky-100 text-sky-700',
+    dot: 'bg-sky-500',
+    accent: 'bg-sky-500',
+  },
+  DATA_ANALYTICS_CDP: {
+    header: 'bg-cyan-50',
+    badge: 'border border-cyan-200 bg-cyan-100 text-cyan-700',
+    dot: 'bg-cyan-500',
+    accent: 'bg-cyan-500',
+  },
+  CORE_ENGINEERING_DEVELOPMENT: {
+    header: 'bg-emerald-50',
+    badge: 'border border-emerald-200 bg-emerald-100 text-emerald-700',
+    dot: 'bg-emerald-500',
+    accent: 'bg-emerald-500',
+  },
+  AUTOMATION_TESTING_VALIDATION: {
+    header: 'bg-amber-50',
+    badge: 'border border-amber-200 bg-amber-100 text-amber-700',
+    dot: 'bg-amber-500',
+    accent: 'bg-amber-500',
+  },
+  INFRASTRUCTURE_OPERATIONS: {
+    header: 'bg-teal-50',
+    badge: 'border border-teal-200 bg-teal-100 text-teal-700',
+    dot: 'bg-teal-500',
+    accent: 'bg-teal-500',
+  },
+  ENTERPRISE_TOOLS_BUSINESS_SYSTEMS: {
+    header: 'bg-rose-50',
+    badge: 'border border-rose-200 bg-rose-100 text-rose-700',
+    dot: 'bg-rose-500',
+    accent: 'bg-rose-500',
+  },
+  SEMICONDUCTOR_HARDWARE: {
+    header: 'bg-indigo-50',
+    badge: 'border border-indigo-200 bg-indigo-100 text-indigo-700',
+    dot: 'bg-indigo-500',
+    accent: 'bg-indigo-500',
+  },
+  MISC_OTHER: {
+    header: 'bg-slate-100',
+    badge: 'border border-slate-200 bg-white text-slate-700',
+    dot: 'bg-slate-500',
+    accent: 'bg-slate-500',
+  },
+};
+
 function PrimaryButton({
   children,
   className = '',
@@ -59,6 +118,29 @@ function PrimaryButton({
       onClick={onClick}
       disabled={disabled}
       className={`inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function OutlineActionButton({
+  children,
+  className = '',
+  disabled = false,
+  onClick,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  disabled?: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`inline-flex items-center justify-center rounded-xl border border-slate-950 bg-white px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
     >
       {children}
     </button>
@@ -190,9 +272,9 @@ function DeleteDialog({ technologyName, deleting, error, onClose, onConfirm }: D
 
 function StatCard({ value, label }: { value: string; label: string }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/8 p-5 backdrop-blur-sm">
-      <p className="text-3xl font-bold text-white">{value}</p>
-      <p className="mt-2 text-sm text-slate-300">{label}</p>
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">{label}</p>
+      <p className="mt-3 text-3xl font-bold text-slate-950">{value}</p>
     </div>
   );
 }
@@ -334,20 +416,22 @@ export default function AvailableTechnologiesPage() {
   return (
     <div className="min-h-full bg-slate-50">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-6">
-        <section className="relative overflow-hidden rounded-[32px] bg-slate-950 px-6 py-8 text-white shadow-2xl sm:px-8">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(255,255,255,0.16),_transparent_34%),radial-gradient(circle_at_bottom_left,_rgba(148,163,184,0.18),_transparent_42%)]" />
-          <div className="relative grid gap-8 xl:grid-cols-[1.2fr_0.8fr] xl:items-end">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-300">Resource Directory</p>
-              <h1 className="mt-3 max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
+        <section className="overflow-hidden rounded-[28px] border border-slate-200 bg-[linear-gradient(135deg,_rgba(255,255,255,1),_rgba(248,250,252,0.96))] shadow-sm">
+          <div className="grid gap-6 px-6 py-6 xl:grid-cols-[1.3fr_0.9fr] xl:items-center">
+            <div className="flex gap-4">
+              <div className="hidden w-1 rounded-full bg-slate-950 sm:block" />
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">Resource Directory</p>
+                <h1 className="mt-3 max-w-2xl text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
                 Available Technologies
-              </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
-                Maintain a shared technology library for admin and agent teams with a clean, searchable catalogue and fast CRUD actions.
-              </p>
+                </h1>
+                <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+                  Maintain a shared technology library for admin and agent teams with a clean, searchable catalogue and fast CRUD actions.
+                </p>
+              </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1 xl:gap-4 2xl:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-3">
               <StatCard value={String(data.length)} label="Technologies tracked" />
               <StatCard value={String(totalCategories)} label="Active categories" />
               <StatCard value={String(technologiesWithDescriptions)} label="Documented entries" />
@@ -355,7 +439,7 @@ export default function AvailableTechnologiesPage() {
           </div>
         </section>
 
-        <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_240px] xl:w-[70%]">
               <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
@@ -412,14 +496,15 @@ export default function AvailableTechnologiesPage() {
           <section className="space-y-5">
             {groupedTechnologies.map((group) => (
               <div key={group.category} className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
-                <div className="border-b border-slate-200 bg-[linear-gradient(135deg,_rgba(248,250,252,1),_rgba(255,255,255,1))] px-6 py-5">
+                <div className={`border-b border-slate-200 px-6 py-5 ${CATEGORY_STYLES[group.category].header}`}>
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                     <div>
                       <div className="flex items-center gap-3">
                         <h2 className="text-xl font-bold text-slate-950">
                           {TECHNOLOGY_CATEGORY_LABELS[group.category]}
                         </h2>
-                        <span className="inline-flex items-center rounded-full bg-slate-950 px-3 py-1 text-xs font-semibold text-white">
+                        <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${CATEGORY_STYLES[group.category].badge}`}>
+                          <span className={`h-2 w-2 rounded-full ${CATEGORY_STYLES[group.category].dot}`} />
                           {group.items.length}
                         </span>
                       </div>
@@ -434,9 +519,9 @@ export default function AvailableTechnologiesPage() {
                   {group.items.map((technology) => (
                     <article
                       key={technology.id}
-                      className="relative overflow-hidden rounded-[24px] border border-slate-200 bg-[linear-gradient(180deg,_rgba(255,255,255,1),_rgba(248,250,252,0.92))] p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
+                      className="relative overflow-hidden rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                     >
-                      <div className="absolute right-0 top-0 h-20 w-20 rounded-full bg-slate-950/5 blur-2xl" />
+                      <div className={`absolute inset-x-0 top-0 h-1 ${CATEGORY_STYLES[group.category].accent}`} />
                       <div className="relative">
                         <div className="flex items-start justify-between gap-3">
                           <div>
@@ -447,18 +532,13 @@ export default function AvailableTechnologiesPage() {
                           </div>
                         </div>
 
-                        <div className="mt-5 flex items-center justify-between gap-3">
-                          <span className="inline-flex rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
-                            Shared library
-                          </span>
-                          <div className="flex gap-2">
-                            <PrimaryButton className="px-3 py-2 text-xs" onClick={() => openEditModal(technology)}>
+                        <div className="mt-6 flex justify-end gap-2">
+                          <OutlineActionButton className="px-4 py-2 text-sm" onClick={() => openEditModal(technology)}>
                               Edit
-                            </PrimaryButton>
-                            <PrimaryButton className="px-3 py-2 text-xs" onClick={() => { setDeleteError(null); setActiveTechnology(technology); }}>
+                          </OutlineActionButton>
+                          <OutlineActionButton className="px-4 py-2 text-sm" onClick={() => { setDeleteError(null); setActiveTechnology(technology); }}>
                               Delete
-                            </PrimaryButton>
-                          </div>
+                          </OutlineActionButton>
                         </div>
                       </div>
                     </article>
