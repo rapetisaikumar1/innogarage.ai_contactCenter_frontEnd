@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useCalls, CallDirection, CallStatus, formatDuration } from '@/hooks/useCalls';
+import { useCalls, CallDirection, CallStatus, formatDuration, clearCallAlerts as clearCallAlertsApi } from '@/hooks/useCalls';
 import { formatDateTime } from '@/utils/formatters';
 
 const DIRECTION_OPTIONS: { label: string; value: CallDirection | '' }[] = [
@@ -22,10 +22,21 @@ export default function CallsPage() {
   const [direction, setDirection] = useState<CallDirection | ''>('');
   const [status, setStatus] = useState<CallStatus | ''>('');
   const [page, setPage] = useState(1);
+  const [clearingCallId, setClearingCallId] = useState<string | null>(null);
 
   const { data, isLoading, error, refetch } = useCalls({ page, direction, status });
 
   function handleFilter() { setPage(1); }
+
+  async function handleClearAlerts(callId: string) {
+    setClearingCallId(callId);
+    try {
+      await clearCallAlertsApi(callId);
+      await refetch();
+    } finally {
+      setClearingCallId(null);
+    }
+  }
 
   return (
     <div>
@@ -139,13 +150,24 @@ export default function CallsPage() {
                       <td className="px-6 py-4 text-sm text-slate-600">{call.loggedBy?.name ?? 'System'}</td>
                       <td className="px-6 py-4 text-sm text-slate-500 whitespace-nowrap">{formatDateTime(call.createdAt)}</td>
                       <td className="px-6 py-4 text-right">
-                        <Link
-                          href={`/candidates/${call.candidateId}`}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 rounded-lg hover:bg-slate-700 transition-all"
-                        >
-                          View
-                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                        </Link>
+                        <div className="flex items-center justify-end gap-2">
+                          {call.status === 'MISSED' && call.openMissedAlertCount > 0 && (
+                            <button
+                              onClick={() => handleClearAlerts(call.id)}
+                              disabled={clearingCallId === call.id}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 border border-red-100 rounded-lg hover:bg-red-100 disabled:opacity-50 transition-all"
+                            >
+                              {clearingCallId === call.id ? 'Clearing...' : 'Clear Alerts'}
+                            </button>
+                          )}
+                          <Link
+                            href={`/candidates/${call.candidateId}`}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 rounded-lg hover:bg-slate-700 transition-all"
+                          >
+                            View
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   ))}

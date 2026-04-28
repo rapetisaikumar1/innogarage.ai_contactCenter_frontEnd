@@ -1,6 +1,6 @@
 'use client';
 
-import { Call, formatDuration, deleteCall, CallStatus } from '@/hooks/useCalls';
+import { Call, formatDuration, deleteCall, CallStatus, clearCallAlerts } from '@/hooks/useCalls';
 import { formatDateTime } from '@/utils/formatters';
 import { useAuth } from '@/hooks/useAuth';
 import { useState } from 'react';
@@ -19,8 +19,10 @@ interface Props {
 export default function CallCard({ call, onDeleted }: Props) {
   const { user } = useAuth();
   const [deleting, setDeleting] = useState(false);
+  const [clearingAlerts, setClearingAlerts] = useState(false);
 
   const canDelete = user?.id === call.loggedById || user?.role === 'ADMIN';
+  const canClearAlerts = call.status === 'MISSED' && call.openMissedAlertCount > 0;
 
   async function handleDelete() {
     if (!window.confirm('Delete this call log?')) return;
@@ -30,6 +32,16 @@ export default function CallCard({ call, onDeleted }: Props) {
       onDeleted();
     } finally {
       setDeleting(false);
+    }
+  }
+
+  async function handleClearAlerts() {
+    setClearingAlerts(true);
+    try {
+      await clearCallAlerts(call.id);
+      onDeleted();
+    } finally {
+      setClearingAlerts(false);
     }
   }
 
@@ -63,7 +75,17 @@ export default function CallCard({ call, onDeleted }: Props) {
         <p className="text-xs text-gray-400 mt-0.5">{call.loggedBy?.name ?? 'System'} · {formatDateTime(call.createdAt)}</p>
       </div>
 
-      {/* Delete */}
+      {/* Actions */}
+      {canClearAlerts && (
+        <button
+          onClick={handleClearAlerts}
+          disabled={clearingAlerts}
+          className="flex-shrink-0 text-xs font-semibold text-red-700 bg-red-50 border border-red-100 rounded-lg px-2.5 py-1.5 hover:bg-red-100 disabled:opacity-50 transition-colors"
+          title="Clear missed-call alerts"
+        >
+          {clearingAlerts ? 'Clearing...' : 'Clear Alerts'}
+        </button>
+      )}
       {canDelete && (
         <button
           onClick={handleDelete}

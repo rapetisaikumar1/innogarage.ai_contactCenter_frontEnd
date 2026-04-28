@@ -116,6 +116,8 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
 
   // Transfer button state for agents
   const isAssignedAgent = user?.role === 'AGENT' && assignedTo?.id === user?.id;
+  const isAdminOrManager = user?.role === 'ADMIN' || user?.role === 'MANAGER';
+  const canStartCandidateCall = Boolean(candidate.phoneNumber || candidate.whatsappNumber) && (isAdminOrManager || isAssignedAgent);
   const isTransferTarget = pendingTransfer?.toAgentId === user?.id;
   const isTransferRequester = pendingTransfer?.fromAgentId === user?.id;
 
@@ -181,6 +183,20 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
                   <option key={s} value={s}>{STATUS_LABELS[s]}</option>
                 ))}
               </select>
+              <button
+                onClick={handleCall}
+                disabled={!canStartCandidateCall || calling || softphone.status !== 'ready'}
+                title={
+                  !canStartCandidateCall
+                    ? 'Only the assigned agent, admin, or manager can call this candidate'
+                    : softphone.status !== 'ready'
+                      ? 'Softphone not ready'
+                      : 'Call candidate'
+                }
+                className="px-4 py-2 text-sm font-semibold bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {calling ? 'Calling...' : 'Call'}
+              </button>
               <button
                 onClick={() => setShowEdit(true)}
                 className="px-4 py-2 text-sm font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"

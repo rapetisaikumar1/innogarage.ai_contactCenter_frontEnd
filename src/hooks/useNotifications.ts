@@ -7,7 +7,8 @@ import { ApiResponse } from '@/types';
 
 export interface AppNotification {
   id: string;
-  conversationId: string;
+  conversationId?: string | null;
+  callId?: string | null;
   type: string;
   title: string;
   body: string;
@@ -114,6 +115,11 @@ export function useNotifications() {
     ]);
   }, []);
 
+  const clearCallAlerts = useCallback(async (callId: string) => {
+    await api.post(`/calls/${callId}/alerts/clear`, {});
+    setNotifications((prev) => prev.filter((n) => n.callId !== callId && n.metadata?.callId !== callId));
+  }, []);
+
   // Real-time: new notification arrives via socket
   useSocket({
     'notification:new': (data) => {
@@ -145,6 +151,10 @@ export function useNotifications() {
       const { conversationId } = data as { conversationId: string };
       setNotifications((prev) => prev.filter((n) => n.conversationId !== conversationId));
     },
+    'agent:notifications:cleared': (data) => {
+      const { callId } = data as { callId: string };
+      setNotifications((prev) => prev.filter((n) => n.callId !== callId && n.metadata?.callId !== callId));
+    },
   });
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
@@ -153,14 +163,19 @@ export function useNotifications() {
   const whatsappUnreadCount = notifications.filter(
     (n) => !n.isRead && n._source === 'whatsapp',
   ).length;
+  const missedCallUnreadCount = notifications.filter(
+    (n) => !n.isRead && n._source === 'agent' && n.type === 'MISSED_CALL',
+  ).length;
 
   return {
     notifications,
     unreadCount,
     whatsappUnreadCount,
+    missedCallUnreadCount,
     isLoading,
     fetchNotifications,
     markRead,
     markAllRead,
+    clearCallAlerts,
   };
 }

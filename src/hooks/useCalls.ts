@@ -15,6 +15,10 @@ export interface Call {
   status: CallStatus;
   providerCallId: string | null;
   notes: string | null;
+  voiceSessionId: string | null;
+  ownerAgentId: string | null;
+  ownerAgentName: string | null;
+  openMissedAlertCount: number;
   createdAt: string;
   candidate: { id: string; fullName: string; phoneNumber: string };
   loggedBy: { id: string; name: string } | null;
@@ -106,6 +110,10 @@ export async function updateCall(
 
 export async function deleteCall(callId: string): Promise<void> {
   await api.delete<ApiResponse<{ deleted: boolean }>>(`/calls/${callId}`);
+}
+
+export async function clearCallAlerts(callId: string): Promise<void> {
+  await api.post<ApiResponse<{ cleared: number }>>(`/calls/${callId}/alerts/clear`, {});
 }
 
 // ─── Initiate outbound call via Twilio Voice ──────────────────────────────────

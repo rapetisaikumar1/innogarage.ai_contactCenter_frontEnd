@@ -39,6 +39,7 @@ export default function InboxPage() {
   async function handleCallCandidate() {
     const number = conversation?.whatsappNumber;
     if (!number) return;
+    if (!canStartConversationCall) return;
     if (softphone.status !== 'ready') return;
     setCalling(true);
     try {
@@ -61,6 +62,7 @@ export default function InboxPage() {
   });
 
   const conversation = inbox.find((c) => c.candidateId === selectedId);
+  const canStartConversationCall = Boolean(conversation?.whatsappNumber) && (isAdmin || conversation?.assignedAgentId === user?.id);
 
   // ── Load pending transfer whenever selected conversation changes ──────────
   useEffect(() => {
@@ -401,8 +403,14 @@ export default function InboxPage() {
                     {conversation?.whatsappNumber && (
                       <button
                         onClick={handleCallCandidate}
-                        disabled={calling || softphone.status !== 'ready'}
-                        title={softphone.status !== 'ready' ? 'Softphone not ready' : `Call ${conversation.whatsappNumber}`}
+                        disabled={!canStartConversationCall || calling || softphone.status !== 'ready'}
+                        title={
+                          !canStartConversationCall
+                            ? 'Only the assigned agent, admin, or manager can call this candidate'
+                            : softphone.status !== 'ready'
+                              ? 'Softphone not ready'
+                              : `Call ${conversation.whatsappNumber}`
+                        }
                         className="w-8 h-8 flex items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                       >
                         <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">

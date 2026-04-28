@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useNotifications } from '@/hooks/useNotifications';
 
 export default function NotificationBell() {
-  const { notifications, unreadCount, markRead, markAllRead } =
+  const { notifications, unreadCount, missedCallUnreadCount, markRead, markAllRead } =
     useNotifications();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -22,9 +22,13 @@ export default function NotificationBell() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  async function handleNotificationClick(n: { id: string; isRead: boolean; conversationId: string; type?: string; metadata?: Record<string, unknown> | null }) {
+  async function handleNotificationClick(n: { id: string; isRead: boolean; conversationId?: string | null; type?: string; metadata?: Record<string, unknown> | null }) {
     if (!n.isRead) await markRead(n.id);
     setOpen(false);
+    if (n.type === 'MISSED_CALL') {
+      router.push('/calls');
+      return;
+    }
     // Transfer-related notifications → navigate to candidate page
     if (n.type && ['TRANSFER_REQUEST', 'TRANSFER_ACCEPTED', 'TRANSFER_REJECTED', 'CANDIDATE_ASSIGNED'].includes(n.type)) {
       const candidateId = n.metadata?.candidateId as string | undefined;
@@ -51,9 +55,9 @@ export default function NotificationBell() {
             d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
           />
         </svg>
-        {unreadCount > 0 && (
+        {missedCallUnreadCount > 0 && (
           <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-white leading-none">
-            {unreadCount > 99 ? '99+' : unreadCount}
+            {missedCallUnreadCount > 99 ? '99+' : missedCallUnreadCount}
           </span>
         )}
       </button>
@@ -64,9 +68,9 @@ export default function NotificationBell() {
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
             <span className="text-sm font-semibold text-slate-900">
               Notifications
-              {unreadCount > 0 && (
+              {missedCallUnreadCount > 0 && (
                 <span className="ml-2 px-1.5 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded-full">
-                  {unreadCount}
+                  {missedCallUnreadCount}
                 </span>
               )}
             </span>

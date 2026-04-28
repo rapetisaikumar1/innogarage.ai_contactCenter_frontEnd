@@ -33,13 +33,14 @@ const AVAILABILITY_OPTIONS: { value: Availability; label: string; color: string 
 // ─── Sidebar nav (needs unread count for WhatsApp badge) ─────────────────────
 function SidebarNav({ pathname }: { pathname: string }) {
   // Inbox badge: only WhatsApp messages — ignore transfer / assignment notifications
-  const { whatsappUnreadCount } = useNotifications();
+  const { whatsappUnreadCount, missedCallUnreadCount } = useNotifications();
 
   return (
     <nav className="flex-1 px-3 pt-4 space-y-0.5 overflow-y-auto pb-4">
       {NAV_ITEMS.map((item) => {
         const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
         const isInbox = item.href === '/inbox';
+        const isCallLogs = item.href === '/calls';
         return (
           <Link
             key={item.href}
@@ -55,6 +56,11 @@ function SidebarNav({ pathname }: { pathname: string }) {
             {isInbox && whatsappUnreadCount > 0 && (
               <span className="min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
                 {whatsappUnreadCount > 99 ? '99+' : whatsappUnreadCount}
+              </span>
+            )}
+            {isCallLogs && missedCallUnreadCount > 0 && (
+              <span className="min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
+                {missedCallUnreadCount > 99 ? '99+' : missedCallUnreadCount}
               </span>
             )}
           </Link>
