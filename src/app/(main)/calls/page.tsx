@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import Link from 'next/link';
 import { useCalls, CallDirection, CallStatus, formatDuration, clearCallAlerts as clearCallAlertsApi } from '@/hooks/useCalls';
 import { formatDateTime } from '@/utils/formatters';
+import CallLogDetails from '@/components/calls/CallLogDetails';
 
 const DIRECTION_OPTIONS: { label: string; value: CallDirection | '' }[] = [
   { label: 'All Directions', value: '' },
@@ -23,6 +24,7 @@ export default function CallsPage() {
   const [status, setStatus] = useState<CallStatus | ''>('');
   const [page, setPage] = useState(1);
   const [clearingCallId, setClearingCallId] = useState<string | null>(null);
+  const [expandedCallId, setExpandedCallId] = useState<string | null>(null);
 
   const { data, isLoading, error, refetch } = useCalls({ page, direction, status });
 
@@ -121,55 +123,70 @@ export default function CallsPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {data.calls.map((call) => (
-                    <tr key={call.id} className="hover:bg-slate-50/80 transition-colors group">
-                      <td className="px-6 py-4">
-                        <Link href={`/candidates/${call.candidateId}`} className="font-semibold text-slate-800 hover:text-slate-900 transition-colors text-sm">
-                          {call.candidate.fullName}
-                        </Link>
-                        <p className="text-xs text-slate-400 mt-0.5">{call.phoneNumber}</p>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="text-sm text-slate-600">
-                          {call.direction === 'OUTBOUND' ? '↑ Outbound' : '↓ Inbound'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`text-sm font-medium ${
-                          call.status === 'MISSED' ? 'text-red-600' :
-                          call.status === 'COMPLETED' ? 'text-emerald-700' :
-                          'text-blue-700'
-                        }`}>
-                          {call.status.replace('_', ' ')}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="text-sm font-mono text-slate-700">
-                          {formatDuration(call.duration)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-slate-600">{call.loggedBy?.name ?? 'System'}</td>
-                      <td className="px-6 py-4 text-sm text-slate-500 whitespace-nowrap">{formatDateTime(call.createdAt)}</td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          {call.status === 'MISSED' && call.openMissedAlertCount > 0 && (
-                            <button
-                              onClick={() => handleClearAlerts(call.id)}
-                              disabled={clearingCallId === call.id}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 border border-red-100 rounded-lg hover:bg-red-100 disabled:opacity-50 transition-all"
-                            >
-                              {clearingCallId === call.id ? 'Clearing...' : 'Clear Alerts'}
-                            </button>
-                          )}
-                          <Link
-                            href={`/candidates/${call.candidateId}`}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 rounded-lg hover:bg-slate-700 transition-all"
-                          >
-                            View
-                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                    <Fragment key={call.id}>
+                      <tr className="hover:bg-slate-50/80 transition-colors group">
+                        <td className="px-6 py-4">
+                          <Link href={`/candidates/${call.candidateId}`} className="font-semibold text-slate-800 hover:text-slate-900 transition-colors text-sm">
+                            {call.candidate.fullName}
                           </Link>
-                        </div>
-                      </td>
-                    </tr>
+                          <p className="text-xs text-slate-400 mt-0.5">{call.phoneNumber}</p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-sm text-slate-600">
+                            {call.direction === 'OUTBOUND' ? '↑ Outbound' : '↓ Inbound'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`text-sm font-medium ${
+                            call.status === 'MISSED' ? 'text-red-600' :
+                            call.status === 'COMPLETED' ? 'text-emerald-700' :
+                            'text-blue-700'
+                          }`}>
+                            {call.status.replace('_', ' ')}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-sm font-mono text-slate-700">
+                            {formatDuration(call.duration)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-slate-600">{call.loggedBy?.name ?? 'System'}</td>
+                        <td className="px-6 py-4 text-sm text-slate-500 whitespace-nowrap">{formatDateTime(call.createdAt)}</td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => setExpandedCallId((current) => current === call.id ? null : call.id)}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition-all"
+                            >
+                              {expandedCallId === call.id ? 'Hide Logs' : 'Show Logs'}
+                            </button>
+                            {call.status === 'MISSED' && call.openMissedAlertCount > 0 && (
+                              <button
+                                onClick={() => handleClearAlerts(call.id)}
+                                disabled={clearingCallId === call.id}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 border border-red-100 rounded-lg hover:bg-red-100 disabled:opacity-50 transition-all"
+                              >
+                                {clearingCallId === call.id ? 'Clearing...' : 'Clear Alerts'}
+                              </button>
+                            )}
+                            <Link
+                              href={`/candidates/${call.candidateId}`}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 rounded-lg hover:bg-slate-700 transition-all"
+                            >
+                              View
+                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                      {expandedCallId === call.id && (
+                        <tr className="bg-slate-50/70">
+                          <td colSpan={7} className="px-6 pb-4 pt-0">
+                            <CallLogDetails call={call} />
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
