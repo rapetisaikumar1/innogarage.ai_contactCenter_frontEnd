@@ -6,29 +6,6 @@ import { useSocket } from '@/hooks/useSocket';
 export type CallDirection = 'INBOUND' | 'OUTBOUND';
 export type CallStatus = 'COMPLETED' | 'MISSED' | 'IN_CALL';
 
-export interface CallEvent {
-  type: 'SYSTEM' | 'ROUTING' | 'AGENT' | 'RESULT';
-  title: string;
-  description: string;
-  occurredAt: string;
-}
-
-export interface CallVoiceDetails {
-  sessionStatus: 'RINGING' | 'CLAIMED' | 'IN_CALL' | 'ENDED';
-  rootCallSid: string;
-  bridgedCallSid: string | null;
-  rawEndReason: string | null;
-  isUnknownCaller: boolean;
-  reservedAgentId: string | null;
-  reservedAgentName: string | null;
-  assignedAgentId: string | null;
-  assignedAgentName: string | null;
-  createdAt: string;
-  claimedAt: string | null;
-  answeredAt: string | null;
-  endedAt: string | null;
-}
-
 export interface Call {
   id: string;
   candidateId: string;
@@ -43,8 +20,6 @@ export interface Call {
   ownerAgentId: string | null;
   ownerAgentName: string | null;
   openMissedAlertCount: number;
-  events: CallEvent[];
-  voiceDetails: CallVoiceDetails | null;
   createdAt: string;
   candidate: { id: string; fullName: string; phoneNumber: string };
   loggedBy: { id: string; name: string } | null;
@@ -55,7 +30,7 @@ export interface CallsPage {
   pagination: { total: number; page: number; limit: number; totalPages: number };
 }
 
-interface VoiceCallSocketEvent {
+interface VoiceCallEndedEvent {
   callId: string | null;
   candidateId: string;
   finalStatus?: CallStatus;
@@ -100,12 +75,6 @@ export function useCalls(params: {
   }, [params.page, params.direction, params.status, params.candidateId]);
 
   useSocket({
-    'voice:incoming:new': () => {
-      fetchCalls();
-    },
-    'voice:incoming:claimed': () => {
-      fetchCalls();
-    },
     'voice:incoming:ended': () => {
       fetchCalls();
     },
@@ -135,20 +104,8 @@ export function useCallsByCandidate(candidateId: string) {
   }, [candidateId]);
 
   useSocket({
-    'voice:incoming:new': (payload) => {
-      const event = payload as VoiceCallSocketEvent;
-      if (event.candidateId === candidateId) {
-        fetchCalls();
-      }
-    },
-    'voice:incoming:claimed': (payload) => {
-      const event = payload as VoiceCallSocketEvent;
-      if (event.candidateId === candidateId) {
-        fetchCalls();
-      }
-    },
     'voice:incoming:ended': (payload) => {
-      const event = payload as VoiceCallSocketEvent;
+      const event = payload as VoiceCallEndedEvent;
       if (event.candidateId === candidateId) {
         fetchCalls();
       }
