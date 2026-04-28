@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { ApiResponse } from '@/types';
+import { useSocket } from '@/hooks/useSocket';
 
 export type CallDirection = 'INBOUND' | 'OUTBOUND';
 export type CallStatus = 'COMPLETED' | 'MISSED' | 'IN_CALL';
@@ -27,6 +28,12 @@ export interface Call {
 export interface CallsPage {
   calls: Call[];
   pagination: { total: number; page: number; limit: number; totalPages: number };
+}
+
+interface VoiceCallEndedEvent {
+  callId: string | null;
+  candidateId: string;
+  finalStatus?: CallStatus;
 }
 
 export interface LogCallInput {
@@ -67,6 +74,12 @@ export function useCalls(params: {
     }
   }, [params.page, params.direction, params.status, params.candidateId]);
 
+  useSocket({
+    'voice:incoming:ended': () => {
+      fetchCalls();
+    },
+  });
+
   useEffect(() => { fetchCalls(); }, [fetchCalls]);
   return { data, isLoading, error, refetch: fetchCalls };
 }
@@ -89,6 +102,15 @@ export function useCallsByCandidate(candidateId: string) {
       setIsLoading(false);
     }
   }, [candidateId]);
+
+  useSocket({
+    'voice:incoming:ended': (payload) => {
+      const event = payload as VoiceCallEndedEvent;
+      if (event.candidateId === candidateId) {
+        fetchCalls();
+      }
+    },
+  });
 
   useEffect(() => { fetchCalls(); }, [fetchCalls]);
   return { calls, isLoading, error, refetch: fetchCalls };
