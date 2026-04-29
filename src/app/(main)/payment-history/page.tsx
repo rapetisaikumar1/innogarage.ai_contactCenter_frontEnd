@@ -256,7 +256,8 @@ function toFormState(entry?: PaymentHistory | null): PaymentHistoryFormState {
 
 export default function PaymentHistoryPage() {
   const { user } = useAuth();
-  const { data, isLoading, error, refetch } = usePaymentHistories(user?.role === 'ADMIN');
+  const canAccessPaymentHistory = user?.role === 'ADMIN' || Boolean(user?.canAccessPaymentHistory);
+  const { data, isLoading, error, refetch } = usePaymentHistories(canAccessPaymentHistory);
   const [search, setSearch] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<'ALL' | PaymentHistoryStatus>('ALL');
   const [modalMode, setModalMode] = useState<'create' | 'edit' | null>(null);
@@ -334,11 +335,11 @@ export default function PaymentHistoryPage() {
     }
   }
 
-  if (user?.role !== 'ADMIN') {
+  if (!canAccessPaymentHistory) {
     return (
       <div className="p-6">
         <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-xl font-bold text-slate-950">Payment history is admin only</h1>
+          <h1 className="text-xl font-bold text-slate-950">Payment history access is restricted</h1>
           <p className="mt-2 text-sm text-slate-500">You do not have permission to view this workspace.</p>
         </div>
       </div>

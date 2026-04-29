@@ -3,6 +3,8 @@ export interface User {
   name: string;
   email: string;
   role: 'ADMIN' | 'AGENT' | 'MANAGER';
+  canAccessBgc?: boolean;
+  canAccessPaymentHistory?: boolean;
 }
 
 export interface LoginResponse {

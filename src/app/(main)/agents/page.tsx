@@ -206,9 +206,9 @@ export default function AgentsPage() {
 
       {/* ── Page header ──────────────────────────────────────────── */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Agents</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Mentors</h1>
         <p className="text-sm text-slate-500 mt-1">
-          {isAdmin ? 'View all agents, their availability and assigned candidates.' : 'Your team\'s current availability.'}
+          {isAdmin ? 'View all mentors, their availability and assigned candidates.' : 'Your team\'s current availability.'}
         </p>
       </div>
 
@@ -232,20 +232,20 @@ export default function AgentsPage() {
           {loading ? (
             <div className="flex items-center justify-center h-48 text-slate-400 text-sm gap-2">
               <div className="w-5 h-5 border-2 border-slate-300 border-t-slate-900 rounded-full animate-spin" />
-              Loading agents…
+              Loading mentors...
             </div>
           ) : agents.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-48 gap-2 text-slate-400">
               <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.3} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <p className="text-sm">No agents found</p>
+              <p className="text-sm">No mentors found</p>
             </div>
           ) : (
             <table className="w-full">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
-                  <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Agent</th>
+                  <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Mentor</th>
                   <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Status</th>
                   <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Assigned</th>
                   {isAdmin && <th className="px-5 py-3" />}

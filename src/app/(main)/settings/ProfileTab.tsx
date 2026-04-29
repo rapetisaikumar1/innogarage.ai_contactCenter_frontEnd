@@ -24,7 +24,7 @@ export default function ProfileTab() {
     }
   }, [data]);
 
-  const ROLE_LABELS: Record<string, string> = { ADMIN: 'Admin', MANAGER: 'Manager', AGENT: 'Agent' };
+  const ROLE_LABELS: Record<string, string> = { ADMIN: 'Admin', MANAGER: 'Manager', AGENT: 'Mentor' };
 
   async function handleProfileSubmit(e: React.FormEvent) {
     e.preventDefault();

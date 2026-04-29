@@ -7,7 +7,18 @@ export interface UserProfile {
   name: string;
   email: string;
   role: string;
+  departmentId: string | null;
+  department: { id: string; name: string } | null;
+  canAccessBgc: boolean;
+  canAccessPaymentHistory: boolean;
   isActive: boolean;
+  createdAt: string;
+}
+
+export interface Department {
+  id: string;
+  name: string;
+  description: string | null;
   createdAt: string;
 }
 
@@ -71,10 +82,13 @@ export function useUsers() {
 }
 
 export async function createUser(input: {
-  name: string;
+  name?: string;
   email: string;
   password: string;
   role: string;
+  departmentId?: string | null;
+  canAccessBgc?: boolean;
+  canAccessPaymentHistory?: boolean;
 }): Promise<UserProfile> {
   const res = await api.post<ApiResponse<UserProfile>>('/settings/users', input);
   return res.data;
@@ -85,5 +99,38 @@ export async function updateUser(
   input: { name?: string; role?: string; isActive?: boolean },
 ): Promise<UserProfile> {
   const res = await api.patch<ApiResponse<UserProfile>>(`/settings/users/${userId}`, input);
+  return res.data;
+}
+
+export async function deleteUser(userId: string): Promise<void> {
+  await api.delete(`/settings/users/${userId}`);
+}
+
+// ─── Departments ─────────────────────────────────────────────────────────────
+export function useDepartments() {
+  const [data, setData] = useState<Department[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchDepartments = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await api.get<ApiResponse<Department[]>>('/settings/departments');
+      setData(res.data);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load departments');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchDepartments(); }, [fetchDepartments]);
+
+  return { data, isLoading, error, refetch: fetchDepartments };
+}
+
+export async function createDepartment(input: { name: string; description?: string | null }): Promise<Department> {
+  const res = await api.post<ApiResponse<Department>>('/settings/departments', input);
   return res.data;
 }

@@ -11,13 +11,14 @@ function formatDate(value: string | null): string {
 
 export default function BgcPage() {
   const { user } = useAuth();
-  const { data, isLoading, error } = useBgcRecords(user?.role === 'ADMIN');
+  const canAccessBgc = user?.role === 'ADMIN' || Boolean(user?.canAccessBgc);
+  const { data, isLoading, error } = useBgcRecords(canAccessBgc);
 
-  if (user?.role !== 'ADMIN') {
+  if (!canAccessBgc) {
     return (
       <div className="p-6">
         <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-xl font-bold text-slate-950">BGC records are admin only</h1>
+          <h1 className="text-xl font-bold text-slate-950">BGC access is restricted</h1>
           <p className="mt-2 text-sm text-slate-500">You do not have permission to view this workspace.</p>
         </div>
       </div>

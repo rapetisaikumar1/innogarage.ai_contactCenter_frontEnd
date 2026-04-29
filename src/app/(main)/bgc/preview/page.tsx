@@ -25,6 +25,7 @@ function DocRow({ label, value }: { label: string; value: string }) {
 
 export default function BgcPreviewPage() {
   const { user } = useAuth();
+  const canAccessBgc = user?.role === 'ADMIN' || Boolean(user?.canAccessBgc);
   const [draft] = useState(() => getBgcDraft());
   const [generatedOn] = useState(() => new Intl.DateTimeFormat('en-US', {
     month: 'long',
@@ -32,11 +33,11 @@ export default function BgcPreviewPage() {
     year: 'numeric',
   }).format(new Date()));
 
-  if (user?.role !== 'ADMIN') {
+  if (!canAccessBgc) {
     return (
       <div className="p-6">
         <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-xl font-bold text-slate-950">BGC records are admin only</h1>
+          <h1 className="text-xl font-bold text-slate-950">BGC access is restricted</h1>
           <p className="mt-2 text-sm text-slate-500">You do not have permission to preview records.</p>
         </div>
       </div>

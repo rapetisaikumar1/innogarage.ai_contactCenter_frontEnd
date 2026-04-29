@@ -4,8 +4,10 @@ import { useState } from 'react';
 import React from 'react';
 import ProfileTab from './ProfileTab';
 import TeamTab from './TeamTab';
+import DepartmentsTab from './DepartmentsTab';
+import { useAuth } from '@/hooks/useAuth';
 
-type Tab = 'profile' | 'team';
+type Tab = 'profile' | 'team' | 'departments';
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   {
@@ -26,10 +28,21 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
       </svg>
     ),
   },
+  {
+    id: 'departments',
+    label: 'Create Departments',
+    icon: (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M5 7v12h14V7M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
+      </svg>
+    ),
+  },
 ];
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<Tab>('profile');
+  const { user } = useAuth();
+  const visibleTabs = user?.role === 'ADMIN' ? TABS : TABS.filter((tab) => tab.id === 'profile');
 
   return (
     <div>
@@ -44,7 +57,7 @@ export default function SettingsPage() {
       <div className="p-6">
         {/* Tab navigation */}
         <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 shadow-sm w-fit mb-7">
-          {TABS.map((tab) => (
+          {visibleTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -63,7 +76,8 @@ export default function SettingsPage() {
         {/* Tab content */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           {activeTab === 'profile' && <ProfileTab />}
-          {activeTab === 'team' && <TeamTab />}
+          {activeTab === 'team' && user?.role === 'ADMIN' && <TeamTab />}
+          {activeTab === 'departments' && user?.role === 'ADMIN' && <DepartmentsTab />}
         </div>
       </div>
     </div>
