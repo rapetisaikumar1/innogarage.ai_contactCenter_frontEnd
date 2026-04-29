@@ -94,6 +94,25 @@ function IconButton({
   );
 }
 
+function ViewButton({
+  onClick,
+}: {
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center gap-1 rounded-lg border border-black bg-white px-3 py-1.5 text-xs font-semibold text-black transition-all hover:bg-slate-50"
+    >
+      View
+      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
+  );
+}
+
 function StatusBadge({ status }: { status: PaymentHistoryStatus }) {
   return (
     <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${STATUS_BADGE_CLASSES[status]}`}>
@@ -447,17 +466,17 @@ export default function PaymentHistoryPage() {
                 <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-slate-500">Saved Records</h2>
               </div>
 
-              <div className="hidden overflow-x-auto lg:block">
-                <table className="w-full min-w-[1120px]">
+              <div className="hidden lg:block">
+                <table className="w-full table-fixed">
                   <thead>
                     <tr className="border-b border-slate-200 bg-slate-50 text-left">
-                      <th className="w-44 px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Name</th>
-                      <th className="w-48 px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Placed Company</th>
-                      <th className="w-48 px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Placed Job Title</th>
-                      <th className="w-44 px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Status</th>
-                      <th className="px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Notes</th>
-                      <th className="w-36 px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Updated</th>
-                      <th className="w-20 px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Edit</th>
+                      <th className="w-[14%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Name</th>
+                      <th className="w-[14%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Placed Company</th>
+                      <th className="w-[16%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Placed Job Title</th>
+                      <th className="w-[14%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Status</th>
+                      <th className="w-[22%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Notes</th>
+                      <th className="w-[10%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Updated</th>
+                      <th className="w-[10%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -467,17 +486,18 @@ export default function PaymentHistoryPage() {
                         <td className="px-5 py-4 text-sm text-slate-600">{entry.placedCompany}</td>
                         <td className="px-5 py-4 text-sm text-slate-600">{entry.placedJobTitle}</td>
                         <td className="px-5 py-4 text-sm"><StatusBadge status={entry.status} /></td>
-                        <td className="px-5 py-3.5 text-sm text-slate-600">
+                        <td className="px-5 py-4 text-sm text-slate-600">
                           <p
-                            className="max-w-[420px] truncate leading-6 text-slate-500"
+                            className="line-clamp-2 break-all leading-6 text-slate-500"
                             title={previewNotes(entry.notes)}
                           >
                             {previewNotes(entry.notes)}
                           </p>
                         </td>
-                        <td className="px-5 py-4 text-sm text-slate-600">{formatDate(entry.updatedAt)}</td>
+                        <td className="px-5 py-4 text-sm text-slate-600 whitespace-nowrap">{formatDate(entry.updatedAt)}</td>
                         <td className="px-5 py-4 text-sm">
-                          <div className="flex items-center justify-end">
+                          <div className="flex items-center justify-end gap-2">
+                            <ViewButton onClick={() => openEditModal(entry)} />
                             <IconButton label={`Edit ${entry.name}`} onClick={() => openEditModal(entry)} />
                           </div>
                         </td>
@@ -501,14 +521,17 @@ export default function PaymentHistoryPage() {
 
                     <div className="mt-3 border-t border-slate-100 pt-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Notes</p>
-                      <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-600" title={previewNotes(entry.notes)}>
+                      <p className="mt-1 line-clamp-2 break-all text-sm leading-6 text-slate-600" title={previewNotes(entry.notes)}>
                         {previewNotes(entry.notes)}
                       </p>
                     </div>
 
                     <div className="mt-3 flex items-center justify-between gap-3">
                       <span className="text-xs text-slate-400">Updated {formatDate(entry.updatedAt)}</span>
-                      <IconButton label={`Edit ${entry.name}`} onClick={() => openEditModal(entry)} />
+                      <div className="flex items-center gap-2">
+                        <ViewButton onClick={() => openEditModal(entry)} />
+                        <IconButton label={`Edit ${entry.name}`} onClick={() => openEditModal(entry)} />
+                      </div>
                     </div>
                   </div>
                 ))}

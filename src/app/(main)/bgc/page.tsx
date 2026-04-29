@@ -91,8 +91,13 @@ export default function BgcPage() {
                           </svg>
                         </Link>
                         <Link href={`/bgc/new?edit=${record.id}`} aria-label={`Edit ${record.fullName}`} className="inline-flex h-[30px] w-[30px] items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 transition-all hover:bg-slate-50">
-                          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={1.8}
+                              d="M16.862 3.487a2.1 2.1 0 113.03 2.91L8.82 17.926l-4.11.6.728-4.082L16.862 3.487z"
+                            />
                           </svg>
                         </Link>
                       </div>
