@@ -23,6 +23,7 @@ export function useBgcRecords(enabled = true, filter?: MonthYearQuery) {
   const [data, setData] = useState<BgcRecord[]>([]);
   const [isLoading, setIsLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
+  const queryString = buildMonthYearQuery(filter);
 
   const fetchRecords = useCallback(async () => {
     if (!enabled) {
@@ -33,15 +34,14 @@ export function useBgcRecords(enabled = true, filter?: MonthYearQuery) {
     setError(null);
 
     try {
-      const query = buildMonthYearQuery(filter);
-      const res = await api.get<ApiResponse<BgcRecord[]>>(`/bgc${query ? `?${query}` : ''}`);
+      const res = await api.get<ApiResponse<BgcRecord[]>>(`/bgc${queryString ? `?${queryString}` : ''}`);
       setData(res.data);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load BGC records');
     } finally {
       setIsLoading(false);
     }
-  }, [enabled, filter?.month, filter?.year]);
+  }, [enabled, queryString]);
 
   useEffect(() => {
     if (enabled) {

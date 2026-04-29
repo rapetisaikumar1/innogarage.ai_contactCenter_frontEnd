@@ -82,7 +82,6 @@ export default function TransferRequestAlert() {
     <div
       className="alert-slide-in w-full max-w-[48rem] rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50 via-white to-indigo-50 px-3 py-2 shadow-sm"
       role="status"
-      aria-modal="false"
       aria-label="Incoming Transfer Request"
     >
       <div className="flex items-center gap-3">

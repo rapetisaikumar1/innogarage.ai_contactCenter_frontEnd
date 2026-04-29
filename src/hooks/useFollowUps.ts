@@ -44,7 +44,13 @@ export function useFollowUpsByCandidate(candidateId: string) {
     }
   }, [candidateId]);
 
-  useEffect(() => { fetchFollowUps(); }, [fetchFollowUps]);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      void fetchFollowUps();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchFollowUps]);
 
   return { followUps, isLoading, error, refetch: fetchFollowUps };
 }
@@ -74,7 +80,13 @@ export function useFollowUps(params: {
     }
   }, [params.page, params.status]);
 
-  useEffect(() => { fetchFollowUps(); }, [fetchFollowUps]);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      void fetchFollowUps();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchFollowUps]);
 
   return { data, isLoading, error, refetch: fetchFollowUps };
 }

@@ -89,8 +89,12 @@ export function useNotifications() {
 
   // Fetch on mount + request browser notification permission
   useEffect(() => {
-    fetchNotifications();
+    const timeoutId = setTimeout(() => {
+      void fetchNotifications();
+    }, 0);
     requestNotificationPermission();
+
+    return () => clearTimeout(timeoutId);
   }, [fetchNotifications]);
 
   const markRead = useCallback(async (id: string) => {

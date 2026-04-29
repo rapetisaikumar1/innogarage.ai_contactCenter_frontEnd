@@ -40,12 +40,16 @@ export type SocketEventHandler = (data: unknown) => void;
 export function useSocket(events: Record<string, SocketEventHandler>) {
   // Always holds the latest event map — updated every render
   const eventsRef = useRef(events);
-  eventsRef.current = events;
+  const eventNamesKey = Object.keys(events).sort().join('|');
 
   // Stable wrapper functions: created once per event per hook instance
   const wrappersRef = useRef<Record<string, (...args: unknown[]) => void>>({});
 
   const socketRef = useRef<Socket | null>(null);
+
+  useEffect(() => {
+    eventsRef.current = events;
+  }, [events]);
 
   useEffect(() => {
     const token = getToken();
@@ -54,24 +58,26 @@ export function useSocket(events: Record<string, SocketEventHandler>) {
     refCount++;
     const socket = getOrCreateSocket();
     socketRef.current = socket;
+    const wrappers = wrappersRef.current;
+    const activeEvents = eventNamesKey ? eventNamesKey.split('|') : [];
 
     // For each event, create one stable wrapper (or reuse existing) that delegates
     // to the latest handler in eventsRef. This means socket.off() will always
     // receive the exact same function reference that socket.on() received.
-    Object.keys(events).forEach((event) => {
-      if (!wrappersRef.current[event]) {
-        wrappersRef.current[event] = (data: unknown) => {
+    activeEvents.forEach((event) => {
+      if (!wrappers[event]) {
+        wrappers[event] = (data: unknown) => {
           eventsRef.current[event]?.(data);
         };
       }
-      socket.on(event, wrappersRef.current[event]);
+      socket.on(event, wrappers[event]);
     });
 
     return () => {
       // Remove exactly what we attached
-      Object.keys(events).forEach((event) => {
-        if (wrappersRef.current[event]) {
-          socket.off(event, wrappersRef.current[event]);
+      activeEvents.forEach((event) => {
+        if (wrappers[event]) {
+          socket.off(event, wrappers[event]);
         }
       });
 
@@ -85,8 +91,7 @@ export function useSocket(events: Record<string, SocketEventHandler>) {
     };
     // Intentionally empty deps — run once on mount/unmount only.
     // eventsRef always has the latest handlers without needing to re-subscribe.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [eventNamesKey]);
 
   return socketRef;
 }

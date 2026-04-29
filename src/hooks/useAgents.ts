@@ -50,7 +50,11 @@ export function useAgents(enabled = true) {
   }, [enabled]);
 
   useEffect(() => {
-    fetchAgents();
+    const timeoutId = setTimeout(() => {
+      void fetchAgents();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
   }, [fetchAgents]);
 
   return { agents, loading, error, refetch: fetchAgents };
@@ -62,13 +66,43 @@ export function useAgentCandidates(agentId: string | null) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!agentId) { setCandidates([]); return; }
-    setLoading(true);
-    setError(null);
-    api.get<{ data?: AgentCandidate[] } | AgentCandidate[]>(`/agents/${agentId}/candidates`)
-      .then((json) => setCandidates((json as { data?: AgentCandidate[] }).data ?? (json as AgentCandidate[])))
-      .catch((e) => setError(e instanceof Error ? e.message : String(e)))
-      .finally(() => setLoading(false));
+    let isActive = true;
+    const timeoutId = setTimeout(() => {
+      if (!agentId) {
+        setCandidates([]);
+        setLoading(false);
+        setError(null);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      api.get<{ data?: AgentCandidate[] } | AgentCandidate[]>(`/agents/${agentId}/candidates`)
+        .then((json) => {
+          if (!isActive) {
+            return;
+          }
+
+          setCandidates((json as { data?: AgentCandidate[] }).data ?? (json as AgentCandidate[]));
+        })
+        .catch((e) => {
+          if (!isActive) {
+            return;
+          }
+
+          setError(e instanceof Error ? e.message : String(e));
+        })
+        .finally(() => {
+          if (isActive) {
+            setLoading(false);
+          }
+        });
+    }, 0);
+
+    return () => {
+      isActive = false;
+      clearTimeout(timeoutId);
+    };
   }, [agentId]);
 
   return { candidates, loading, error };

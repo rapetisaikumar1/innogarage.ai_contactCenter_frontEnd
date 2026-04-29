@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Candidate, CandidateStatus } from '@/types/candidate';
+import { Candidate } from '@/types/candidate';
 import { createCandidate, updateCandidate } from '@/hooks/useCandidates';
 import { useAvailableTechnologies } from '@/hooks/useAvailableTechnologies';
 import { TECHNOLOGY_CATEGORY_LABELS, TECHNOLOGY_CATEGORY_ORDER } from '@/types';

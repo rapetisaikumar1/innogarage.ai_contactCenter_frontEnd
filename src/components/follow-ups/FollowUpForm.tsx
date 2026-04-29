@@ -9,16 +9,18 @@ interface Props {
   onCancel: () => void;
 }
 
+function buildLocalDateTimeMin(): string {
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  return now.toISOString().slice(0, 16);
+}
+
 export default function FollowUpForm({ candidateId, onSuccess, onCancel }: Props) {
   const [dueAt, setDueAt] = useState('');
   const [remarks, setRemarks] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Build a min datetime string (now) for the date picker
-  const nowLocal = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-    .toISOString()
-    .slice(0, 16);
+  const [nowLocal] = useState(buildLocalDateTimeMin);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

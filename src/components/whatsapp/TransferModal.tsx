@@ -28,7 +28,6 @@ const AVAIL_LABEL: Record<Agent['availability'], string> = {
 };
 
 export default function TransferModal({
-  conversationId: _conversationId,
   candidateId,
   candidateName,
   currentAgentId,

@@ -30,7 +30,11 @@ export function useAvailableTechnologies() {
   }
 
   useEffect(() => {
-    void fetchAvailableTechnologies();
+    const timeoutId = window.setTimeout(() => {
+      void fetchAvailableTechnologies();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   return { data, isLoading, error, refetch: fetchAvailableTechnologies };

@@ -34,7 +34,13 @@ export function useFiles(candidateId: string) {
     }
   }, [candidateId]);
 
-  useEffect(() => { fetchFiles(); }, [fetchFiles]);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      void fetchFiles();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchFiles]);
 
   return { files, isLoading, error, refetch: fetchFiles };
 }

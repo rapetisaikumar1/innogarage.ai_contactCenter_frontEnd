@@ -42,7 +42,13 @@ export function useProfile() {
     }
   }, []);
 
-  useEffect(() => { fetchProfile(); }, [fetchProfile]);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      void fetchProfile();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchProfile]);
 
   return { data, isLoading, error, refetch: fetchProfile };
 }
@@ -77,7 +83,13 @@ export function useUsers() {
     }
   }, []);
 
-  useEffect(() => { fetchUsers(); }, [fetchUsers]);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      void fetchUsers();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchUsers]);
 
   return { data, isLoading, error, refetch: fetchUsers };
 }
@@ -127,7 +139,13 @@ export function useDepartments() {
     }
   }, []);
 
-  useEffect(() => { fetchDepartments(); }, [fetchDepartments]);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      void fetchDepartments();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchDepartments]);
 
   return { data, isLoading, error, refetch: fetchDepartments };
 }

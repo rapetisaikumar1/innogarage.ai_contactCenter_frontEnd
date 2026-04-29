@@ -20,6 +20,7 @@ export function usePaymentHistories(enabled = true, filter?: MonthYearQuery) {
   const [data, setData] = useState<PaymentHistory[]>([]);
   const [isLoading, setIsLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
+  const queryString = buildMonthYearQuery(filter);
 
   const fetchPaymentHistories = useCallback(async () => {
     if (!enabled) {
@@ -30,15 +31,14 @@ export function usePaymentHistories(enabled = true, filter?: MonthYearQuery) {
     setError(null);
 
     try {
-      const query = buildMonthYearQuery(filter);
-      const res = await api.get<ApiResponse<PaymentHistory[]>>(`/payment-history${query ? `?${query}` : ''}`);
+      const res = await api.get<ApiResponse<PaymentHistory[]>>(`/payment-history${queryString ? `?${queryString}` : ''}`);
       setData(res.data);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load payment history');
     } finally {
       setIsLoading(false);
     }
-  }, [enabled, filter?.month, filter?.year]);
+  }, [enabled, queryString]);
 
   useEffect(() => {
     if (enabled) {

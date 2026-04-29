@@ -5,7 +5,7 @@ import { useFiles, uploadFile, deleteFile, CandidateFile } from '@/hooks/useFile
 import { useAuth } from '@/hooks/useAuth';
 import { formatDateTime } from '@/utils/formatters';
 
-const ACCEPTED_TYPES = '.jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.xls,.xlsx';
+const ACCEPTED_TYPES = '.jpg,.jpeg,.png,.webp,.svg,.pdf,.doc,.docx,.xls,.xlsx';
 const MAX_SIZE_MB = 10;
 
 function formatBytes(bytes: number): string {

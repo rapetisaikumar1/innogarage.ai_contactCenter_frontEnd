@@ -31,7 +31,10 @@ export default function InboxPage() {
   const [reassignOpen, setReassignOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
   const [calling, setCalling] = useState(false);
-  const [pendingTransfer, setPendingTransfer] = useState<TransferRequest | null>(null);
+  const [pendingTransferState, setPendingTransferState] = useState<{
+    candidateId: string;
+    request: TransferRequest | null;
+  } | null>(null);
   const [respondingTransfer, setRespondingTransfer] = useState(false);
 
   const softphone = useSoftphone();
@@ -63,11 +66,30 @@ export default function InboxPage() {
 
   const conversation = inbox.find((c) => c.candidateId === selectedId);
   const canStartConversationCall = Boolean(conversation?.whatsappNumber) && (isAdmin || conversation?.assignedAgentId === user?.id);
+  const pendingTransfer = pendingTransferState?.candidateId === selectedId ? pendingTransferState.request : null;
 
   // ── Load pending transfer whenever selected conversation changes ──────────
   useEffect(() => {
-    if (!selectedId) { setPendingTransfer(null); return; }
-    getPendingTransferRequest(selectedId).then(setPendingTransfer).catch(() => setPendingTransfer(null));
+    if (!selectedId) {
+      return;
+    }
+
+    let isActive = true;
+    getPendingTransferRequest(selectedId)
+      .then((request) => {
+        if (isActive) {
+          setPendingTransferState({ candidateId: selectedId, request });
+        }
+      })
+      .catch(() => {
+        if (isActive) {
+          setPendingTransferState({ candidateId: selectedId, request: null });
+        }
+      });
+
+    return () => {
+      isActive = false;
+    };
   }, [selectedId]);
 
   async function handleRespondTransfer(action: 'accept' | 'reject') {
@@ -75,7 +97,13 @@ export default function InboxPage() {
     setRespondingTransfer(true);
     try {
       await respondToTransferRequest(selectedId, pendingTransfer.id, action);
-      setPendingTransfer(null);
+      setPendingTransferState((current) => {
+        if (!current || current.candidateId !== selectedId) {
+          return current;
+        }
+
+        return { ...current, request: null };
+      });
       refetch();
     } catch {
       // ignore
@@ -479,7 +507,11 @@ export default function InboxPage() {
           onClose={() => setTransferOpen(false)}
           onRequestSent={() => {
             setTransferOpen(false);
-            getPendingTransferRequest(selectedId).then(setPendingTransfer).catch(() => {});
+            getPendingTransferRequest(selectedId)
+              .then((request) => {
+                setPendingTransferState({ candidateId: selectedId, request });
+              })
+              .catch(() => {});
           }}
         />
       )}

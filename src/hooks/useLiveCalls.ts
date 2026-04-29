@@ -69,7 +69,11 @@ export function useLiveCalls() {
   });
 
   useEffect(() => {
-    fetchSessions();
+    const timeoutId = setTimeout(() => {
+      void fetchSessions();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
   }, [fetchSessions]);
 
   return { sessions, isLoading, error, refetch: fetchSessions };

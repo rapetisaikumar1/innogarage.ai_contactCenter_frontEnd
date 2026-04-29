@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { createUser, deleteUser, updateUser, useDepartments, useUsers, UserProfile } from '@/hooks/useSettings';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -34,12 +34,7 @@ function CreateUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
   const [error, setError] = useState<string | null>(null);
 
   const isMentor = form.role === 'AGENT';
-
-  useEffect(() => {
-    if (isMentor && !form.departmentId && orderedDepartments[0]) {
-      setForm((current) => ({ ...current, departmentId: orderedDepartments[0].id }));
-    }
-  }, [form.departmentId, isMentor, orderedDepartments]);
+  const selectedDepartmentId = isMentor ? (form.departmentId || orderedDepartments[0]?.id || '') : '';
 
   function update(field: keyof typeof form, value: string | boolean) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -56,7 +51,7 @@ function CreateUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
         email: form.email,
         password: form.password,
         role: form.role,
-        departmentId: isMentor ? form.departmentId : null,
+        departmentId: isMentor ? selectedDepartmentId : null,
         canAccessBgc: isMentor ? form.canAccessBgc : false,
         canAccessPaymentHistory: isMentor ? form.canAccessPaymentHistory : false,
         canAccessMentors: isMentor ? form.canAccessMentors : false,
@@ -103,7 +98,7 @@ function CreateUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
             <div>
               <label className="mb-1 block text-sm font-medium text-slate-700">Department</label>
               <select
-                value={form.departmentId}
+                value={selectedDepartmentId}
                 onChange={(event) => update('departmentId', event.target.value)}
                 required
                 disabled={departmentsLoading || orderedDepartments.length === 0}

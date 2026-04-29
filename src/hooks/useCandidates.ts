@@ -39,8 +39,6 @@ export function useCandidates(params: ListParams = {}) {
     }
   }, [params.page, params.search, params.status, params.limit]);
 
-  useEffect(() => { fetch(); }, [fetch]);
-
   useSocket({
     'conversation:updated': () => { fetch(); },
     'conversation:assigned': () => { fetch(); },
@@ -51,6 +49,14 @@ export function useCandidates(params: ListParams = {}) {
       }
     },
   });
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      void fetch();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetch]);
 
   return { data, isLoading, error, refetch: fetch };
 }
@@ -73,7 +79,13 @@ export function useCandidateDetail(id: string) {
     }
   }, [id]);
 
-  useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      void fetch();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetch]);
 
   return { candidate, isLoading, error, refetch: fetch };
 }

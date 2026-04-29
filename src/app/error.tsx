@@ -16,7 +16,6 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     // In production, hook this up to your error reporting service (Sentry, etc.)
-    // eslint-disable-next-line no-console
     console.error('App error:', error);
   }, [error]);
 

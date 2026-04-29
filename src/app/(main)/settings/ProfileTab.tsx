@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useProfile, updateProfile, changePassword } from '@/hooks/useSettings';
 
 export default function ProfileTab() {
   const { data, isLoading, refetch } = useProfile();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -16,13 +16,8 @@ export default function ProfileTab() {
   const [pwSaving, setPwSaving] = useState(false);
   const [pwError, setPwError] = useState<string | null>(null);
   const [pwSuccess, setPwSuccess] = useState(false);
-
-  useEffect(() => {
-    if (data) {
-      setName(data.name);
-      setEmail(data.email);
-    }
-  }, [data]);
+  const currentName = name ?? data?.name ?? '';
+  const currentEmail = email ?? data?.email ?? '';
 
   const ROLE_LABELS: Record<string, string> = { ADMIN: 'Admin', MANAGER: 'Manager', AGENT: 'Mentor' };
   const departmentLabel = data?.role === 'AGENT' ? data.department?.name ?? 'Not assigned' : 'Not applicable';
@@ -34,10 +29,12 @@ export default function ProfileTab() {
     setSuccess(false);
     try {
       const updates: { name?: string; email?: string } = {};
-      if (name !== data?.name) updates.name = name;
-      if (email !== data?.email) updates.email = email;
+      if (currentName !== data?.name) updates.name = currentName;
+      if (currentEmail !== data?.email) updates.email = currentEmail;
       if (Object.keys(updates).length === 0) { setError('No changes to save'); setSaving(false); return; }
-      await updateProfile(updates);
+      const updatedProfile = await updateProfile(updates);
+      setName(updatedProfile.name);
+      setEmail(updatedProfile.email);
       setSuccess(true);
       refetch();
     } catch (err: unknown) {
@@ -106,7 +103,7 @@ export default function ProfileTab() {
             <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
             <input
               type="text"
-              value={name}
+              value={currentName}
               onChange={(e) => setName(e.target.value)}
               minLength={2}
               required
@@ -117,7 +114,7 @@ export default function ProfileTab() {
             <label className="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
             <input
               type="email"
-              value={email}
+              value={currentEmail}
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"

@@ -80,7 +80,13 @@ export function useCalls(params: {
     },
   });
 
-  useEffect(() => { fetchCalls(); }, [fetchCalls]);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      void fetchCalls();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchCalls]);
   return { data, isLoading, error, refetch: fetchCalls };
 }
 
@@ -112,7 +118,13 @@ export function useCallsByCandidate(candidateId: string) {
     },
   });
 
-  useEffect(() => { fetchCalls(); }, [fetchCalls]);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      void fetchCalls();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchCalls]);
   return { calls, isLoading, error, refetch: fetchCalls };
 }
 

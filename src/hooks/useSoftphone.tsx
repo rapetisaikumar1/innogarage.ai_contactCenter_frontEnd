@@ -26,6 +26,13 @@ interface VoiceSessionEvent {
   finalStatus?: 'COMPLETED' | 'MISSED';
 }
 
+interface VoiceTokenResponse {
+  enabled: boolean;
+  token: string | null;
+  identity: string;
+  message?: string;
+}
+
 interface TwilioContextValue {
   status: DeviceStatus;
   callState: CallState;
@@ -168,8 +175,14 @@ export function SoftphoneProvider({ children }: { children: ReactNode }) {
       setStatus('initializing');
       setErrorMessage(null);
       try {
-        const res = await api.get<ApiResponse<{ token: string; identity: string }>>('/voice/token');
+        const res = await api.get<ApiResponse<VoiceTokenResponse>>('/voice/token');
         if (cancelled) return;
+
+        if (!res.data.enabled || !res.data.token) {
+          setStatus('error');
+          setErrorMessage(res.data.message ?? 'Voice calling is not configured');
+          return;
+        }
 
         const device = new Device(res.data.token, {
           codecPreferences: ['opus' as unknown as Call.Codec, 'pcmu' as unknown as Call.Codec],

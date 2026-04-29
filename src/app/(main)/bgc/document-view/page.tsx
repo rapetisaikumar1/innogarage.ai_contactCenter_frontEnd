@@ -69,6 +69,8 @@ export default function BgcDocumentViewerPage() {
           </div>
         ) : isImage ? (
           <div className="flex min-h-[60vh] items-center justify-center overflow-hidden rounded-2xl bg-slate-100 p-4">
+            {/* Dynamic preview URLs may be local blobs or third-party documents, so keep the raw image element here. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={embedSource} alt={name} className="max-h-[75vh] w-auto max-w-full rounded-xl object-contain shadow-sm" />
           </div>
         ) : (

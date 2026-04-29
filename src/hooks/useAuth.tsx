@@ -21,11 +21,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const session = getSession();
-    if (session) {
-      setUser(session.user);
-    }
-    setIsLoading(false);
+    let isActive = true;
+    const timeoutId = window.setTimeout(() => {
+      const session = getSession();
+      if (!isActive) {
+        return;
+      }
+
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    }, 0);
+
+    return () => {
+      isActive = false;
+      window.clearTimeout(timeoutId);
+    };
   }, []);
 
   async function login(email: string, password: string): Promise<void> {

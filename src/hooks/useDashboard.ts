@@ -43,14 +43,16 @@ export function useDashboard(dateRange?: { from: string; to: string }) {
   const [data, setData] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const from = dateRange?.from;
+  const to = dateRange?.to;
 
   const fetchStats = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       const query = new URLSearchParams();
-      if (dateRange?.from) query.set('from', dateRange.from);
-      if (dateRange?.to) query.set('to', dateRange.to);
+      if (from) query.set('from', from);
+      if (to) query.set('to', to);
       const qs = query.toString();
       const res = await api.get<ApiResponse<DashboardStats>>(`/dashboard${qs ? `?${qs}` : ''}`);
       setData(res.data);
@@ -59,9 +61,15 @@ export function useDashboard(dateRange?: { from: string; to: string }) {
     } finally {
       setIsLoading(false);
     }
-  }, [dateRange?.from, dateRange?.to]);
+  }, [from, to]);
 
-  useEffect(() => { fetchStats(); }, [fetchStats]);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      void fetchStats();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchStats]);
 
   return { data, isLoading, error, refetch: fetchStats };
 }

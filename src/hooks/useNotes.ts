@@ -28,7 +28,13 @@ export function useNotes(candidateId: string) {
     }
   }, [candidateId]);
 
-  useEffect(() => { fetchNotes(); }, [fetchNotes]);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      void fetchNotes();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchNotes]);
 
   return { notes, isLoading, error, refetch: fetchNotes };
 }

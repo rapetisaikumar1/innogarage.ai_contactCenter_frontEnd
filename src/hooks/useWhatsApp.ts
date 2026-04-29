@@ -57,7 +57,13 @@ export function useInbox(statusFilter?: string) {
     }
   }, [statusFilter]);
 
-  useEffect(() => { fetchInbox(); }, [fetchInbox]);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      void fetchInbox();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchInbox]);
 
   return { inbox, setInbox, isLoading, error, refetch: fetchInbox };
 }
@@ -70,6 +76,14 @@ export function useThread(candidateId: string) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const fetchThread = useCallback(async () => {
+    if (!candidateId) {
+      setData(null);
+      setError(null);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
     setError(null);
     try {
       const res = await api.get<ApiResponse<ThreadResponse>>(
@@ -83,7 +97,13 @@ export function useThread(candidateId: string) {
     }
   }, [candidateId]);
 
-  useEffect(() => { fetchThread(); }, [fetchThread]);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      void fetchThread();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchThread]);
 
   // Scroll to bottom after messages load
   useEffect(() => {
