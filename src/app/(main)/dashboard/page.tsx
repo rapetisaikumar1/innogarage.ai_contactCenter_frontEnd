@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { useDashboard } from '@/hooks/useDashboard';
-import { LiveVoiceSession, useLiveCalls } from '@/hooks/useLiveCalls';
 import { useAuth } from '@/hooks/useAuth';
 import { STATUS_LABELS, STATUS_COLORS, formatDateTime } from '@/utils/formatters';
 import { formatDuration } from '@/hooks/useCalls';
@@ -16,20 +15,6 @@ const STATUS_BAR: Record<string, string> = {
   CANDIDATE_GOT_OFFER:     'bg-gradient-to-r from-emerald-400 to-emerald-600',
   BGC_ONGOING:             'bg-gradient-to-r from-orange-400 to-orange-600',
   STARTED_WORKING:         'bg-gradient-to-r from-green-500 to-green-600',
-};
-
-const LIVE_CALL_STATUS_LABELS: Record<LiveVoiceSession['status'], string> = {
-  RINGING: 'Ringing',
-  CLAIMED: 'Connecting',
-  IN_CALL: 'In Call',
-  ENDED: 'Ended',
-};
-
-const LIVE_CALL_STATUS_STYLES: Record<LiveVoiceSession['status'], string> = {
-  RINGING: 'bg-amber-100 text-amber-700',
-  CLAIMED: 'bg-sky-100 text-sky-700',
-  IN_CALL: 'bg-emerald-100 text-emerald-700',
-  ENDED: 'bg-slate-100 text-slate-600',
 };
 
 // ─── Compact KPI card ─────────────────────────────────────────────────────────
@@ -91,20 +76,6 @@ function Pulse({ rows = 4 }: { rows?: number }) {
   );
 }
 
-function describeLiveCall(session: LiveVoiceSession): string {
-  const direction = session.direction === 'OUTBOUND' ? 'Outbound call' : 'Inbound call';
-
-  if (session.status === 'RINGING') {
-    return session.assignedAgentName ? `${direction} waiting for ${session.assignedAgentName}` : `${direction} waiting for an available agent`;
-  }
-
-  if (session.status === 'CLAIMED') {
-    return session.assignedAgentName ? `${direction} claimed by ${session.assignedAgentName}` : `${direction} is connecting`;
-  }
-
-  return session.assignedAgentName ? `${direction} with ${session.assignedAgentName}` : direction;
-}
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 // Returns Monday of the week containing date d
 function weekStart(d: Date): Date {
@@ -126,7 +97,6 @@ export default function DashboardPage() {
     to: toISODate(today),
   });
   const { data, isLoading, error, refetch } = useDashboard(dateRange);
-  const { sessions: liveCalls, isLoading: liveCallsLoading, error: liveCallsError } = useLiveCalls();
 
   const activePipeline = data?.candidatesByStatus
     .filter(s => s.status !== 'STARTED_WORKING')
@@ -279,44 +249,6 @@ export default function DashboardPage() {
 
         {/* Right column */}
         <div className="flex-1 flex flex-col gap-3 min-h-0">
-
-          <Panel title="Live Calls" className="h-64 flex-shrink-0">
-            {liveCallsError ? (
-              <div className="flex items-center justify-center h-full px-4 text-xs text-red-500 text-center">{liveCallsError}</div>
-            ) : liveCallsLoading ? <Pulse rows={3} /> : liveCalls.length > 0 ? (
-              <ul className="divide-y divide-slate-100">
-                {liveCalls.map((session) => (
-                  <li key={session.id} className="px-4 py-3">
-                    <div className="flex items-start gap-3">
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center ${LIVE_CALL_STATUS_STYLES[session.status]}`}>
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </svg>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <Link href={`/candidates/${session.candidateId}`} className="text-sm font-semibold text-slate-800 hover:text-slate-900 truncate transition-colors">
-                            {session.candidateName}
-                          </Link>
-                          {session.isUnknownCaller && (
-                            <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                              Unknown
-                            </span>
-                          )}
-                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${LIVE_CALL_STATUS_STYLES[session.status]}`}>
-                            {LIVE_CALL_STATUS_LABELS[session.status]}
-                          </span>
-                        </div>
-                        <p className="text-xs text-slate-500 mt-1 truncate">{session.phoneNumber}</p>
-                        <p className="text-[11px] text-slate-400 mt-1">{describeLiveCall(session)}</p>
-                      </div>
-                      <span className="text-[10px] text-slate-400 flex-shrink-0 whitespace-nowrap">{formatDateTime(session.createdAt)}</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : <Empty message="New inbound calls and active calls will appear here" />}
-          </Panel>
 
           {/* Recent messages */}
           <Panel title="Recent WhatsApp Messages" viewHref="/inbox" className="flex-1 min-h-0">

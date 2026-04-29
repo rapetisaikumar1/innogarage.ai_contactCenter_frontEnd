@@ -19,7 +19,6 @@ type TechnologyFormState = {
 };
 
 type TechnologyModalProps = {
-  mode: 'create' | 'edit';
   initialValue: TechnologyFormState;
   saving: boolean;
   error: string | null;
@@ -36,6 +35,17 @@ type DeleteDialogProps = {
 };
 
 const DEFAULT_CATEGORY: TechnologyCategory = 'MARKETING_AUTOMATION_ADOBE_STACK';
+
+const CATEGORY_COUNT_COLORS: Record<TechnologyCategory, string> = {
+  MARKETING_AUTOMATION_ADOBE_STACK: 'text-sky-600',
+  DATA_ANALYTICS_CDP: 'text-cyan-600',
+  CORE_ENGINEERING_DEVELOPMENT: 'text-emerald-600',
+  AUTOMATION_TESTING_VALIDATION: 'text-amber-600',
+  INFRASTRUCTURE_OPERATIONS: 'text-teal-600',
+  ENTERPRISE_TOOLS_BUSINESS_SYSTEMS: 'text-rose-600',
+  SEMICONDUCTOR_HARDWARE: 'text-indigo-600',
+  MISC_OTHER: 'text-slate-600',
+};
 
 function PrimaryButton({
   children,
@@ -69,7 +79,7 @@ function IconButton({ disabled = false, onClick }: { disabled?: boolean; onClick
       onClick={onClick}
       disabled={disabled}
       aria-label="Delete technology"
-      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:border-slate-300 hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
+      className="inline-flex h-8 w-8 items-center justify-center text-slate-300 transition hover:text-slate-500 disabled:cursor-not-allowed disabled:opacity-50"
     >
       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M6 7h12M9 7V5.75A1.75 1.75 0 0110.75 4h2.5A1.75 1.75 0 0115 5.75V7m-7 0v10.25A1.75 1.75 0 009.75 19h4.5A1.75 1.75 0 0016 17.25V7M10 11v4m4-4v4" />
@@ -78,7 +88,7 @@ function IconButton({ disabled = false, onClick }: { disabled?: boolean; onClick
   );
 }
 
-function TechnologyModal({ mode, initialValue, saving, error, onClose, onSubmit }: TechnologyModalProps) {
+function TechnologyModal({ initialValue, saving, error, onClose, onSubmit }: TechnologyModalProps) {
   const [form, setForm] = useState<TechnologyFormState>(initialValue);
 
   function update<K extends keyof TechnologyFormState>(field: K, value: TechnologyFormState[K]) {
@@ -308,10 +318,15 @@ export default function AvailableTechnologiesPage() {
   return (
     <div className="min-h-full bg-slate-50">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-6">
-        <section className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="rounded-[20px] border border-slate-200 bg-white p-4">
+          <div className="mb-4">
+            <h1 className="text-xl font-semibold text-slate-950">Available Technologies</h1>
+            <p className="mt-1 text-sm text-slate-500">Track technology demand by candidate preference and maintain the library.</p>
+          </div>
+
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_240px] xl:w-[72%]">
-              <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+              <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
                 <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
                   Search
                 </label>
@@ -323,7 +338,7 @@ export default function AvailableTechnologiesPage() {
                 />
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+              <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
                 <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
                   Category
                 </label>
@@ -342,7 +357,7 @@ export default function AvailableTechnologiesPage() {
               </div>
             </div>
 
-            <PrimaryButton className="xl:min-w-52" onClick={openCreateModal}>
+            <PrimaryButton className="xl:min-w-48" onClick={openCreateModal}>
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 5v14m7-7H5" />
               </svg>
@@ -364,35 +379,41 @@ export default function AvailableTechnologiesPage() {
         ) : (
           <section className="space-y-5">
             {groupedTechnologies.map((group) => (
-              <div key={group.category} className="rounded-[24px] border border-slate-200 bg-white shadow-sm">
-                <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-                  <h2 className="text-lg font-semibold text-slate-950">
+              <div key={group.category} className="rounded-[20px] border border-slate-200 bg-white">
+                <div className="border-b border-slate-200 px-5 py-4">
+                  <h2 className="text-base font-semibold text-slate-950">
                     {TECHNOLOGY_CATEGORY_LABELS[group.category]}
+                    <span className={`ml-2 text-sm font-bold ${CATEGORY_COUNT_COLORS[group.category]}`}>
+                      ({group.items.length})
+                    </span>
                   </h2>
-                  <span className="text-sm font-semibold text-slate-500">
-                    {group.items.length}
-                  </span>
                 </div>
 
                 <div className="grid gap-3 p-4 md:grid-cols-2 xl:grid-cols-3">
                   {group.items.map((technology) => (
                     <article
                       key={technology.id}
-                      className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3"
+                      className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3"
                     >
-                      <p className="pr-3 text-base font-semibold text-slate-950">{technology.name}</p>
-                      <IconButton onClick={() => { setDeleteError(null); setActiveTechnology(technology); }} />
+                      <div className="min-w-0 pr-3">
+                        <p className="truncate text-sm font-semibold text-slate-950">{technology.name}</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-semibold tabular-nums text-slate-500">
+                          {technology.candidateCount}
+                        </span>
+                        <IconButton onClick={() => { setDeleteError(null); setActiveTechnology(technology); }} />
+                      </div>
                     </article>
                   ))}
-                  </div>
                 </div>
+              </div>
             ))}
           </section>
         )}
 
         {modalMode && (
           <TechnologyModal
-            mode={modalMode}
             initialValue={toFormState(activeTechnology)}
             saving={isSaving}
             error={saveError}

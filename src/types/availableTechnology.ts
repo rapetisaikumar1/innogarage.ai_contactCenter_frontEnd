@@ -13,6 +13,7 @@ export interface AvailableTechnology {
   name: string;
   category: TechnologyCategory;
   description: string | null;
+  candidateCount: number;
   createdAt: string;
   updatedAt: string;
 }
