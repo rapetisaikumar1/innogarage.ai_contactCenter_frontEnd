@@ -1,11 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { createBgcRecord } from '@/hooks/useBgcRecords';
-import { BGC_DOCUMENT_LABELS, clearBgcDraft, getBgcDraft, saveBgcDraft, validateBgcDraft } from '@/lib/bgcDraft';
+import { BGC_DOCUMENT_LABELS, getBgcDraft } from '@/lib/bgcDraft';
 
 function formatDate(value: string): string {
   return new Intl.DateTimeFormat('en-US', {
@@ -26,10 +24,7 @@ function DocRow({ label, value }: { label: string; value: string }) {
 
 export default function BgcPreviewPage() {
   const { user } = useAuth();
-  const router = useRouter();
   const [draft] = useState(() => getBgcDraft());
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [generatedOn] = useState(() => new Intl.DateTimeFormat('en-US', {
     month: 'long',
     day: '2-digit',
@@ -63,64 +58,33 @@ export default function BgcPreviewPage() {
 
   const activeDraft = draft;
 
-  async function handleSave() {
-    const validationErrors = validateBgcDraft(activeDraft.form, activeDraft.files);
-
-    if (validationErrors.length > 0) {
-      setError(validationErrors[0]);
-      return;
-    }
-
-    setIsSaving(true);
-    setError(null);
-
-    try {
-      await createBgcRecord(activeDraft.form, activeDraft.files);
-      clearBgcDraft();
-      router.push('/bgc');
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to save BGC record');
-    } finally {
-      setIsSaving(false);
-    }
-  }
-
-  function handleEdit() {
-    saveBgcDraft(activeDraft);
-    router.push('/bgc/new');
+  function handleOpenDraftFile(file: File) {
+    const previewUrl = URL.createObjectURL(file);
+    window.open(previewUrl, '_blank', 'noopener,noreferrer');
+    window.setTimeout(() => URL.revokeObjectURL(previewUrl), 60_000);
   }
 
   return (
     <div className="mx-auto max-w-6xl p-6">
-      <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-5">
         <div>
           <Link href="/bgc/new" className="text-sm font-semibold text-slate-500 hover:text-slate-900">Back to form</Link>
           <h1 className="mt-2 text-2xl font-bold text-slate-950">BGC Preview</h1>
-          <p className="mt-1 text-sm text-slate-500">Review the record as a document before saving it.</p>
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <button type="button" onClick={handleEdit} className="rounded-xl border border-black bg-white px-5 py-2.5 text-sm font-semibold text-black hover:bg-slate-50">
-            Edit Details
-          </button>
-          <button type="button" onClick={handleSave} disabled={isSaving} className="rounded-xl bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50">
-            {isSaving ? 'Saving...' : 'Save Record'}
-          </button>
+          <p className="mt-1 text-sm text-slate-500">Review the record as a document, then return to the form page to save it.</p>
         </div>
       </div>
-
-      {error && <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
       <article className="mx-auto max-w-4xl rounded-[28px] border border-slate-300 bg-white p-6 shadow-[0_30px_80px_rgba(15,23,42,0.08)] sm:p-10">
         <div className="border-b border-slate-200 pb-6">
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-slate-400">Background Check Document</p>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-slate-950">{draft.form.fullName}</h2>
+              <h2 className="text-3xl font-bold text-slate-950">{activeDraft.form.fullName}</h2>
               <p className="mt-1 text-sm text-slate-500">Generated on {generatedOn}</p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
               <p className="font-semibold text-slate-900">Record Summary</p>
-              <p className="mt-1">Mandatory fields complete and ready to save.</p>
+              <p className="mt-1">Preview only. Return to the form page to save this record.</p>
             </div>
           </div>
         </div>
@@ -172,8 +136,10 @@ export default function BgcPreviewPage() {
                 </div>
                 <ul className="mt-3 space-y-2 text-sm text-slate-600">
                   {activeDraft.files[field].map((file) => (
-                    <li key={`${field}-${file.name}`} className="rounded-xl border border-slate-200 bg-white px-3 py-2">
-                      {file.name}
+                    <li key={`${field}-${file.name}`}>
+                      <button type="button" onClick={() => handleOpenDraftFile(file)} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-left font-medium text-slate-700 underline underline-offset-2 hover:text-slate-950">
+                        {file.name}
+                      </button>
                     </li>
                   ))}
                 </ul>

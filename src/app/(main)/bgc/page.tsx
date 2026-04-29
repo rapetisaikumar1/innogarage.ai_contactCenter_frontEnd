@@ -59,7 +59,7 @@ export default function BgcPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[760px]">
+            <table className="w-full min-w-[900px]">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50 text-left">
                   <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Full Name</th>
@@ -68,6 +68,7 @@ export default function BgcPage() {
                   <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">From</th>
                   <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">To</th>
                   <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Documents</th>
+                  <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -80,6 +81,11 @@ export default function BgcPage() {
                     <td className="px-5 py-4 text-sm text-slate-600">{formatDate(record.usToDate)}</td>
                     <td className="px-5 py-4 text-sm text-slate-600">
                       {record.resumeFiles.length + record.usCanadaBgcFiles.length + record.indiaBgcFiles.length} files
+                    </td>
+                    <td className="px-5 py-4 text-sm text-slate-600">
+                      <Link href={`/bgc/${record.id}`} className="inline-flex rounded-xl border border-black bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-slate-50">
+                        View
+                      </Link>
                     </td>
                   </tr>
                 ))}

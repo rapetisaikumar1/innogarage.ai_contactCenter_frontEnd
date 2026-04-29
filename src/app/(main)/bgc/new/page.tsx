@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { BGC_DOCUMENT_LABELS, EMPTY_BGC_FORM, createEmptyBgcFiles, getBgcDraft, saveBgcDraft, validateBgcDraft } from '@/lib/bgcDraft';
+import { createBgcRecord } from '@/hooks/useBgcRecords';
+import { BGC_DOCUMENT_LABELS, EMPTY_BGC_FORM, clearBgcDraft, createEmptyBgcFiles, getBgcDraft, saveBgcDraft, validateBgcDraft } from '@/lib/bgcDraft';
 import { BgcDocumentField, BgcFileInput, BgcRecordInput } from '@/types';
 
 function Field({ label, required = false, children }: { label: string; required?: boolean; children: React.ReactNode }) {
@@ -25,6 +26,7 @@ export default function NewBgcRecordPage() {
   const initialDraft = getBgcDraft();
   const [form, setForm] = useState<BgcRecordInput>(initialDraft?.form ?? EMPTY_BGC_FORM);
   const [files, setFiles] = useState<BgcFileInput>(initialDraft?.files ?? createEmptyBgcFiles());
+  const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
 
   if (user?.role !== 'ADMIN') {
@@ -65,6 +67,28 @@ export default function NewBgcRecordPage() {
 
     saveBgcDraft({ form, files });
     router.push('/bgc/preview');
+  }
+
+  async function handleSave() {
+    const validationErrors = validateBgcDraft(form, files);
+
+    if (validationErrors.length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setIsSaving(true);
+    setErrors([]);
+
+    try {
+      await createBgcRecord(form, files);
+      clearBgcDraft();
+      router.push('/bgc');
+    } catch (err: unknown) {
+      setErrors([err instanceof Error ? err.message : 'Failed to save BGC record']);
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   const inputClass = 'w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-950 focus:ring-2 focus:ring-slate-950/10';
@@ -161,6 +185,9 @@ export default function NewBgcRecordPage() {
           <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:justify-end">
             <button type="button" onClick={handlePreview} className="rounded-xl border border-black bg-white px-5 py-2.5 text-sm font-semibold text-black hover:bg-slate-50">
               Preview
+            </button>
+            <button type="button" onClick={handleSave} disabled={isSaving} className="rounded-xl bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50">
+              {isSaving ? 'Saving...' : 'Save Record'}
             </button>
           </div>
       </div>
