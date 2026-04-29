@@ -10,6 +10,7 @@ import TransferRequestAlert from '@/components/layout/TransferRequestAlert';
 import { User } from '@/types';
 import { useNotifications } from '@/hooks/useNotifications';
 import { updateMyAvailability, type Availability } from '@/hooks/useAgents';
+import { useProfile } from '@/hooks/useSettings';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -105,6 +106,7 @@ function SidebarBottom() {
 // ─── Top navbar ───────────────────────────────────────────────────────────────
 function TopNav({ user }: { user: User }) {
   const { logout } = useAuth();
+  const { data: profile } = useProfile();
   const router     = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [availability, setAvailability] = useState<Availability>('AVAILABLE');
@@ -112,6 +114,9 @@ function TopNav({ user }: { user: User }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const currentAvail = AVAILABILITY_OPTIONS.find((o) => o.value === availability)!;
+  const profileRole = profile?.role ?? user.role;
+  const roleLabel = profileRole === 'AGENT' ? 'Mentor' : profileRole === 'ADMIN' ? 'Admin' : 'Manager';
+  const departmentLabel = profileRole === 'AGENT' ? profile?.department?.name ?? 'Not assigned' : null;
 
   async function handleAvailabilityChange(next: Availability) {
     if (next === availability || updatingAvailability) return;
@@ -183,7 +188,8 @@ function TopNav({ user }: { user: User }) {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-slate-900">{user.name}</p>
-                    <p className="text-xs text-slate-500 capitalize">{user.role?.toLowerCase()}</p>
+                    <p className="text-xs text-slate-500">{roleLabel}</p>
+                    {departmentLabel && <p className="text-[11px] text-slate-400">Department: {departmentLabel}</p>}
                   </div>
                 </div>
               </div>

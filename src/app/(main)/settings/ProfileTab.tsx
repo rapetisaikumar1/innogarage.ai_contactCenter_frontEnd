@@ -25,6 +25,7 @@ export default function ProfileTab() {
   }, [data]);
 
   const ROLE_LABELS: Record<string, string> = { ADMIN: 'Admin', MANAGER: 'Manager', AGENT: 'Mentor' };
+  const departmentLabel = data?.role === 'AGENT' ? data.department?.name ?? 'Not assigned' : 'Not applicable';
 
   async function handleProfileSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -89,7 +90,14 @@ export default function ProfileTab() {
           </div>
           <div>
             <p className="text-base font-semibold text-slate-900">{data?.name}</p>
-            <p className="text-sm text-slate-500">{ROLE_LABELS[data?.role ?? ''] ?? data?.role}</p>
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                {ROLE_LABELS[data?.role ?? ''] ?? data?.role}
+              </span>
+              <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                Department: {departmentLabel}
+              </span>
+            </div>
           </div>
         </div>
 

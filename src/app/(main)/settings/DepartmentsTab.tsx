@@ -9,6 +9,7 @@ export default function DepartmentsTab() {
   const [description, setDescription] = useState('');
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const sortedDepartments = [...departments].sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: 'base' }));
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -91,9 +92,9 @@ export default function DepartmentsTab() {
             </div>
           ) : (
             <div className="divide-y divide-slate-100">
-              {departments.map((department) => (
-                <div key={department.id} className="px-4 py-3">
-                  <p className="text-sm font-semibold text-slate-900">{department.name}</p>
+              {sortedDepartments.map((department) => (
+                <div key={department.id} className="px-5 py-4">
+                  <p className="text-lg font-bold tracking-tight text-slate-950">{department.name}</p>
                   {department.description && <p className="mt-1 text-sm text-slate-500">{department.description}</p>}
                 </div>
               ))}

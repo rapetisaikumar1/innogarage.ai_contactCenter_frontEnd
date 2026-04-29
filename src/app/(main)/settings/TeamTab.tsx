@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createUser, deleteUser, useDepartments, useUsers, UserProfile } from '@/hooks/useSettings';
+import { createUser, deleteUser, updateUser, useDepartments, useUsers, UserProfile } from '@/hooks/useSettings';
 import { useAuth } from '@/hooks/useAuth';
 
 type TeamRole = 'AGENT' | 'MANAGER' | 'ADMIN';
@@ -183,10 +183,26 @@ function CreateUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
 }
 
 function UserRow({ user, onUpdated, isSelf }: { user: UserProfile; onUpdated: () => void; isSelf: boolean }) {
+  const [updatingActive, setUpdatingActive] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const role = user.role as TeamRole;
   const isMentor = user.role === 'AGENT';
+
+  async function handleToggleActive() {
+    if (isSelf || updatingActive) return;
+
+    setUpdatingActive(true);
+    setError(null);
+    try {
+      await updateUser(user.id, { isActive: !user.isActive });
+      onUpdated();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to update user status');
+    } finally {
+      setUpdatingActive(false);
+    }
+  }
 
   async function handleDelete() {
     if (isSelf || deleting) return;
@@ -239,13 +255,22 @@ function UserRow({ user, onUpdated, isSelf }: { user: UserProfile; onUpdated: ()
       </td>
       <td className="px-4 py-3 text-right">
         {!isSelf && (
-          <button
-            onClick={handleDelete}
-            disabled={deleting}
-            className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
-          >
-            {deleting ? 'Deleting...' : 'Delete'}
-          </button>
+          <div className="flex items-center justify-end gap-2">
+            <button
+              onClick={handleToggleActive}
+              disabled={updatingActive}
+              className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors disabled:opacity-50 ${user.isActive ? 'border-amber-200 text-amber-700 hover:bg-amber-50' : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'}`}
+            >
+              {updatingActive ? 'Updating...' : user.isActive ? 'Deactivate' : 'Activate'}
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
+            >
+              {deleting ? 'Deleting...' : 'Delete'}
+            </button>
+          </div>
         )}
       </td>
     </tr>
