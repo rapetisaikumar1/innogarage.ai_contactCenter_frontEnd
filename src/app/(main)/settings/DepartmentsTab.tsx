@@ -9,7 +9,12 @@ export default function DepartmentsTab() {
   const [description, setDescription] = useState('');
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const sortedDepartments = [...departments].sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: 'base' }));
+  const sortedDepartments = [...departments].sort((left, right) => {
+    const createdAtDifference = new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime();
+    return createdAtDifference !== 0
+      ? createdAtDifference
+      : left.name.localeCompare(right.name, undefined, { sensitivity: 'base' });
+  });
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -73,8 +78,16 @@ export default function DepartmentsTab() {
         </form>
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <div className="border-b border-slate-200 px-4 py-3">
-            <p className="text-sm font-semibold text-slate-900">Departments</p>
+          <div className="border-b border-slate-200 bg-slate-50 px-5 py-4">
+            <div className="flex items-center gap-3">
+              <span className="h-10 w-1.5 rounded-full bg-slate-900" aria-hidden="true" />
+              <div>
+                <p className="text-base font-bold text-slate-950">Departments</p>
+                <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                  Ordered by creation time
+                </p>
+              </div>
+            </div>
           </div>
 
           {isLoading ? (
@@ -94,7 +107,7 @@ export default function DepartmentsTab() {
             <div className="divide-y divide-slate-100">
               {sortedDepartments.map((department) => (
                 <div key={department.id} className="px-5 py-4">
-                  <p className="text-lg font-bold tracking-tight text-slate-950">{department.name}</p>
+                  <p className="text-base font-semibold text-slate-900">{department.name}</p>
                   {department.description && <p className="mt-1 text-sm text-slate-500">{department.description}</p>}
                 </div>
               ))}
