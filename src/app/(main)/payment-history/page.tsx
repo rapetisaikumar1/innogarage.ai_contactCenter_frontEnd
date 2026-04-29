@@ -67,33 +67,6 @@ function PrimaryButton({
   );
 }
 
-function IconButton({
-  label,
-  onClick,
-}: {
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      title={label}
-      className="inline-flex h-[30px] w-[30px] items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 transition-all hover:bg-slate-50"
-    >
-      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={1.8}
-          d="M16.862 3.487a2.1 2.1 0 113.03 2.91L8.82 17.926l-4.11.6.728-4.082L16.862 3.487z"
-        />
-      </svg>
-    </button>
-  );
-}
-
 function ViewButton({
   onClick,
 }: {
@@ -144,7 +117,7 @@ function PaymentHistoryModal({ mode, initialValue, saving, error, onClose, onSub
       <div className="w-full max-w-xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
         <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-5 py-4">
           <h2 className="text-base font-semibold text-slate-950">
-            {mode === 'create' ? 'Add payment record' : 'Edit payment record'}
+            {mode === 'create' ? 'Add payment record' : 'Payment record'}
           </h2>
           <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-700 transition">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -271,11 +244,6 @@ function formatDate(value: string): string {
   }).format(new Date(value));
 }
 
-function previewNotes(value: string | null): string {
-  const trimmed = value?.trim();
-  return trimmed && trimmed.length > 0 ? trimmed : 'No notes added';
-}
-
 function toFormState(entry?: PaymentHistory | null): PaymentHistoryFormState {
   return {
     name: entry?.name ?? '',
@@ -379,37 +347,75 @@ export default function PaymentHistoryPage() {
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-5 p-6">
-      <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-950">Payment History</h1>
-          <p className="mt-1 text-sm text-slate-500">Track placement payment status and follow-through for each candidate.</p>
+      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col gap-4 border-b border-slate-200 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-950">Payment History</h1>
+            <p className="mt-1 text-sm text-slate-500">Track placement payment status and follow-through for each candidate.</p>
+          </div>
+          <PrimaryButton onClick={openCreateModal} className="lg:shrink-0">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 5v14m7-7H5" />
+            </svg>
+            Add payment record
+          </PrimaryButton>
         </div>
-        <PrimaryButton onClick={openCreateModal}>
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 5v14m7-7H5" />
-          </svg>
-          Add payment record
-        </PrimaryButton>
-      </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-          <p className="text-xs text-slate-500">Total records</p>
-          <p className="mt-1 text-xl font-semibold text-slate-950 tabular-nums">{data.length}</p>
+        <div className="grid gap-4 px-5 py-4 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Total</p>
+              <p className="mt-1 text-lg font-semibold text-slate-950 tabular-nums">{metrics.total}</p>
+            </div>
+            <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-600">Settled</p>
+              <p className="mt-1 text-lg font-semibold text-emerald-900 tabular-nums">{metrics.settled}</p>
+            </div>
+            <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-600">Extensions</p>
+              <p className="mt-1 text-lg font-semibold text-amber-900 tabular-nums">{metrics.extensions}</p>
+            </div>
+            <div className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-rose-600">Attention</p>
+              <p className="mt-1 text-lg font-semibold text-rose-900 tabular-nums">{metrics.attention}</p>
+            </div>
+          </div>
+
+          {data.length > 0 && (
+            <div className="space-y-3">
+              <div className="rounded-xl border border-slate-200 px-3 py-2.5">
+                <input
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search by name, company, title, or status"
+                  className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                />
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <div className="min-w-0 flex-1 rounded-xl border border-slate-200 px-3 py-2.5">
+                  <select
+                    value={selectedStatus}
+                    onChange={(event) => setSelectedStatus(event.target.value as 'ALL' | PaymentHistoryStatus)}
+                    className="w-full bg-transparent text-sm text-slate-900 outline-none"
+                  >
+                    <option value="ALL">All statuses</option>
+                    {PAYMENT_HISTORY_STATUS_ORDER.map((status) => (
+                      <option key={status} value={status}>
+                        {PAYMENT_HISTORY_STATUS_LABELS[status]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="text-sm text-slate-500 sm:shrink-0">
+                  <span className="font-medium text-slate-900">{filteredEntries.length}</span> of {data.length} records
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-        <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 shadow-sm">
-          <p className="text-xs text-emerald-700">Settled</p>
-          <p className="mt-1 text-xl font-semibold text-emerald-900 tabular-nums">{metrics.settled}</p>
-        </div>
-        <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 shadow-sm">
-          <p className="text-xs text-amber-700">Extensions</p>
-          <p className="mt-1 text-xl font-semibold text-amber-900 tabular-nums">{metrics.extensions}</p>
-        </div>
-        <div className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 shadow-sm">
-          <p className="text-xs text-rose-700">Attention</p>
-          <p className="mt-1 text-xl font-semibold text-rose-900 tabular-nums">{metrics.attention}</p>
-        </div>
-      </div>
+      </section>
 
       {error && (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -423,38 +429,6 @@ export default function PaymentHistoryPage() {
         <EmptyState onCreate={openCreateModal} />
       ) : (
         <>
-          <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center">
-            <div className="grid flex-1 gap-3 sm:grid-cols-[minmax(0,1fr)_220px]">
-              <div className="rounded-xl border border-slate-200 px-3 py-2">
-                <input
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Search by name, company, title, or status"
-                  className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
-                />
-              </div>
-
-              <div className="rounded-xl border border-slate-200 px-3 py-2">
-                <select
-                  value={selectedStatus}
-                  onChange={(event) => setSelectedStatus(event.target.value as 'ALL' | PaymentHistoryStatus)}
-                  className="w-full bg-transparent text-sm text-slate-900 outline-none"
-                >
-                  <option value="ALL">All statuses</option>
-                  {PAYMENT_HISTORY_STATUS_ORDER.map((status) => (
-                    <option key={status} value={status}>
-                      {PAYMENT_HISTORY_STATUS_LABELS[status]}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="text-sm text-slate-500">
-              {filteredEntries.length} of {data.length} records
-            </div>
-          </div>
-
           {filteredEntries.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center shadow-sm">
               <p className="text-sm font-medium text-slate-950">No matching records</p>
@@ -470,35 +444,25 @@ export default function PaymentHistoryPage() {
                 <table className="w-full table-fixed">
                   <thead>
                     <tr className="border-b border-slate-200 bg-slate-50 text-left">
-                      <th className="w-[14%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Name</th>
-                      <th className="w-[14%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Placed Company</th>
-                      <th className="w-[16%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Placed Job Title</th>
-                      <th className="w-[14%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Status</th>
-                      <th className="w-[22%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Notes</th>
-                      <th className="w-[10%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Updated</th>
-                      <th className="w-[10%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Action</th>
+                      <th className="w-[20%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Name</th>
+                      <th className="w-[18%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Placed Company</th>
+                      <th className="w-[20%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Placed Job Title</th>
+                      <th className="w-[17%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Status</th>
+                      <th className="w-[13%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Updated</th>
+                      <th className="w-[12%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {filteredEntries.map((entry) => (
-                      <tr key={entry.id} className="align-top hover:bg-slate-50/70">
+                      <tr key={entry.id} className="hover:bg-slate-50/70">
                         <td className="px-5 py-4 text-sm font-semibold text-slate-950">{entry.name}</td>
                         <td className="px-5 py-4 text-sm text-slate-600">{entry.placedCompany}</td>
                         <td className="px-5 py-4 text-sm text-slate-600">{entry.placedJobTitle}</td>
                         <td className="px-5 py-4 text-sm"><StatusBadge status={entry.status} /></td>
-                        <td className="px-5 py-4 text-sm text-slate-600">
-                          <p
-                            className="line-clamp-2 break-all leading-6 text-slate-500"
-                            title={previewNotes(entry.notes)}
-                          >
-                            {previewNotes(entry.notes)}
-                          </p>
-                        </td>
                         <td className="px-5 py-4 text-sm text-slate-600 whitespace-nowrap">{formatDate(entry.updatedAt)}</td>
                         <td className="px-5 py-4 text-sm">
-                          <div className="flex items-center justify-end gap-2">
+                          <div className="flex items-center justify-end">
                             <ViewButton onClick={() => openEditModal(entry)} />
-                            <IconButton label={`Edit ${entry.name}`} onClick={() => openEditModal(entry)} />
                           </div>
                         </td>
                       </tr>
@@ -519,19 +483,9 @@ export default function PaymentHistoryPage() {
                       <StatusBadge status={entry.status} />
                     </div>
 
-                    <div className="mt-3 border-t border-slate-100 pt-3">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Notes</p>
-                      <p className="mt-1 line-clamp-2 break-all text-sm leading-6 text-slate-600" title={previewNotes(entry.notes)}>
-                        {previewNotes(entry.notes)}
-                      </p>
-                    </div>
-
                     <div className="mt-3 flex items-center justify-between gap-3">
                       <span className="text-xs text-slate-400">Updated {formatDate(entry.updatedAt)}</span>
-                      <div className="flex items-center gap-2">
-                        <ViewButton onClick={() => openEditModal(entry)} />
-                        <IconButton label={`Edit ${entry.name}`} onClick={() => openEditModal(entry)} />
-                      </div>
+                      <ViewButton onClick={() => openEditModal(entry)} />
                     </div>
                   </div>
                 ))}
