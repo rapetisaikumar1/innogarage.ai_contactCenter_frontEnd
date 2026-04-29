@@ -149,65 +149,63 @@ export default function CandidatesPage() {
               <p className="text-xs text-slate-400 mt-1">Try adjusting your search or filters</p>
             </div>
           ) : (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-200">
-                  <th className="text-left px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">Candidate</th>
-                  <th className="text-left px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">Phone</th>
-                  <th className="text-left px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">Role</th>
-                  <th className="text-left px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                  <th className="text-left px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">Assigned To</th>
-                  <th className="text-left px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">Added</th>
-                  <th className="px-6 py-3.5 w-12" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {data.candidates.map((c, idx) => (
-                  <tr key={c.id} className="hover:bg-slate-50/80 transition-colors group">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${avatarColors(c.fullName)}`}>
-                          {c.fullName.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <Link href={`/candidates/${c.id}`} className="font-semibold text-slate-800 hover:text-slate-900 transition-colors text-sm">
-                            {c.fullName}
-                          </Link>
-                          <p className="text-xs text-slate-400 mt-0.5">#C{String(idx + 1).padStart(3, '0')}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-slate-600">{c.phoneNumber}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-slate-600">{c.preferredRole ?? <span className="text-slate-300">—</span>}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <StatusBadge status={c.status as CandidateStatus} />
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xs font-bold flex-shrink-0">
-                          {(c.assignments[0]?.user.name ?? 'U').charAt(0).toUpperCase()}
-                        </div>
-                        <span className="text-sm text-slate-600">{c.assignments[0]?.user.name ?? 'Unassigned'}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-slate-500">{formatDate(c.createdAt)}</td>
-                    <td className="px-6 py-4 text-right">
-                      <Link
-                        href={`/candidates/${c.id}`}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 rounded-lg hover:bg-slate-700 transition-all"
-                      >
-                        View
-                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                      </Link>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[1100px] table-fixed text-sm">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-200">
+                    <th className="w-[24%] text-left px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">Candidate</th>
+                    <th className="w-[17%] text-left px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">Phone</th>
+                    <th className="w-[15%] text-left px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">Role</th>
+                    <th className="w-[19%] text-left px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                    <th className="w-[14%] text-left px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">Assigned To</th>
+                    <th className="w-[11%] text-left px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">Added</th>
+                    <th className="w-[112px] px-6 py-3.5" />
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {data.candidates.map((c, idx) => (
+                    <tr key={c.id} className="group align-middle transition-colors hover:bg-slate-50/80">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${avatarColors(c.fullName)}`}>
+                            {c.fullName.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <Link href={`/candidates/${c.id}`} className="block truncate text-sm font-semibold text-slate-800 transition-colors hover:text-slate-900">
+                              {c.fullName}
+                            </Link>
+                            <p className="mt-0.5 text-xs text-slate-400">#C{String(idx + 1).padStart(3, '0')}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-600 whitespace-nowrap">{c.phoneNumber}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{c.preferredRole ?? <span className="text-slate-300">—</span>}</td>
+                      <td className="px-6 py-4">
+                        <StatusBadge status={c.status as CandidateStatus} />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xs font-bold flex-shrink-0">
+                            {(c.assignments[0]?.user.name ?? 'U').charAt(0).toUpperCase()}
+                          </div>
+                          <span className="truncate text-sm text-slate-600">{c.assignments[0]?.user.name ?? 'Unassigned'}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-500 whitespace-nowrap">{formatDate(c.createdAt)}</td>
+                      <td className="px-6 py-4 text-right">
+                        <Link
+                          href={`/candidates/${c.id}`}
+                          className="inline-flex min-w-[92px] items-center justify-center gap-1 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-slate-700"
+                        >
+                          View
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 

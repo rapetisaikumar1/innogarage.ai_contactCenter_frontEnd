@@ -60,38 +60,38 @@ export default function BgcPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px]">
+            <table className="w-full min-w-[1080px] table-fixed">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50 text-left">
-                  <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Full Name</th>
-                  <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">DOB</th>
-                  <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">US / Canada Job Title</th>
-                  <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">From</th>
-                  <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">To</th>
-                  <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Documents</th>
-                  <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Action</th>
+                  <th className="w-[18%] px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Full Name</th>
+                  <th className="w-[13%] px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">DOB</th>
+                  <th className="w-[23%] px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">US / Canada Job Title</th>
+                  <th className="w-[13%] px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">From</th>
+                  <th className="w-[13%] px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">To</th>
+                  <th className="w-[10%] px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Documents</th>
+                  <th className="w-[10%] px-5 py-3 text-right text-xs font-bold uppercase tracking-wider text-slate-500">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {data.map((record) => (
-                  <tr key={record.id} className="hover:bg-slate-50">
+                  <tr key={record.id} className="align-middle hover:bg-slate-50">
                     <td className="px-5 py-4 text-sm font-semibold text-slate-950">{record.fullName}</td>
-                    <td className="px-5 py-4 text-sm text-slate-600">{formatDate(record.dob)}</td>
+                    <td className="px-5 py-4 text-sm text-slate-600 whitespace-nowrap">{formatDate(record.dob)}</td>
                     <td className="px-5 py-4 text-sm text-slate-600">{record.usJobTitle || '-'}</td>
-                    <td className="px-5 py-4 text-sm text-slate-600">{formatDate(record.usFromDate)}</td>
-                    <td className="px-5 py-4 text-sm text-slate-600">{formatDate(record.usToDate)}</td>
-                    <td className="px-5 py-4 text-sm text-slate-600">
+                    <td className="px-5 py-4 text-sm text-slate-600 whitespace-nowrap">{formatDate(record.usFromDate)}</td>
+                    <td className="px-5 py-4 text-sm text-slate-600 whitespace-nowrap">{formatDate(record.usToDate)}</td>
+                    <td className="px-5 py-4 text-sm text-slate-600 whitespace-nowrap">
                       {record.resumeFiles.length + record.usCanadaBgcFiles.length + record.indiaBgcFiles.length} files
                     </td>
                     <td className="px-5 py-4 text-sm text-slate-600">
                       <div className="flex items-center justify-end gap-2">
-                        <Link href={`/bgc/${record.id}`} className="inline-flex items-center gap-1 rounded-lg border border-black bg-white px-3 py-1.5 text-xs font-semibold text-black transition-all hover:bg-slate-50">
+                        <Link href={`/bgc/${record.id}`} className="inline-flex min-w-[92px] items-center justify-center gap-1 rounded-lg border border-black bg-white px-3 py-1.5 text-xs font-semibold text-black transition-all hover:bg-slate-50">
                           View
                           <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         </Link>
-                        <Link href={`/bgc/new?edit=${record.id}`} aria-label={`Edit ${record.fullName}`} className="inline-flex h-[30px] w-[30px] items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 transition-all hover:bg-slate-50">
+                        <Link href={`/bgc/new?edit=${record.id}`} aria-label={`Edit ${record.fullName}`} className="inline-flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 transition-all hover:bg-slate-50">
                           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path
                               strokeLinecap="round"
