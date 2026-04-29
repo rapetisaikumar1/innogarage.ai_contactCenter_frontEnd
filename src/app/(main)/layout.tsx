@@ -14,7 +14,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
-const NAV_ITEMS = [
+const NAV_ITEMS: Array<{ label: string; href: string; icon: ReactNode; roles?: User['role'][] }> = [
   { label: 'Dashboard', href: '/dashboard', icon: (<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>) },
   { label: 'Candidates', href: '/candidates', icon: (<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>) },
   { label: 'WhatsApp Inbox', href: '/inbox', icon: (<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3v-3z" /></svg>) },
@@ -22,6 +22,7 @@ const NAV_ITEMS = [
   { label: 'Follow-ups', href: '/follow-ups', icon: (<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>) },
   { label: 'Agents', href: '/agents', icon: (<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>) },
   { label: 'Available Technologies', href: '/available-technologies', icon: (<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M20 7L12 3 4 7m16 0-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M8 5l8 4" /></svg>) },
+  { label: 'BGC', href: '/bgc', roles: ['ADMIN'], icon: (<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M9 12.75L11.25 15 15 9.75M12 3.75l7.5 3v5.25c0 4.52-3.15 7.95-7.5 9-4.35-1.05-7.5-4.48-7.5-9V6.75l7.5-3z" /></svg>) },
 ];
 
 const AVAILABILITY_OPTIONS: { value: Availability; label: string; color: string }[] = [
@@ -32,13 +33,13 @@ const AVAILABILITY_OPTIONS: { value: Availability; label: string; color: string 
 ];
 
 // ─── Sidebar nav (needs unread count for WhatsApp badge) ─────────────────────
-function SidebarNav({ pathname }: { pathname: string }) {
+function SidebarNav({ pathname, user }: { pathname: string; user: User }) {
   // Inbox badge: only WhatsApp messages — ignore transfer / assignment notifications
   const { whatsappUnreadCount, missedCallUnreadCount } = useNotifications();
 
   return (
     <nav className="flex-1 px-3 pt-4 space-y-0.5 overflow-y-auto pb-4">
-      {NAV_ITEMS.map((item) => {
+      {NAV_ITEMS.filter((item) => !item.roles || item.roles.includes(user.role)).map((item) => {
         const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
         const isInbox = item.href === '/inbox';
         const isCallLogs = item.href === '/calls';
@@ -285,7 +286,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
           </div>
 
           {/* Nav */}
-          <SidebarNav pathname={pathname} />
+          <SidebarNav pathname={pathname} user={user} />
 
 
           {/* Agent + Softphone */}
