@@ -80,7 +80,7 @@ function IconButton({
       onClick={onClick}
       aria-label={label}
       title={label}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:bg-slate-50 hover:text-slate-900"
+      className="inline-flex h-[30px] w-[30px] items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 transition-all hover:bg-slate-50"
     >
       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path
@@ -443,36 +443,40 @@ export default function PaymentHistoryPage() {
             </div>
           ) : (
             <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div className="border-b border-slate-200 px-5 py-4">
+                <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-slate-500">Saved Records</h2>
+              </div>
+
               <div className="hidden overflow-x-auto lg:block">
-                <table className="w-full min-w-[980px] table-fixed">
+                <table className="w-full min-w-[1120px]">
                   <thead>
                     <tr className="border-b border-slate-200 bg-slate-50 text-left">
-                      <th className="w-36 px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Name</th>
-                      <th className="w-48 px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Placed Company</th>
-                      <th className="w-44 px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Placed Job Title</th>
-                      <th className="w-44 px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
-                      <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Notes</th>
-                      <th className="w-32 px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Updated</th>
-                      <th className="w-20 px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Edit</th>
+                      <th className="w-44 px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Name</th>
+                      <th className="w-48 px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Placed Company</th>
+                      <th className="w-48 px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Placed Job Title</th>
+                      <th className="w-44 px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Status</th>
+                      <th className="px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Notes</th>
+                      <th className="w-36 px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Updated</th>
+                      <th className="w-20 px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Edit</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {filteredEntries.map((entry) => (
-                      <tr key={entry.id} className="hover:bg-slate-50">
-                        <td className="px-5 py-3.5 text-sm font-semibold text-slate-950">{entry.name}</td>
-                        <td className="px-5 py-3.5 text-sm text-slate-600">{entry.placedCompany}</td>
-                        <td className="px-5 py-3.5 text-sm text-slate-600">{entry.placedJobTitle}</td>
-                        <td className="px-5 py-3.5 text-sm"><StatusBadge status={entry.status} /></td>
+                      <tr key={entry.id} className="align-top hover:bg-slate-50/70">
+                        <td className="px-5 py-4 text-sm font-semibold text-slate-950">{entry.name}</td>
+                        <td className="px-5 py-4 text-sm text-slate-600">{entry.placedCompany}</td>
+                        <td className="px-5 py-4 text-sm text-slate-600">{entry.placedJobTitle}</td>
+                        <td className="px-5 py-4 text-sm"><StatusBadge status={entry.status} /></td>
                         <td className="px-5 py-3.5 text-sm text-slate-600">
-                          <div
-                            className="rounded-lg bg-slate-50 px-3 py-2 leading-5 text-slate-600 break-all line-clamp-2"
+                          <p
+                            className="max-w-[420px] truncate leading-6 text-slate-500"
                             title={previewNotes(entry.notes)}
                           >
                             {previewNotes(entry.notes)}
-                          </div>
+                          </p>
                         </td>
-                        <td className="px-5 py-3.5 text-sm text-slate-600">{formatDate(entry.updatedAt)}</td>
-                        <td className="px-5 py-3.5 text-sm">
+                        <td className="px-5 py-4 text-sm text-slate-600">{formatDate(entry.updatedAt)}</td>
+                        <td className="px-5 py-4 text-sm">
                           <div className="flex items-center justify-end">
                             <IconButton label={`Edit ${entry.name}`} onClick={() => openEditModal(entry)} />
                           </div>
@@ -485,7 +489,7 @@ export default function PaymentHistoryPage() {
 
               <div className="grid gap-3 p-4 lg:hidden">
                 {filteredEntries.map((entry) => (
-                  <div key={entry.id} className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+                  <div key={entry.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="text-sm font-semibold text-slate-950">{entry.name}</p>
@@ -494,9 +498,14 @@ export default function PaymentHistoryPage() {
                       </div>
                       <StatusBadge status={entry.status} />
                     </div>
-                    <div className="mt-3 rounded-lg bg-white px-3 py-2 text-sm leading-5 text-slate-600 break-all line-clamp-3">
-                      {previewNotes(entry.notes)}
+
+                    <div className="mt-3 border-t border-slate-100 pt-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Notes</p>
+                      <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-600" title={previewNotes(entry.notes)}>
+                        {previewNotes(entry.notes)}
+                      </p>
                     </div>
+
                     <div className="mt-3 flex items-center justify-between gap-3">
                       <span className="text-xs text-slate-400">Updated {formatDate(entry.updatedAt)}</span>
                       <IconButton label={`Edit ${entry.name}`} onClick={() => openEditModal(entry)} />
