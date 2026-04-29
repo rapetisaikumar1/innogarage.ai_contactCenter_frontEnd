@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React from 'react';
 import { useDashboard } from '@/hooks/useDashboard';
 import { useAuth } from '@/hooks/useAuth';
 import { STATUS_LABELS, STATUS_COLORS, formatDateTime } from '@/utils/formatters';
@@ -76,27 +76,9 @@ function Pulse({ rows = 4 }: { rows?: number }) {
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-// Returns Monday of the week containing date d
-function weekStart(d: Date): Date {
-  const day = d.getDay(); // 0=Sun
-  const diff = day === 0 ? -6 : 1 - day;
-  const m = new Date(d);
-  m.setDate(d.getDate() + diff);
-  return m;
-}
-function toISODate(d: Date): string {
-  return d.toISOString().slice(0, 10);
-}
-
 export default function DashboardPage() {
   const { user } = useAuth();
-  const today = new Date();
-  const [dateRange, setDateRange] = useState({
-    from: toISODate(weekStart(today)),
-    to: toISODate(today),
-  });
-  const { data, isLoading, error, refetch } = useDashboard(dateRange);
+  const { data, isLoading, error, refetch } = useDashboard();
 
   const activePipeline = data?.candidatesByStatus
     .filter(s => s.status !== 'STARTED_WORKING')
@@ -112,28 +94,6 @@ export default function DashboardPage() {
           <p className="text-xs text-slate-400 leading-none mt-0.5">Overview of your contact center activity</p>
         </div>
         <div className="flex items-center gap-2.5">
-          {/* Date range picker */}
-          <div className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700">
-            <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <input
-              type="date"
-              value={dateRange.from}
-              max={dateRange.to}
-              onChange={(e) => setDateRange((r) => ({ ...r, from: e.target.value }))}
-              className="bg-transparent border-none outline-none text-xs font-semibold text-slate-700 cursor-pointer"
-            />
-            <span className="text-slate-400">–</span>
-            <input
-              type="date"
-              value={dateRange.to}
-              min={dateRange.from}
-              max={toISODate(new Date())}
-              onChange={(e) => setDateRange((r) => ({ ...r, to: e.target.value }))}
-              className="bg-transparent border-none outline-none text-xs font-semibold text-slate-700 cursor-pointer"
-            />
-          </div>
           <button
             onClick={refetch}
             disabled={isLoading}
