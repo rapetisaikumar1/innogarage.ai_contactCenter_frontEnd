@@ -4,7 +4,19 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { ApiResponse, PaymentHistory, PaymentHistoryInput } from '@/types';
 
-export function usePaymentHistories(enabled = true) {
+interface MonthYearQuery {
+  month?: string;
+  year?: string;
+}
+
+function buildMonthYearQuery(filter?: MonthYearQuery): string {
+  const query = new URLSearchParams();
+  if (filter?.year) query.set('year', filter.year);
+  if (filter?.month && filter.year) query.set('month', filter.month);
+  return query.toString();
+}
+
+export function usePaymentHistories(enabled = true, filter?: MonthYearQuery) {
   const [data, setData] = useState<PaymentHistory[]>([]);
   const [isLoading, setIsLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
@@ -18,14 +30,15 @@ export function usePaymentHistories(enabled = true) {
     setError(null);
 
     try {
-      const res = await api.get<ApiResponse<PaymentHistory[]>>('/payment-history');
+      const query = buildMonthYearQuery(filter);
+      const res = await api.get<ApiResponse<PaymentHistory[]>>(`/payment-history${query ? `?${query}` : ''}`);
       setData(res.data);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load payment history');
     } finally {
       setIsLoading(false);
     }
-  }, [enabled]);
+  }, [enabled, filter?.month, filter?.year]);
 
   useEffect(() => {
     if (enabled) {

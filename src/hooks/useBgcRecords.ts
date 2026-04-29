@@ -7,7 +7,19 @@ import { ApiResponse, BgcFileInput, BgcRecord, BgcRecordInput } from '@/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
-export function useBgcRecords(enabled = true) {
+interface MonthYearQuery {
+  month?: string;
+  year?: string;
+}
+
+function buildMonthYearQuery(filter?: MonthYearQuery): string {
+  const query = new URLSearchParams();
+  if (filter?.year) query.set('year', filter.year);
+  if (filter?.month && filter.year) query.set('month', filter.month);
+  return query.toString();
+}
+
+export function useBgcRecords(enabled = true, filter?: MonthYearQuery) {
   const [data, setData] = useState<BgcRecord[]>([]);
   const [isLoading, setIsLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
@@ -21,14 +33,15 @@ export function useBgcRecords(enabled = true) {
     setError(null);
 
     try {
-      const res = await api.get<ApiResponse<BgcRecord[]>>('/bgc');
+      const query = buildMonthYearQuery(filter);
+      const res = await api.get<ApiResponse<BgcRecord[]>>(`/bgc${query ? `?${query}` : ''}`);
       setData(res.data);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load BGC records');
     } finally {
       setIsLoading(false);
     }
-  }, [enabled]);
+  }, [enabled, filter?.month, filter?.year]);
 
   useEffect(() => {
     if (enabled) {

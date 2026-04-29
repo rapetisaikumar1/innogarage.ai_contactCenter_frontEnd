@@ -2,6 +2,7 @@
 
 import { ReactNode, useDeferredValue, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import MonthYearFilter, { MonthYearSelection } from '@/components/ui/MonthYearFilter';
 import {
   createPaymentHistory,
   updatePaymentHistory,
@@ -257,7 +258,8 @@ function toFormState(entry?: PaymentHistory | null): PaymentHistoryFormState {
 export default function PaymentHistoryPage() {
   const { user } = useAuth();
   const canAccessPaymentHistory = user?.role === 'ADMIN' || Boolean(user?.canAccessPaymentHistory);
-  const { data, isLoading, error, refetch } = usePaymentHistories(canAccessPaymentHistory);
+  const [monthYearFilter, setMonthYearFilter] = useState<MonthYearSelection>({ month: '', year: '' });
+  const { data, isLoading, error, refetch } = usePaymentHistories(canAccessPaymentHistory, monthYearFilter);
   const [search, setSearch] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<'ALL' | PaymentHistoryStatus>('ALL');
   const [modalMode, setModalMode] = useState<'create' | 'edit' | null>(null);
@@ -354,12 +356,15 @@ export default function PaymentHistoryPage() {
             <h1 className="text-2xl font-bold text-slate-950">Payment History</h1>
             <p className="mt-1 text-sm text-slate-500">Track placement payment status and follow-through for each candidate.</p>
           </div>
-          <PrimaryButton onClick={openCreateModal} className="lg:shrink-0">
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 5v14m7-7H5" />
-            </svg>
-            Add payment record
-          </PrimaryButton>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:shrink-0">
+            <MonthYearFilter value={monthYearFilter} onChange={setMonthYearFilter} />
+            <PrimaryButton onClick={openCreateModal} className="h-10">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 5v14m7-7H5" />
+              </svg>
+              Add payment record
+            </PrimaryButton>
+          </div>
         </div>
 
         <div className="grid gap-4 px-5 py-4 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start">

@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useBgcRecords } from '@/hooks/useBgcRecords';
+import MonthYearFilter, { MonthYearSelection } from '@/components/ui/MonthYearFilter';
 
 function formatDate(value: string | null): string {
   if (!value) return '-';
@@ -12,7 +14,8 @@ function formatDate(value: string | null): string {
 export default function BgcPage() {
   const { user } = useAuth();
   const canAccessBgc = user?.role === 'ADMIN' || Boolean(user?.canAccessBgc);
-  const { data, isLoading, error } = useBgcRecords(canAccessBgc);
+  const [monthYearFilter, setMonthYearFilter] = useState<MonthYearSelection>({ month: '', year: '' });
+  const { data, isLoading, error } = useBgcRecords(canAccessBgc, monthYearFilter);
 
   if (!canAccessBgc) {
     return (
@@ -32,12 +35,15 @@ export default function BgcPage() {
           <h1 className="text-2xl font-bold text-slate-950">BGC</h1>
           <p className="mt-1 text-sm text-slate-500">Manage background-check information and supporting document sets.</p>
         </div>
-        <Link href="/bgc/new" className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800">
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 5v14m7-7H5" />
-          </svg>
-          Add new record
-        </Link>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <MonthYearFilter value={monthYearFilter} onChange={setMonthYearFilter} />
+          <Link href="/bgc/new" className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 5v14m7-7H5" />
+            </svg>
+            Add new record
+          </Link>
+        </div>
       </div>
 
       {error && <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
