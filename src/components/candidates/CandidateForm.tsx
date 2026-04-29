@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Candidate, CandidateStatus } from '@/types/candidate';
 import { createCandidate, updateCandidate } from '@/hooks/useCandidates';
 import { useAvailableTechnologies } from '@/hooks/useAvailableTechnologies';
@@ -27,6 +27,7 @@ const EMPTY_FORM = {
 export default function CandidateForm({ candidate, onSuccess, onCancel }: Props) {
   const isEdit = !!candidate;
   const { data: availableTechnologies, isLoading: technologiesLoading, error: technologiesError } = useAvailableTechnologies();
+  const technologyMenuRef = useRef<HTMLDivElement>(null);
   const [form, setForm] = useState({
     fullName: candidate?.fullName ?? EMPTY_FORM.fullName,
     phoneNumber: candidate?.phoneNumber ?? EMPTY_FORM.phoneNumber,
@@ -40,6 +41,7 @@ export default function CandidateForm({ candidate, onSuccess, onCancel }: Props)
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [technologyMenuOpen, setTechnologyMenuOpen] = useState(false);
 
   const technologyGroups = useMemo(
     () => TECHNOLOGY_CATEGORY_ORDER.map((category) => ({
@@ -54,8 +56,26 @@ export default function CandidateForm({ candidate, onSuccess, onCancel }: Props)
     Boolean(form.preferredRole) &&
     !availableTechnologies.some((technology) => technology.name === form.preferredRole);
 
+  const selectedTechnologyLabel = form.preferredRole || 'Select preferred technology';
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (technologyMenuRef.current && !technologyMenuRef.current.contains(event.target as Node)) {
+        setTechnologyMenuOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }
+
+  function handlePreferredTechnologySelect(value: string) {
+    setForm((prev) => ({ ...prev, preferredRole: value }));
+    setTechnologyMenuOpen(false);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -108,27 +128,64 @@ export default function CandidateForm({ candidate, onSuccess, onCancel }: Props)
         </div>
         <div>
           <label className={labelClass}>Preferred Technology</label>
-          <select
-            name="preferredRole"
-            value={form.preferredRole ?? ''}
-            onChange={handleChange}
-            className={inputClass}
-            disabled={technologiesLoading}
-          >
-            <option value="">Select preferred technology</option>
-            {hasLegacyTechnologyValue && (
-              <option value={form.preferredRole ?? ''}>{form.preferredRole}</option>
-            )}
-            {technologyGroups.map((group) => (
-              <optgroup key={group.category} label={group.label}>
-                {group.items.map((technology) => (
-                  <option key={technology.id} value={technology.name}>
-                    {technology.name}
-                  </option>
+          <div className="relative" ref={technologyMenuRef}>
+            <button
+              type="button"
+              onClick={() => !technologiesLoading && setTechnologyMenuOpen((value) => !value)}
+              disabled={technologiesLoading}
+              className={`${inputClass} flex items-center justify-between text-left ${!form.preferredRole ? 'text-gray-400' : 'text-gray-900'}`}
+            >
+              <span className="truncate pr-3">{selectedTechnologyLabel}</span>
+              <svg className={`h-4 w-4 flex-shrink-0 text-gray-400 transition-transform ${technologyMenuOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {technologyMenuOpen && (
+              <div className="absolute z-30 mt-2 max-h-72 w-full overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-xl">
+                <button
+                  type="button"
+                  onClick={() => handlePreferredTechnologySelect('')}
+                  className={`w-full px-4 py-2 text-left text-sm transition hover:bg-slate-50 ${!form.preferredRole ? 'bg-slate-50 font-semibold text-slate-900' : 'text-slate-500'}`}
+                >
+                  No preferred technology
+                </button>
+
+                {hasLegacyTechnologyValue && (
+                  <div className="border-t border-slate-100 py-2">
+                    <p className="px-4 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Current saved value</p>
+                    <button
+                      type="button"
+                      onClick={() => handlePreferredTechnologySelect(form.preferredRole ?? '')}
+                      className="w-full px-5 py-2 text-left text-sm font-medium text-slate-900 transition hover:bg-slate-50"
+                    >
+                      {form.preferredRole}
+                    </button>
+                  </div>
+                )}
+
+                {technologyGroups.map((group) => (
+                  <div key={group.category} className="border-t border-slate-100 py-2 first:border-t-0">
+                    <p className="px-4 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">
+                      {group.label}
+                    </p>
+                    <div className="space-y-0.5">
+                      {group.items.map((technology) => (
+                        <button
+                          key={technology.id}
+                          type="button"
+                          onClick={() => handlePreferredTechnologySelect(technology.name)}
+                          className={`w-full px-5 py-2 text-left text-sm transition hover:bg-slate-50 ${form.preferredRole === technology.name ? 'bg-slate-100 font-semibold text-slate-950' : 'text-slate-700'}`}
+                        >
+                          {technology.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
-              </optgroup>
-            ))}
-          </select>
+              </div>
+            )}
+          </div>
           {technologiesLoading && (
             <p className="mt-1 text-xs text-gray-400">Loading available technologies...</p>
           )}

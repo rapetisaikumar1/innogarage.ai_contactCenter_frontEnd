@@ -1,6 +1,7 @@
 'use client';
 
 import { useDeferredValue, useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 import {
   createAvailableTechnology,
   deleteAvailableTechnology,
@@ -237,6 +238,7 @@ function toFormState(technology?: AvailableTechnology | null): TechnologyFormSta
 }
 
 export default function AvailableTechnologiesPage() {
+  const { user } = useAuth();
   const { data, isLoading, error, refetch } = useAvailableTechnologies();
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'ALL' | TechnologyCategory>('ALL');
@@ -246,6 +248,7 @@ export default function AvailableTechnologiesPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const canManageTechnologies = user?.role === 'ADMIN';
 
   const deferredSearch = useDeferredValue(search);
 
@@ -321,15 +324,11 @@ export default function AvailableTechnologiesPage() {
         <section className="rounded-[20px] border border-slate-200 bg-white p-4">
           <div className="mb-4">
             <h1 className="text-xl font-semibold text-slate-950">Available Technologies</h1>
-            <p className="mt-1 text-sm text-slate-500">Track technology demand by candidate preference and maintain the library.</p>
           </div>
 
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_240px] xl:w-[72%]">
               <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                  Search
-                </label>
                 <input
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
@@ -339,9 +338,6 @@ export default function AvailableTechnologiesPage() {
               </div>
 
               <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                  Category
-                </label>
                 <select
                   value={selectedCategory}
                   onChange={(event) => setSelectedCategory(event.target.value as 'ALL' | TechnologyCategory)}
@@ -357,12 +353,14 @@ export default function AvailableTechnologiesPage() {
               </div>
             </div>
 
-            <PrimaryButton className="xl:min-w-48" onClick={openCreateModal}>
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 5v14m7-7H5" />
-              </svg>
-              Add technology
-            </PrimaryButton>
+            {canManageTechnologies && (
+              <PrimaryButton className="xl:min-w-48" onClick={openCreateModal}>
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 5v14m7-7H5" />
+                </svg>
+                Add technology
+              </PrimaryButton>
+            )}
           </div>
         </section>
 
@@ -402,7 +400,9 @@ export default function AvailableTechnologiesPage() {
                         <span className="text-sm font-semibold tabular-nums text-slate-500">
                           {technology.candidateCount}
                         </span>
-                        <IconButton onClick={() => { setDeleteError(null); setActiveTechnology(technology); }} />
+                        {canManageTechnologies && (
+                          <IconButton onClick={() => { setDeleteError(null); setActiveTechnology(technology); }} />
+                        )}
                       </div>
                     </article>
                   ))}
@@ -412,7 +412,7 @@ export default function AvailableTechnologiesPage() {
           </section>
         )}
 
-        {modalMode && (
+        {modalMode && canManageTechnologies && (
           <TechnologyModal
             initialValue={toFormState(activeTechnology)}
             saving={isSaving}
@@ -422,7 +422,7 @@ export default function AvailableTechnologiesPage() {
           />
         )}
 
-        {activeTechnology && !modalMode && (
+        {activeTechnology && !modalMode && canManageTechnologies && (
           <DeleteDialog
             technologyName={activeTechnology.name}
             deleting={isDeleting}
