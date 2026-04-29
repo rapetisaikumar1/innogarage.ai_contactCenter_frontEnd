@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { BGC_DOCUMENT_LABELS, getBgcDraft } from '@/lib/bgcDraft';
+import { getBgcDocumentViewerHref, openLocalBgcDocumentViewer } from '@/lib/bgcDocumentViewer';
 
 function formatDate(value: string): string {
   return new Intl.DateTimeFormat('en-US', {
@@ -57,18 +58,13 @@ export default function BgcPreviewPage() {
   }
 
   const activeDraft = draft;
-
-  function handleOpenDraftFile(file: File) {
-    const previewUrl = URL.createObjectURL(file);
-    window.open(previewUrl, '_blank', 'noopener,noreferrer');
-    window.setTimeout(() => URL.revokeObjectURL(previewUrl), 60_000);
-  }
+  const backHref = activeDraft.sourcePath || '/bgc/new';
 
   return (
     <div className="mx-auto max-w-6xl p-6">
       <div className="mb-5">
         <div>
-          <Link href="/bgc/new" className="text-sm font-semibold text-slate-500 hover:text-slate-900">Back to form</Link>
+          <Link href={backHref} className="text-sm font-semibold text-slate-500 hover:text-slate-900">Back to form</Link>
           <h1 className="mt-2 text-2xl font-bold text-slate-950">BGC Preview</h1>
           <p className="mt-1 text-sm text-slate-500">Review the record as a document, then return to the form page to save it.</p>
         </div>
@@ -126,25 +122,39 @@ export default function BgcPreviewPage() {
         <section className="mt-8">
           <h3 className="text-lg font-bold text-slate-950">Supporting Documents</h3>
           <div className="mt-4 space-y-4">
-            {(Object.entries(BGC_DOCUMENT_LABELS) as Array<[keyof typeof activeDraft.files, string]>).map(([field, label]) => (
-              <div key={field} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-slate-900">{label}</p>
-                  <span className="rounded-full bg-black px-3 py-1 text-xs font-semibold text-white">
-                    {activeDraft.files[field].length} file{activeDraft.files[field].length === 1 ? '' : 's'}
-                  </span>
+            {(Object.entries(BGC_DOCUMENT_LABELS) as Array<[keyof typeof activeDraft.files, string]>).map(([field, label]) => {
+              const selectedFiles = activeDraft.files[field];
+              const currentDocuments = activeDraft.existingDocuments[field];
+              const totalFiles = selectedFiles.length || currentDocuments.length;
+
+              return (
+                <div key={field} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-semibold text-slate-900">{label}</p>
+                    <span className="rounded-full bg-black px-3 py-1 text-xs font-semibold text-white">
+                      {totalFiles} file{totalFiles === 1 ? '' : 's'}
+                    </span>
+                  </div>
+                  <ul className="mt-3 space-y-2 text-sm text-slate-600">
+                    {selectedFiles.length > 0
+                      ? selectedFiles.map((file) => (
+                          <li key={`${field}-${file.name}`}>
+                            <button type="button" onClick={() => openLocalBgcDocumentViewer(file)} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-left font-medium text-slate-700 underline underline-offset-2 hover:text-slate-950">
+                              {file.name}
+                            </button>
+                          </li>
+                        ))
+                      : currentDocuments.map((document) => (
+                          <li key={`${field}-${document.publicId}`}>
+                            <a href={getBgcDocumentViewerHref(document)} target="_blank" rel="noreferrer" className="block rounded-xl border border-slate-200 bg-white px-3 py-2 font-medium text-slate-700 underline underline-offset-2 hover:text-slate-950">
+                              {document.originalName}
+                            </a>
+                          </li>
+                        ))}
+                  </ul>
                 </div>
-                <ul className="mt-3 space-y-2 text-sm text-slate-600">
-                  {activeDraft.files[field].map((file) => (
-                    <li key={`${field}-${file.name}`}>
-                      <button type="button" onClick={() => handleOpenDraftFile(file)} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-left font-medium text-slate-700 underline underline-offset-2 hover:text-slate-950">
-                        {file.name}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       </article>

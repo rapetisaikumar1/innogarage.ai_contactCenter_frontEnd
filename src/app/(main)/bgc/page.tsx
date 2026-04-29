@@ -83,9 +83,19 @@ export default function BgcPage() {
                       {record.resumeFiles.length + record.usCanadaBgcFiles.length + record.indiaBgcFiles.length} files
                     </td>
                     <td className="px-5 py-4 text-sm text-slate-600">
-                      <Link href={`/bgc/${record.id}`} className="inline-flex rounded-xl border border-black bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-slate-50">
-                        View
-                      </Link>
+                      <div className="flex items-center justify-end gap-2">
+                        <Link href={`/bgc/${record.id}`} className="inline-flex items-center gap-1 rounded-lg border border-black bg-white px-3 py-1.5 text-xs font-semibold text-black transition-all hover:bg-slate-50">
+                          View
+                          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </Link>
+                        <Link href={`/bgc/new?edit=${record.id}`} aria-label={`Edit ${record.fullName}`} className="inline-flex h-[30px] w-[30px] items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 transition-all hover:bg-slate-50">
+                          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}

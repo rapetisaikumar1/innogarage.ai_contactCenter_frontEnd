@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useBgcRecord } from '@/hooks/useBgcRecords';
 import { BGC_DOCUMENT_LABELS } from '@/lib/bgcDraft';
+import { getBgcDocumentViewerHref } from '@/lib/bgcDocumentViewer';
 
 function formatDate(value: string | null): string {
   if (!value) {
@@ -131,7 +132,7 @@ export default function SavedBgcRecordPage() {
                   <ul className="mt-3 space-y-2 text-sm text-slate-600">
                     {data[field].map((document) => (
                       <li key={`${field}-${document.publicId}`}>
-                        <a href={document.url} target="_blank" rel="noreferrer" className="block rounded-xl border border-slate-200 bg-white px-3 py-2 font-medium text-slate-700 underline underline-offset-2 hover:text-slate-950">
+                        <a href={getBgcDocumentViewerHref(document)} target="_blank" rel="noreferrer" className="block rounded-xl border border-slate-200 bg-white px-3 py-2 font-medium text-slate-700 underline underline-offset-2 hover:text-slate-950">
                           {document.originalName}
                         </a>
                       </li>

@@ -72,8 +72,7 @@ export function useBgcRecord(recordId: string | null, enabled = true) {
   return { data, isLoading, error, refetch: fetchRecord };
 }
 
-export async function createBgcRecord(input: BgcRecordInput, files: BgcFileInput): Promise<BgcRecord> {
-  const token = getSession()?.token;
+function buildBgcFormData(input: BgcRecordInput, files: BgcFileInput): FormData {
   const formData = new FormData();
 
   Object.entries(input).forEach(([key, value]) => {
@@ -83,6 +82,13 @@ export async function createBgcRecord(input: BgcRecordInput, files: BgcFileInput
   Object.entries(files).forEach(([field, fieldFiles]) => {
     fieldFiles.forEach((file) => formData.append(field, file));
   });
+
+  return formData;
+}
+
+export async function createBgcRecord(input: BgcRecordInput, files: BgcFileInput): Promise<BgcRecord> {
+  const token = getSession()?.token;
+  const formData = buildBgcFormData(input, files);
 
   const res = await fetch(`${API_URL}/bgc`, {
     method: 'POST',
@@ -94,6 +100,25 @@ export async function createBgcRecord(input: BgcRecordInput, files: BgcFileInput
 
   if (!res.ok) {
     throw new Error(json.message || 'Failed to save BGC record');
+  }
+
+  return json.data;
+}
+
+export async function updateBgcRecord(recordId: string, input: BgcRecordInput, files: BgcFileInput): Promise<BgcRecord> {
+  const token = getSession()?.token;
+  const formData = buildBgcFormData(input, files);
+
+  const res = await fetch(`${API_URL}/bgc/${recordId}`, {
+    method: 'PATCH',
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    body: formData,
+  });
+
+  const json = await res.json();
+
+  if (!res.ok) {
+    throw new Error(json.message || 'Failed to update BGC record');
   }
 
   return json.data;
