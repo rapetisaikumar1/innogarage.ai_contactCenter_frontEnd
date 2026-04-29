@@ -306,6 +306,13 @@ export default function PaymentHistoryPage() {
     return matchesSearch && matchesStatus;
   });
 
+  const metrics = {
+    total: data.length,
+    settled: data.filter((entry) => entry.status === 'PAID_ON_TIME' || entry.status === 'FULLY_PAID').length,
+    extensions: data.filter((entry) => entry.status === 'ASKED_FOR_EXTENSION').length,
+    attention: data.filter((entry) => entry.status === 'NOT_RESPONDING' || entry.status === 'ABSCONDED').length,
+  };
+
   function openCreateModal() {
     setActiveEntry(null);
     setSaveError(null);
@@ -407,6 +414,25 @@ export default function PaymentHistoryPage() {
           </svg>
           Add payment record
         </PrimaryButton>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <p className="text-xs text-slate-500">Total records</p>
+          <p className="mt-1 text-xl font-semibold text-slate-950 tabular-nums">{data.length}</p>
+        </div>
+        <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 shadow-sm">
+          <p className="text-xs text-emerald-700">Settled</p>
+          <p className="mt-1 text-xl font-semibold text-emerald-900 tabular-nums">{metrics.settled}</p>
+        </div>
+        <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 shadow-sm">
+          <p className="text-xs text-amber-700">Extensions</p>
+          <p className="mt-1 text-xl font-semibold text-amber-900 tabular-nums">{metrics.extensions}</p>
+        </div>
+        <div className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 shadow-sm">
+          <p className="text-xs text-rose-700">Attention</p>
+          <p className="mt-1 text-xl font-semibold text-rose-900 tabular-nums">{metrics.attention}</p>
+        </div>
       </div>
 
       {error && (
