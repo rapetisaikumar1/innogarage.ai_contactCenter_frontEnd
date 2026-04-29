@@ -11,6 +11,7 @@ import { User } from '@/types';
 import { useNotifications } from '@/hooks/useNotifications';
 import { updateMyAvailability, type Availability } from '@/hooks/useAgents';
 import { useProfile } from '@/hooks/useSettings';
+import { useSocket } from '@/hooks/useSocket';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -252,9 +253,15 @@ function TopNav({ user }: { user: User }) {
 
 // ─── Main layout ──────────────────────────────────────────────────────────────
 export default function MainLayout({ children }: { children: ReactNode }) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, logout } = useAuth();
   const router   = useRouter();
   const pathname = usePathname();
+
+  useSocket({
+    'account:disabled': () => {
+      logout();
+    },
+  });
 
   useEffect(() => {
     if (!isLoading && !user) router.replace('/login');
