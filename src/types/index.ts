@@ -27,3 +27,4 @@ export interface ApiError {
 
 export * from './availableTechnology';
 export * from './bgc';
+export * from './paymentHistory';
