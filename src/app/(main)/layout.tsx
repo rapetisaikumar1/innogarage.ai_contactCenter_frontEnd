@@ -13,12 +13,6 @@ import { updateMyAvailability, type Availability } from '@/hooks/useAgents';
 import Image from 'next/image';
 import Link from 'next/link';
 
-const ROLE_LABELS: Record<User['role'], string> = {
-  ADMIN: 'Admin',
-  AGENT: 'Mentor',
-  MANAGER: 'Manager',
-};
-
 // ─── Nav items ────────────────────────────────────────────────────────────────
 const NAV_ITEMS: Array<{ label: string; href: string; icon: ReactNode; roles?: User['role'][]; canShow?: (user: User) => boolean }> = [
   { label: 'Dashboard', href: '/dashboard', icon: (<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>) },
@@ -118,7 +112,6 @@ function TopNav({ user }: { user: User }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const currentAvail = AVAILABILITY_OPTIONS.find((o) => o.value === availability)!;
-  const roleLabel = ROLE_LABELS[user.role] ?? user.role;
 
   async function handleAvailabilityChange(next: Availability) {
     if (next === availability || updatingAvailability) return;
@@ -190,7 +183,7 @@ function TopNav({ user }: { user: User }) {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-slate-900">{user.name}</p>
-                    <p className="text-xs text-slate-500">{roleLabel}</p>
+                    <p className="text-xs text-slate-500 capitalize">{user.role?.toLowerCase()}</p>
                   </div>
                 </div>
               </div>

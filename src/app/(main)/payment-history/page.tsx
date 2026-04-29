@@ -76,7 +76,7 @@ function ViewButton({
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex min-w-[96px] items-center justify-center gap-1 rounded-lg border border-black bg-white px-3 py-1.5 text-xs font-semibold text-black transition-all hover:bg-slate-50"
+      className="inline-flex items-center gap-1 rounded-lg border border-black bg-white px-3 py-1.5 text-xs font-semibold text-black transition-all hover:bg-slate-50"
     >
       View
       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -450,12 +450,12 @@ export default function PaymentHistoryPage() {
                       <th className="w-[20%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Placed Job Title</th>
                       <th className="w-[17%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Status</th>
                       <th className="w-[13%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Updated</th>
-                      <th className="w-[12%] px-5 py-3 text-right text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Action</th>
+                      <th className="w-[12%] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {filteredEntries.map((entry) => (
-                      <tr key={entry.id} className="align-middle hover:bg-slate-50/70">
+                      <tr key={entry.id} className="hover:bg-slate-50/70">
                         <td className="px-5 py-4 text-sm font-semibold text-slate-950">{entry.name}</td>
                         <td className="px-5 py-4 text-sm text-slate-600">{entry.placedCompany}</td>
                         <td className="px-5 py-4 text-sm text-slate-600">{entry.placedJobTitle}</td>
