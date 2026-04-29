@@ -4,7 +4,6 @@ import { ReactNode, useDeferredValue, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import {
   createPaymentHistory,
-  deletePaymentHistory,
   updatePaymentHistory,
   usePaymentHistories,
 } from '@/hooks/usePaymentHistory';
@@ -31,14 +30,6 @@ type PaymentHistoryModalProps = {
   error: string | null;
   onClose: () => void;
   onSubmit: (value: PaymentHistoryFormState) => Promise<void>;
-};
-
-type DeleteDialogProps = {
-  entry: PaymentHistory;
-  deleting: boolean;
-  error: string | null;
-  onClose: () => void;
-  onConfirm: () => Promise<void>;
 };
 
 const DEFAULT_STATUS: PaymentHistoryStatus = 'PAID_ON_TIME';
@@ -72,6 +63,33 @@ function PrimaryButton({
       className={`inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
     >
       {children}
+    </button>
+  );
+}
+
+function IconButton({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:bg-slate-50 hover:text-slate-900"
+    >
+      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.8}
+          d="M16.862 3.487a2.1 2.1 0 113.03 2.91L8.82 17.926l-4.11.6.728-4.082L16.862 3.487z"
+        />
+      </svg>
     </button>
   );
 }
@@ -202,34 +220,6 @@ function PaymentHistoryModal({ mode, initialValue, saving, error, onClose, onSub
   );
 }
 
-function DeleteDialog({ entry, deleting, error, onClose, onConfirm }: DeleteDialogProps) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
-      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl">
-        <h2 className="text-base font-semibold text-slate-950">Delete {entry.name}?</h2>
-        <p className="mt-1.5 text-sm text-slate-500">
-          This removes the payment history entry for {entry.placedCompany}. This action cannot be undone.
-        </p>
-
-        {error && (
-          <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-
-        <div className="mt-5 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
-            Cancel
-          </button>
-          <PrimaryButton onClick={() => void onConfirm()} disabled={deleting}>
-            {deleting ? 'Deleting...' : 'Delete record'}
-          </PrimaryButton>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function LoadingState() {
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -263,8 +253,8 @@ function formatDate(value: string): string {
 }
 
 function previewNotes(value: string | null): string {
-  if (!value) return 'No notes added';
-  return value.length > 88 ? `${value.slice(0, 88)}...` : value;
+  const trimmed = value?.trim();
+  return trimmed && trimmed.length > 0 ? trimmed : 'No notes added';
 }
 
 function toFormState(entry?: PaymentHistory | null): PaymentHistoryFormState {
@@ -284,11 +274,8 @@ export default function PaymentHistoryPage() {
   const [selectedStatus, setSelectedStatus] = useState<'ALL' | PaymentHistoryStatus>('ALL');
   const [modalMode, setModalMode] = useState<'create' | 'edit' | null>(null);
   const [activeEntry, setActiveEntry] = useState<PaymentHistory | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<PaymentHistory | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const deferredSearch = useDeferredValue(search);
 
@@ -332,17 +319,6 @@ export default function PaymentHistoryPage() {
     setSaveError(null);
   }
 
-  function openDeleteDialog(entry: PaymentHistory) {
-    setDeleteTarget(entry);
-    setDeleteError(null);
-  }
-
-  function closeDeleteDialog() {
-    if (isDeleting) return;
-    setDeleteTarget(null);
-    setDeleteError(null);
-  }
-
   async function handleSave(form: PaymentHistoryFormState) {
     const payload: PaymentHistoryInput = {
       name: form.name,
@@ -368,25 +344,6 @@ export default function PaymentHistoryPage() {
       setSaveError(err instanceof Error ? err.message : 'Failed to save payment history record');
     } finally {
       setIsSaving(false);
-    }
-  }
-
-  async function handleDelete() {
-    if (!deleteTarget) {
-      return;
-    }
-
-    setIsDeleting(true);
-    setDeleteError(null);
-
-    try {
-      await deletePaymentHistory(deleteTarget.id);
-      await refetch();
-      closeDeleteDialog();
-    } catch (err: unknown) {
-      setDeleteError(err instanceof Error ? err.message : 'Failed to delete payment history record');
-    } finally {
-      setIsDeleting(false);
     }
   }
 
@@ -487,16 +444,16 @@ export default function PaymentHistoryPage() {
           ) : (
             <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="hidden overflow-x-auto lg:block">
-                <table className="w-full min-w-[980px]">
+                <table className="w-full min-w-[980px] table-fixed">
                   <thead>
                     <tr className="border-b border-slate-200 bg-slate-50 text-left">
-                      <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Name</th>
-                      <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Placed Company</th>
-                      <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Placed Job Title</th>
-                      <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
+                      <th className="w-36 px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Name</th>
+                      <th className="w-48 px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Placed Company</th>
+                      <th className="w-44 px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Placed Job Title</th>
+                      <th className="w-44 px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
                       <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Notes</th>
-                      <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Updated</th>
-                      <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Action</th>
+                      <th className="w-32 px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Updated</th>
+                      <th className="w-20 px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Edit</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -506,16 +463,18 @@ export default function PaymentHistoryPage() {
                         <td className="px-5 py-3.5 text-sm text-slate-600">{entry.placedCompany}</td>
                         <td className="px-5 py-3.5 text-sm text-slate-600">{entry.placedJobTitle}</td>
                         <td className="px-5 py-3.5 text-sm"><StatusBadge status={entry.status} /></td>
-                        <td className="px-5 py-3.5 text-sm text-slate-600">{previewNotes(entry.notes)}</td>
+                        <td className="px-5 py-3.5 text-sm text-slate-600">
+                          <div
+                            className="rounded-lg bg-slate-50 px-3 py-2 leading-5 text-slate-600 break-all line-clamp-2"
+                            title={previewNotes(entry.notes)}
+                          >
+                            {previewNotes(entry.notes)}
+                          </div>
+                        </td>
                         <td className="px-5 py-3.5 text-sm text-slate-600">{formatDate(entry.updatedAt)}</td>
                         <td className="px-5 py-3.5 text-sm">
-                          <div className="flex items-center justify-end gap-2">
-                            <PrimaryButton className="rounded-lg px-3 py-1.5 text-xs" onClick={() => openEditModal(entry)}>
-                              Edit
-                            </PrimaryButton>
-                            <PrimaryButton className="rounded-lg px-3 py-1.5 text-xs" onClick={() => openDeleteDialog(entry)}>
-                              Delete
-                            </PrimaryButton>
+                          <div className="flex items-center justify-end">
+                            <IconButton label={`Edit ${entry.name}`} onClick={() => openEditModal(entry)} />
                           </div>
                         </td>
                       </tr>
@@ -535,13 +494,12 @@ export default function PaymentHistoryPage() {
                       </div>
                       <StatusBadge status={entry.status} />
                     </div>
-                    <p className="mt-3 text-sm text-slate-600">{previewNotes(entry.notes)}</p>
+                    <div className="mt-3 rounded-lg bg-white px-3 py-2 text-sm leading-5 text-slate-600 break-all line-clamp-3">
+                      {previewNotes(entry.notes)}
+                    </div>
                     <div className="mt-3 flex items-center justify-between gap-3">
                       <span className="text-xs text-slate-400">Updated {formatDate(entry.updatedAt)}</span>
-                      <div className="flex gap-2">
-                        <PrimaryButton className="rounded-lg px-3 py-1.5 text-xs" onClick={() => openEditModal(entry)}>Edit</PrimaryButton>
-                        <PrimaryButton className="rounded-lg px-3 py-1.5 text-xs" onClick={() => openDeleteDialog(entry)}>Delete</PrimaryButton>
-                      </div>
+                      <IconButton label={`Edit ${entry.name}`} onClick={() => openEditModal(entry)} />
                     </div>
                   </div>
                 ))}
@@ -559,16 +517,6 @@ export default function PaymentHistoryPage() {
           error={saveError}
           onClose={closeModal}
           onSubmit={handleSave}
-        />
-      )}
-
-      {deleteTarget && (
-        <DeleteDialog
-          entry={deleteTarget}
-          deleting={isDeleting}
-          error={deleteError}
-          onClose={closeDeleteDialog}
-          onConfirm={handleDelete}
         />
       )}
     </div>
