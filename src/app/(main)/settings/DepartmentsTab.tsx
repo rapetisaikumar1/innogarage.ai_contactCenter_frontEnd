@@ -83,9 +83,6 @@ export default function DepartmentsTab() {
               <span className="h-10 w-1.5 rounded-full bg-slate-900" aria-hidden="true" />
               <div>
                 <p className="text-base font-bold text-slate-950">Departments</p>
-                <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
-                  Ordered by creation time
-                </p>
               </div>
             </div>
           </div>
