@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Candidate, CandidateStatus } from '@/types/candidate';
 import { createCandidate, updateCandidate } from '@/hooks/useCandidates';
+import { useAvailableTechnologies } from '@/hooks/useAvailableTechnologies';
+import { TECHNOLOGY_CATEGORY_LABELS, TECHNOLOGY_CATEGORY_ORDER } from '@/types';
 
 interface Props {
   candidate?: Candidate;
@@ -24,6 +26,7 @@ const EMPTY_FORM = {
 
 export default function CandidateForm({ candidate, onSuccess, onCancel }: Props) {
   const isEdit = !!candidate;
+  const { data: availableTechnologies, isLoading: technologiesLoading, error: technologiesError } = useAvailableTechnologies();
   const [form, setForm] = useState({
     fullName: candidate?.fullName ?? EMPTY_FORM.fullName,
     phoneNumber: candidate?.phoneNumber ?? EMPTY_FORM.phoneNumber,
@@ -37,6 +40,19 @@ export default function CandidateForm({ candidate, onSuccess, onCancel }: Props)
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const technologyGroups = useMemo(
+    () => TECHNOLOGY_CATEGORY_ORDER.map((category) => ({
+      category,
+      label: TECHNOLOGY_CATEGORY_LABELS[category],
+      items: availableTechnologies.filter((technology) => technology.category === category),
+    })).filter((group) => group.items.length > 0),
+    [availableTechnologies],
+  );
+
+  const hasLegacyTechnologyValue =
+    Boolean(form.preferredRole) &&
+    !availableTechnologies.some((technology) => technology.name === form.preferredRole);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -92,7 +108,33 @@ export default function CandidateForm({ candidate, onSuccess, onCancel }: Props)
         </div>
         <div>
           <label className={labelClass}>Preferred Technology</label>
-          <input name="preferredRole" value={form.preferredRole ?? ''} onChange={handleChange} className={inputClass} />
+          <select
+            name="preferredRole"
+            value={form.preferredRole ?? ''}
+            onChange={handleChange}
+            className={inputClass}
+            disabled={technologiesLoading}
+          >
+            <option value="">Select preferred technology</option>
+            {hasLegacyTechnologyValue && (
+              <option value={form.preferredRole ?? ''}>{form.preferredRole}</option>
+            )}
+            {technologyGroups.map((group) => (
+              <optgroup key={group.category} label={group.label}>
+                {group.items.map((technology) => (
+                  <option key={technology.id} value={technology.name}>
+                    {technology.name}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+          {technologiesLoading && (
+            <p className="mt-1 text-xs text-gray-400">Loading available technologies...</p>
+          )}
+          {technologiesError && (
+            <p className="mt-1 text-xs text-red-600">{technologiesError}</p>
+          )}
         </div>
         <div>
           <label className={labelClass}>Visa Status</label>
