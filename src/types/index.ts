@@ -5,6 +5,7 @@ export interface User {
   role: 'ADMIN' | 'AGENT' | 'MANAGER';
   canAccessBgc?: boolean;
   canAccessPaymentHistory?: boolean;
+  canAccessMentors?: boolean;
 }
 
 export interface LoginResponse {

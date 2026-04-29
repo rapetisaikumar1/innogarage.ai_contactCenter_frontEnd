@@ -189,16 +189,29 @@ function CandidatesPanel({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function AgentsPage() {
   const { user } = useAuth();
-  const { agents, loading, error } = useAgents();
+  const canManageMentors = user?.role === 'ADMIN';
+  const canAccessMentors = canManageMentors || Boolean(user?.canAccessMentors);
+  const { agents, loading, error } = useAgents(canAccessMentors);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const isAdmin = user?.role === 'ADMIN' || user?.role === 'MANAGER';
+  const isAdmin = canManageMentors;
   const selectedAgent = agents.find((a) => a.id === selectedId) ?? null;
 
   const statuses: Availability[] = ['AVAILABLE', 'BUSY', 'AWAY', 'OFFLINE'];
 
   function toggle(id: string) {
     setSelectedId((prev) => (prev === id ? null : id));
+  }
+
+  if (!canAccessMentors) {
+    return (
+      <div className="p-6">
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <h1 className="text-xl font-bold text-slate-950">Mentors access is restricted</h1>
+          <p className="mt-2 text-sm text-slate-500">You do not have permission to view this workspace.</p>
+        </div>
+      </div>
+    );
   }
 
   return (

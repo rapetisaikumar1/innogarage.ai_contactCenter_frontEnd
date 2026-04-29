@@ -11,6 +11,7 @@ export interface UserProfile {
   department: { id: string; name: string } | null;
   canAccessBgc: boolean;
   canAccessPaymentHistory: boolean;
+  canAccessMentors: boolean;
   isActive: boolean;
   createdAt: string;
 }
@@ -89,6 +90,7 @@ export async function createUser(input: {
   departmentId?: string | null;
   canAccessBgc?: boolean;
   canAccessPaymentHistory?: boolean;
+  canAccessMentors?: boolean;
 }): Promise<UserProfile> {
   const res = await api.post<ApiResponse<UserProfile>>('/settings/users', input);
   return res.data;

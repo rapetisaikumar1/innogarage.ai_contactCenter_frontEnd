@@ -27,12 +27,17 @@ export interface AgentCandidate {
 }
 
 
-export function useAgents() {
+export function useAgents(enabled = true) {
   const [agents, setAgents] = useState<Agent[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
 
   const fetchAgents = useCallback(async () => {
+    if (!enabled) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const json = await api.get<{ data?: Agent[]; success?: boolean } | Agent[]>('/agents');
@@ -42,7 +47,7 @@ export function useAgents() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
     fetchAgents();

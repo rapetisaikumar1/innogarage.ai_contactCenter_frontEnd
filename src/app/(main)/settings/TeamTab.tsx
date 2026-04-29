@@ -28,6 +28,7 @@ function CreateUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
     departmentId: '',
     canAccessBgc: false,
     canAccessPaymentHistory: false,
+    canAccessMentors: false,
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,6 +59,7 @@ function CreateUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
         departmentId: isMentor ? form.departmentId : null,
         canAccessBgc: isMentor ? form.canAccessBgc : false,
         canAccessPaymentHistory: isMentor ? form.canAccessPaymentHistory : false,
+        canAccessMentors: isMentor ? form.canAccessMentors : false,
       });
       onCreated();
       onClose();
@@ -164,6 +166,15 @@ function CreateUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
                     className="h-4 w-4 accent-slate-900"
                   />
                 </label>
+                <label className="flex cursor-pointer items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700">
+                  Mentors
+                  <input
+                    type="checkbox"
+                    checked={form.canAccessMentors}
+                    onChange={(event) => update('canAccessMentors', event.target.checked)}
+                    className="h-4 w-4 accent-slate-900"
+                  />
+                </label>
               </div>
             </div>
           )}
@@ -259,7 +270,8 @@ function UserRow({ user, onUpdated, isSelf }: { user: UserProfile; onUpdated: ()
           <div className="flex flex-wrap gap-1.5">
             {user.canAccessBgc && <span className="rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">BGC</span>}
             {user.canAccessPaymentHistory && <span className="rounded-full bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700">Payment History</span>}
-            {!user.canAccessBgc && !user.canAccessPaymentHistory && <span className="text-xs text-slate-400">Standard</span>}
+            {user.canAccessMentors && <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">Mentors</span>}
+            {!user.canAccessBgc && !user.canAccessPaymentHistory && !user.canAccessMentors && <span className="text-xs text-slate-400">Standard</span>}
           </div>
         ) : (
           <span className="text-xs text-slate-400">-</span>
