@@ -51,13 +51,6 @@ const STATUS_BADGE_CLASSES: Record<PaymentHistoryStatus, string> = {
   ABSCONDED: 'border border-red-200 bg-red-50 text-red-700',
 };
 
-const METRIC_STYLES = [
-  'from-slate-950 via-slate-900 to-slate-800 text-white',
-  'from-emerald-600 via-emerald-500 to-emerald-400 text-white',
-  'from-amber-500 via-amber-400 to-yellow-300 text-slate-950',
-  'from-rose-600 via-rose-500 to-orange-400 text-white',
-] as const;
-
 function PrimaryButton({
   children,
   type = 'button',
@@ -80,28 +73,6 @@ function PrimaryButton({
     >
       {children}
     </button>
-  );
-}
-
-function MetricCard({
-  label,
-  value,
-  detail,
-  tone,
-}: {
-  label: string;
-  value: number;
-  detail: string;
-  tone: (typeof METRIC_STYLES)[number];
-}) {
-  return (
-    <div className={`rounded-[24px] bg-gradient-to-br p-[1px] shadow-sm ${tone}`}>
-      <div className="h-full rounded-[23px] bg-white/95 px-5 py-4 backdrop-blur-sm">
-        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">{label}</p>
-        <p className="mt-3 text-3xl font-bold text-slate-950 tabular-nums">{value}</p>
-        <p className="mt-1 text-sm text-slate-500">{detail}</p>
-      </div>
-    </div>
   );
 }
 
@@ -132,67 +103,63 @@ function PaymentHistoryModal({ mode, initialValue, saving, error, onClose, onSub
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-3xl overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-2xl">
-        <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Payment History</p>
-            <h2 className="mt-1 text-xl font-bold text-slate-950">
-              {mode === 'create' ? 'Add payment record' : 'Edit payment record'}
-            </h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Keep placement payment commitments clear, current, and easy to review.
-            </p>
-          </div>
-          <PrimaryButton className="h-10 w-10 rounded-full px-0" onClick={onClose}>
-            <span className="text-lg leading-none">&times;</span>
-          </PrimaryButton>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+      <div className="w-full max-w-xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+        <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-5 py-4">
+          <h2 className="text-base font-semibold text-slate-950">
+            {mode === 'create' ? 'Add payment record' : 'Edit payment record'}
+          </h2>
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-700 transition">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5 px-6 py-6">
-          <div className="grid gap-5 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-800">Name</label>
+        <form onSubmit={handleSubmit} className="space-y-4 px-5 py-5">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-slate-700">Name</label>
               <input
                 value={form.name}
                 onChange={(event) => update('name', event.target.value)}
                 maxLength={120}
                 required
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-950 focus:ring-2 focus:ring-slate-950/10"
+                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-950 focus:ring-2 focus:ring-slate-950/10"
                 placeholder="Enter candidate name"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-800">Placed company</label>
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-slate-700">Placed company</label>
               <input
                 value={form.placedCompany}
                 onChange={(event) => update('placedCompany', event.target.value)}
                 maxLength={120}
                 required
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-950 focus:ring-2 focus:ring-slate-950/10"
+                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-950 focus:ring-2 focus:ring-slate-950/10"
                 placeholder="Enter company name"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-800">Placed job title</label>
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-slate-700">Placed job title</label>
               <input
                 value={form.placedJobTitle}
                 onChange={(event) => update('placedJobTitle', event.target.value)}
                 maxLength={120}
                 required
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-950 focus:ring-2 focus:ring-slate-950/10"
+                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-950 focus:ring-2 focus:ring-slate-950/10"
                 placeholder="Enter placed job title"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-800">Status</label>
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-slate-700">Status</label>
               <select
                 value={form.status}
                 onChange={(event) => update('status', event.target.value as PaymentHistoryStatus)}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-950 focus:ring-2 focus:ring-slate-950/10"
+                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-950 focus:ring-2 focus:ring-slate-950/10"
               >
                 {PAYMENT_HISTORY_STATUS_ORDER.map((status) => (
                   <option key={status} value={status}>
@@ -203,29 +170,29 @@ function PaymentHistoryModal({ mode, initialValue, saving, error, onClose, onSub
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-slate-800">Notes</label>
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-slate-700">Notes</label>
             <textarea
               value={form.notes}
               onChange={(event) => update('notes', event.target.value)}
               maxLength={2000}
-              rows={5}
-              className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-950 focus:ring-2 focus:ring-slate-950/10"
+              rows={4}
+              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-950 focus:ring-2 focus:ring-slate-950/10"
               placeholder="Add any payment timeline context, follow-up detail, or risk note"
             />
           </div>
 
           {error && (
-            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
               {error}
             </div>
           )}
 
-          <div className="flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end">
-            <PrimaryButton className="sm:min-w-28" onClick={onClose}>
+          <div className="flex justify-end gap-2 border-t border-slate-200 pt-4">
+            <button type="button" onClick={onClose} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
               Cancel
-            </PrimaryButton>
-            <PrimaryButton type="submit" className="sm:min-w-36" disabled={saving}>
+            </button>
+            <PrimaryButton type="submit" disabled={saving}>
               {saving ? 'Saving...' : mode === 'create' ? 'Create record' : 'Save changes'}
             </PrimaryButton>
           </div>
@@ -237,25 +204,24 @@ function PaymentHistoryModal({ mode, initialValue, saving, error, onClose, onSub
 
 function DeleteDialog({ entry, deleting, error, onClose, onConfirm }: DeleteDialogProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-[28px] border border-slate-200 bg-white p-6 shadow-2xl">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Delete Record</p>
-        <h2 className="mt-2 text-xl font-bold text-slate-950">Delete {entry.name}?</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-500">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl">
+        <h2 className="text-base font-semibold text-slate-950">Delete {entry.name}?</h2>
+        <p className="mt-1.5 text-sm text-slate-500">
           This removes the payment history entry for {entry.placedCompany}. This action cannot be undone.
         </p>
 
         {error && (
-          <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
             {error}
           </div>
         )}
 
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-          <PrimaryButton className="sm:min-w-28" onClick={onClose}>
+        <div className="mt-5 flex justify-end gap-2">
+          <button type="button" onClick={onClose} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
             Cancel
-          </PrimaryButton>
-          <PrimaryButton className="sm:min-w-32" onClick={() => void onConfirm()} disabled={deleting}>
+          </button>
+          <PrimaryButton onClick={() => void onConfirm()} disabled={deleting}>
             {deleting ? 'Deleting...' : 'Delete record'}
           </PrimaryButton>
         </div>
@@ -266,18 +232,11 @@ function DeleteDialog({ entry, deleting, error, onClose, onConfirm }: DeleteDial
 
 function LoadingState() {
   return (
-    <div className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <div key={index} className="h-28 animate-pulse rounded-[24px] border border-slate-200 bg-white" />
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="space-y-3 p-5">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div key={index} className="h-12 animate-pulse rounded-xl bg-slate-100" />
         ))}
-      </div>
-      <div className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="space-y-3">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <div key={index} className="h-14 animate-pulse rounded-2xl bg-slate-100" />
-          ))}
-        </div>
       </div>
     </div>
   );
@@ -285,17 +244,10 @@ function LoadingState() {
 
 function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
-    <div className="rounded-[28px] border border-dashed border-slate-300 bg-white px-6 py-16 text-center shadow-sm">
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
-        <svg className="h-8 w-8 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6M7.5 4.5h9A2.25 2.25 0 0118.75 6.75v10.5A2.25 2.25 0 0116.5 19.5h-9a2.25 2.25 0 01-2.25-2.25V6.75A2.25 2.25 0 017.5 4.5z" />
-        </svg>
-      </div>
-      <h3 className="mt-5 text-xl font-bold text-slate-950">No payment records yet</h3>
-      <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-500">
-        Add the first record to track placement payments, extension requests, and risk signals from one place.
-      </p>
-      <PrimaryButton className="mt-6" onClick={onCreate}>
+    <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center shadow-sm">
+      <h3 className="text-lg font-semibold text-slate-950">No payment records yet</h3>
+      <p className="mt-1.5 text-sm text-slate-500">Add the first record to track placement payments and risk signals.</p>
+      <PrimaryButton className="mt-4" onClick={onCreate}>
         Add first record
       </PrimaryButton>
     </div>
@@ -353,13 +305,6 @@ export default function PaymentHistoryPage() {
     const matchesStatus = selectedStatus === 'ALL' || entry.status === selectedStatus;
     return matchesSearch && matchesStatus;
   });
-
-  const metrics = {
-    total: data.length,
-    settled: data.filter((entry) => entry.status === 'PAID_ON_TIME' || entry.status === 'FULLY_PAID').length,
-    extensions: data.filter((entry) => entry.status === 'ASKED_FOR_EXTENSION').length,
-    attention: data.filter((entry) => entry.status === 'NOT_RESPONDING' || entry.status === 'ABSCONDED').length,
-  };
 
   function openCreateModal() {
     setActiveEntry(null);
@@ -450,162 +395,135 @@ export default function PaymentHistoryPage() {
   }
 
   return (
-    <div className="min-h-full bg-slate-50">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-6">
-        <section className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
-          <div className="grid gap-6 px-6 py-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Admin Workspace</p>
-              <h1 className="mt-2 text-3xl font-bold text-slate-950">Payment History</h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-                Track post-placement payment follow-through with a clean operational view of fully paid cases, extension requests, and records that need immediate attention.
-              </p>
-            </div>
-
-            <PrimaryButton className="lg:min-w-48" onClick={openCreateModal}>
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 5v14m7-7H5" />
-              </svg>
-              Add payment record
-            </PrimaryButton>
-          </div>
-
-          <div className="border-t border-slate-200 bg-slate-50/60 px-6 py-5">
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              <MetricCard label="Total records" value={metrics.total} detail="All payment-tracked placements" tone={METRIC_STYLES[0]} />
-              <MetricCard label="Settled" value={metrics.settled} detail="Paid on time or fully paid" tone={METRIC_STYLES[1]} />
-              <MetricCard label="Extensions" value={metrics.extensions} detail="Cases needing more time" tone={METRIC_STYLES[2]} />
-              <MetricCard label="Attention" value={metrics.attention} detail="Not responding or absconded" tone={METRIC_STYLES[3]} />
-            </div>
-          </div>
-        </section>
-
-        {error && (
-          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-
-        {isLoading ? (
-          <LoadingState />
-        ) : data.length === 0 ? (
-          <EmptyState onCreate={openCreateModal} />
-        ) : (
-          <>
-            <section className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">
-              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_260px] lg:min-w-[56%]">
-                  <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
-                    <input
-                      value={search}
-                      onChange={(event) => setSearch(event.target.value)}
-                      placeholder="Search by name, company, title, notes, or status"
-                      className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
-                    />
-                  </div>
-
-                  <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
-                    <select
-                      value={selectedStatus}
-                      onChange={(event) => setSelectedStatus(event.target.value as 'ALL' | PaymentHistoryStatus)}
-                      className="w-full bg-transparent text-sm text-slate-900 outline-none"
-                    >
-                      <option value="ALL">All statuses</option>
-                      {PAYMENT_HISTORY_STATUS_ORDER.map((status) => (
-                        <option key={status} value={status}>
-                          {PAYMENT_HISTORY_STATUS_LABELS[status]}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="text-sm text-slate-500">
-                  Showing <span className="font-semibold text-slate-900">{filteredEntries.length}</span> of {data.length} records
-                </div>
-              </div>
-            </section>
-
-            {filteredEntries.length === 0 ? (
-              <div className="rounded-[24px] border border-dashed border-slate-300 bg-white px-6 py-14 text-center shadow-sm">
-                <h2 className="text-xl font-bold text-slate-950">No matching records</h2>
-                <p className="mt-2 text-sm text-slate-500">Adjust the search term or status filter to find a payment record.</p>
-              </div>
-            ) : (
-              <section className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
-                <div className="hidden overflow-x-auto lg:block">
-                  <table className="w-full min-w-[980px]">
-                    <thead>
-                      <tr className="border-b border-slate-200 bg-slate-50 text-left">
-                        <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Name</th>
-                        <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Placed Company</th>
-                        <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Placed Job Title</th>
-                        <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
-                        <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Notes</th>
-                        <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Updated</th>
-                        <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {filteredEntries.map((entry) => (
-                        <tr key={entry.id} className="hover:bg-slate-50">
-                          <td className="px-5 py-4 text-sm font-semibold text-slate-950">{entry.name}</td>
-                          <td className="px-5 py-4 text-sm text-slate-600">{entry.placedCompany}</td>
-                          <td className="px-5 py-4 text-sm text-slate-600">{entry.placedJobTitle}</td>
-                          <td className="px-5 py-4 text-sm text-slate-600"><StatusBadge status={entry.status} /></td>
-                          <td className="px-5 py-4 text-sm text-slate-600">{previewNotes(entry.notes)}</td>
-                          <td className="px-5 py-4 text-sm text-slate-600">{formatDate(entry.updatedAt)}</td>
-                          <td className="px-5 py-4 text-sm text-slate-600">
-                            <div className="flex items-center justify-end gap-2">
-                              <PrimaryButton className="rounded-lg px-3 py-1.5 text-xs" onClick={() => openEditModal(entry)}>
-                                Edit
-                              </PrimaryButton>
-                              <PrimaryButton className="rounded-lg px-3 py-1.5 text-xs" onClick={() => openDeleteDialog(entry)}>
-                                Delete
-                              </PrimaryButton>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="grid gap-4 p-4 lg:hidden">
-                  {filteredEntries.map((entry) => (
-                    <article key={entry.id} className="rounded-[22px] border border-slate-200 bg-slate-50/70 p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <h2 className="text-lg font-bold text-slate-950">{entry.name}</h2>
-                          <p className="mt-1 text-sm text-slate-600">{entry.placedCompany}</p>
-                          <p className="text-sm text-slate-500">{entry.placedJobTitle}</p>
-                        </div>
-                        <StatusBadge status={entry.status} />
-                      </div>
-
-                      <div className="mt-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
-                        {previewNotes(entry.notes)}
-                      </div>
-
-                      <div className="mt-4 flex items-center justify-between gap-3 text-xs text-slate-500">
-                        <span>Updated {formatDate(entry.updatedAt)}</span>
-                        <div className="flex items-center gap-2">
-                          <PrimaryButton className="rounded-lg px-3 py-1.5 text-xs" onClick={() => openEditModal(entry)}>
-                            Edit
-                          </PrimaryButton>
-                          <PrimaryButton className="rounded-lg px-3 py-1.5 text-xs" onClick={() => openDeleteDialog(entry)}>
-                            Delete
-                          </PrimaryButton>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </section>
-            )}
-          </>
-        )}
+    <div className="mx-auto flex max-w-7xl flex-col gap-5 p-6">
+      <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-950">Payment History</h1>
+          <p className="mt-1 text-sm text-slate-500">Track placement payment status and follow-through for each candidate.</p>
+        </div>
+        <PrimaryButton onClick={openCreateModal}>
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 5v14m7-7H5" />
+          </svg>
+          Add payment record
+        </PrimaryButton>
       </div>
+
+      {error && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      {isLoading ? (
+        <LoadingState />
+      ) : data.length === 0 ? (
+        <EmptyState onCreate={openCreateModal} />
+      ) : (
+        <>
+          <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center">
+            <div className="grid flex-1 gap-3 sm:grid-cols-[minmax(0,1fr)_220px]">
+              <div className="rounded-xl border border-slate-200 px-3 py-2">
+                <input
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search by name, company, title, or status"
+                  className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                />
+              </div>
+
+              <div className="rounded-xl border border-slate-200 px-3 py-2">
+                <select
+                  value={selectedStatus}
+                  onChange={(event) => setSelectedStatus(event.target.value as 'ALL' | PaymentHistoryStatus)}
+                  className="w-full bg-transparent text-sm text-slate-900 outline-none"
+                >
+                  <option value="ALL">All statuses</option>
+                  {PAYMENT_HISTORY_STATUS_ORDER.map((status) => (
+                    <option key={status} value={status}>
+                      {PAYMENT_HISTORY_STATUS_LABELS[status]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="text-sm text-slate-500">
+              {filteredEntries.length} of {data.length} records
+            </div>
+          </div>
+
+          {filteredEntries.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center shadow-sm">
+              <p className="text-sm font-medium text-slate-950">No matching records</p>
+              <p className="mt-1 text-sm text-slate-500">Adjust the search term or status filter.</p>
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div className="hidden overflow-x-auto lg:block">
+                <table className="w-full min-w-[980px]">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-50 text-left">
+                      <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Name</th>
+                      <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Placed Company</th>
+                      <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Placed Job Title</th>
+                      <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
+                      <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Notes</th>
+                      <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Updated</th>
+                      <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {filteredEntries.map((entry) => (
+                      <tr key={entry.id} className="hover:bg-slate-50">
+                        <td className="px-5 py-3.5 text-sm font-semibold text-slate-950">{entry.name}</td>
+                        <td className="px-5 py-3.5 text-sm text-slate-600">{entry.placedCompany}</td>
+                        <td className="px-5 py-3.5 text-sm text-slate-600">{entry.placedJobTitle}</td>
+                        <td className="px-5 py-3.5 text-sm"><StatusBadge status={entry.status} /></td>
+                        <td className="px-5 py-3.5 text-sm text-slate-600">{previewNotes(entry.notes)}</td>
+                        <td className="px-5 py-3.5 text-sm text-slate-600">{formatDate(entry.updatedAt)}</td>
+                        <td className="px-5 py-3.5 text-sm">
+                          <div className="flex items-center justify-end gap-2">
+                            <PrimaryButton className="rounded-lg px-3 py-1.5 text-xs" onClick={() => openEditModal(entry)}>
+                              Edit
+                            </PrimaryButton>
+                            <PrimaryButton className="rounded-lg px-3 py-1.5 text-xs" onClick={() => openDeleteDialog(entry)}>
+                              Delete
+                            </PrimaryButton>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="grid gap-3 p-4 lg:hidden">
+                {filteredEntries.map((entry) => (
+                  <div key={entry.id} className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-950">{entry.name}</p>
+                        <p className="mt-0.5 text-sm text-slate-600">{entry.placedCompany}</p>
+                        <p className="text-xs text-slate-500">{entry.placedJobTitle}</p>
+                      </div>
+                      <StatusBadge status={entry.status} />
+                    </div>
+                    <p className="mt-3 text-sm text-slate-600">{previewNotes(entry.notes)}</p>
+                    <div className="mt-3 flex items-center justify-between gap-3">
+                      <span className="text-xs text-slate-400">Updated {formatDate(entry.updatedAt)}</span>
+                      <div className="flex gap-2">
+                        <PrimaryButton className="rounded-lg px-3 py-1.5 text-xs" onClick={() => openEditModal(entry)}>Edit</PrimaryButton>
+                        <PrimaryButton className="rounded-lg px-3 py-1.5 text-xs" onClick={() => openDeleteDialog(entry)}>Delete</PrimaryButton>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
 
       {modalMode && (
         <PaymentHistoryModal
