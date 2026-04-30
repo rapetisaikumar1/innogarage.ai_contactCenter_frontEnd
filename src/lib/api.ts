@@ -1,4 +1,16 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+
+export function toAbsoluteApiUrl(pathOrUrl: string): string {
+  if (/^https?:\/\//i.test(pathOrUrl)) {
+    return pathOrUrl;
+  }
+
+  const apiBase = API_URL.replace(/\/+$/, '');
+  const apiOrigin = apiBase.endsWith('/api') ? apiBase.slice(0, -4) : apiBase;
+  const normalizedPath = pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`;
+
+  return `${apiOrigin}${normalizedPath}`;
+}
 
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;

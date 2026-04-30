@@ -3,6 +3,7 @@ export interface BgcDocument {
   mimeType: string;
   size: number;
   url: string;
+  viewUrl?: string;
   publicId: string;
   uploadedAt: string;
 }

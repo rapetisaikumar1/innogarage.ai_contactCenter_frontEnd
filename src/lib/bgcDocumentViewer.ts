@@ -1,4 +1,5 @@
 import { BgcDocument } from '@/types';
+import { toAbsoluteApiUrl } from '@/lib/api';
 
 const OFFICE_DOCUMENT_TYPES = new Set([
   'application/msword',
@@ -20,23 +21,24 @@ function buildOfficeOnlineViewerUrl(fileUrl: string): string {
  * - Anything else: the raw URL and let the browser handle it.
  */
 export function getBgcDocumentViewerHref(
-  document: Pick<BgcDocument, 'url' | 'mimeType'>,
+  document: Pick<BgcDocument, 'url' | 'viewUrl' | 'mimeType'>,
 ): string {
-  const { url, mimeType } = document;
+  const { url, viewUrl, mimeType } = document;
+  const displayUrl = viewUrl ? toAbsoluteApiUrl(viewUrl) : url;
 
-  if (!url) {
+  if (!displayUrl) {
     return '#';
   }
 
   if (mimeType === 'application/pdf' || mimeType.startsWith('image/')) {
-    return url;
+    return displayUrl;
   }
 
-  if (OFFICE_DOCUMENT_TYPES.has(mimeType) && /^https?:\/\//i.test(url)) {
-    return buildOfficeOnlineViewerUrl(url);
+  if (OFFICE_DOCUMENT_TYPES.has(mimeType) && /^https?:\/\//i.test(displayUrl)) {
+    return buildOfficeOnlineViewerUrl(displayUrl);
   }
 
-  return url;
+  return displayUrl;
 }
 
 /**
