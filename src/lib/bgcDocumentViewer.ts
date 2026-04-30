@@ -1,23 +1,51 @@
 import { BgcDocument } from '@/types';
 
-function buildViewerSearchParams(url: string, mimeType: string, name: string, localSource = false): string {
-  const params = new URLSearchParams({ url, mimeType, name });
+const OFFICE_DOCUMENT_TYPES = new Set([
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+]);
 
-  if (localSource) {
-    params.set('local', '1');
+function buildOfficeOnlineViewerUrl(fileUrl: string): string {
+  return `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(fileUrl)}`;
+}
+
+/**
+ * Returns the URL to open in a new tab so the document content is displayed.
+ * - PDFs and images: the file URL itself (browsers render them inline).
+ * - Office docs on a public URL: Microsoft Office Online viewer (full page).
+ * - Anything else: the raw URL and let the browser handle it.
+ */
+export function getBgcDocumentViewerHref(
+  document: Pick<BgcDocument, 'url' | 'mimeType'>,
+): string {
+  const { url, mimeType } = document;
+
+  if (!url) {
+    return '#';
   }
 
-  return params.toString();
+  if (mimeType === 'application/pdf' || mimeType.startsWith('image/')) {
+    return url;
+  }
+
+  if (OFFICE_DOCUMENT_TYPES.has(mimeType) && /^https?:\/\//i.test(url)) {
+    return buildOfficeOnlineViewerUrl(url);
+  }
+
+  return url;
 }
 
-export function getBgcDocumentViewerHref(document: Pick<BgcDocument, 'url' | 'mimeType' | 'originalName'>): string {
-  return `/bgc/document-view?${buildViewerSearchParams(document.url, document.mimeType, document.originalName)}`;
-}
-
+/**
+ * Opens a not-yet-uploaded local file in a new tab.
+ * PDFs/images render inline. Office files cannot be previewed before save
+ * because the Office Online viewer needs a public URL.
+ */
 export function openLocalBgcDocumentViewer(file: File): void {
   const objectUrl = URL.createObjectURL(file);
-  const href = `/bgc/document-view?${buildViewerSearchParams(objectUrl, file.type, file.name, true)}`;
-
-  window.open(href, '_blank', 'noopener,noreferrer');
+  window.open(objectUrl, '_blank', 'noopener,noreferrer');
   window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
 }
