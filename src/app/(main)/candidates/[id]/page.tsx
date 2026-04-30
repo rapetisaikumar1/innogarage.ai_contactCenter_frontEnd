@@ -12,7 +12,6 @@ import CallsList from '@/components/calls/CallsList';
 import FollowUpCard from '@/components/follow-ups/FollowUpCard';
 import FollowUpForm from '@/components/follow-ups/FollowUpForm';
 import { useFollowUpsByCandidate } from '@/hooks/useFollowUps';
-import { useSoftphone } from '@/hooks/useSoftphone';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDate, formatDateTime, STATUS_LABELS } from '@/utils/formatters';
 import { CandidateStatus } from '@/types/candidate';
@@ -29,9 +28,6 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'notes' | 'files' | 'calls' | 'history'>('overview');
-  const [calling, setCalling] = useState(false);
-  const [callMessage, setCallMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const softphone = useSoftphone();
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [pendingTransfer, setPendingTransfer] = useState<TransferRequest | null | undefined>(undefined);
   const [respondingTransfer, setRespondingTransfer] = useState(false);
@@ -53,39 +49,6 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
       // ignore
     } finally {
       setRespondingTransfer(false);
-    }
-  }
-
-  async function handleCall() {
-    if (!candidate) return;
-    const to = candidate.phoneNumber || candidate.whatsappNumber;
-    if (!to) {
-      setCallMessage({ type: 'error', text: 'Candidate has no phone number' });
-      setTimeout(() => setCallMessage(null), 5000);
-      return;
-    }
-    if (softphone.status !== 'ready') {
-      setCallMessage({
-        type: 'error',
-        text: softphone.status === 'initializing'
-          ? 'Softphone is still connecting — please try again in a moment.'
-          : 'Softphone is not ready. Check microphone permissions and reload.',
-      });
-      setTimeout(() => setCallMessage(null), 5000);
-      return;
-    }
-    setCalling(true);
-    setCallMessage(null);
-    try {
-      await softphone.startCall(to, { candidateId: candidate.id });
-      setCallMessage({ type: 'success', text: 'Calling — speak through your browser microphone.' });
-      setActiveTab('calls');
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to start call';
-      setCallMessage({ type: 'error', text: msg });
-    } finally {
-      setCalling(false);
-      setTimeout(() => setCallMessage(null), 5000);
     }
   }
 
@@ -116,15 +79,13 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
 
   // Transfer button state for agents
   const isAssignedAgent = user?.role === 'AGENT' && assignedTo?.id === user?.id;
-  const isAdminOrManager = user?.role === 'ADMIN' || user?.role === 'MANAGER';
-  const canStartCandidateCall = Boolean(candidate.phoneNumber || candidate.whatsappNumber) && (isAdminOrManager || isAssignedAgent);
   const isTransferTarget = pendingTransfer?.toAgentId === user?.id;
   const isTransferRequester = pendingTransfer?.fromAgentId === user?.id;
 
   return (
     <div className="space-y-0 pb-8">
       {/* ── Back link ────────────────────────────────────────────────────── */}
-      <div className="pb-4">
+      <div className="pt-4 pb-4">
         <Link
           href="/candidates"
           className="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 font-medium transition-colors"
@@ -184,20 +145,6 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
                 ))}
               </select>
               <button
-                onClick={handleCall}
-                disabled={!canStartCandidateCall || calling || softphone.status !== 'ready'}
-                title={
-                  !canStartCandidateCall
-                    ? 'Only the assigned agent, admin, or manager can call this candidate'
-                    : softphone.status !== 'ready'
-                      ? 'Softphone not ready'
-                      : 'Call candidate'
-                }
-                className="px-4 py-2 text-sm font-semibold bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {calling ? 'Calling...' : 'Call'}
-              </button>
-              <button
                 onClick={() => setShowEdit(true)}
                 className="px-4 py-2 text-sm font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
               >
@@ -241,14 +188,6 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
               )}
             </div>
           </div>
-
-          {/* Call feedback toast */}
-          {callMessage && (
-            <div className={`mt-4 px-4 py-2.5 rounded-xl text-sm font-medium border ${callMessage.type === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
-              {callMessage.text}
-            </div>
-          )}
-
           {/* Info grid */}
           <div className="mt-6 pt-6 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
             <div>
