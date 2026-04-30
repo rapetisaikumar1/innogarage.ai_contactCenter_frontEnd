@@ -11,6 +11,7 @@ export interface CandidateFile {
   mimeType: string;
   size: number;
   url: string;
+  viewUrl?: string;
   publicId: string;
   createdAt: string;
   uploadedBy: { id: string; name: string };

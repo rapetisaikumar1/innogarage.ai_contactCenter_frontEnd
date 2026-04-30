@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { useFiles, uploadFile, deleteFile, CandidateFile } from '@/hooks/useFiles';
 import { useAuth } from '@/hooks/useAuth';
+import { getCandidateFileViewerHref } from '@/lib/candidateFileViewer';
 import { formatDateTime } from '@/utils/formatters';
 
 const ACCEPTED_TYPES = '.jpg,.jpeg,.png,.webp,.svg,.pdf,.doc,.docx,.xls,.xlsx';
@@ -137,7 +138,7 @@ export default function FilesList({ candidateId }: Props) {
                 <span className="text-xl">{fileIcon(file.mimeType)}</span>
                 <div className="flex-1 min-w-0">
                   <a
-                    href={file.url}
+                    href={getCandidateFileViewerHref(file)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm font-medium text-blue-600 hover:underline truncate block"
