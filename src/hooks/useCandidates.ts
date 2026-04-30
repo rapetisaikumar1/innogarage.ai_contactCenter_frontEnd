@@ -128,8 +128,15 @@ export async function getPendingTransferRequest(candidateId: string): Promise<Tr
   return res.data;
 }
 
-export async function createTransferRequest(candidateId: string, toAgentId: string): Promise<TransferRequest> {
-  const res = await api.post<ApiResponse<TransferRequest>>(`/candidates/${candidateId}/transfer-request`, { toAgentId });
+export async function createTransferRequest(
+  candidateId: string,
+  toAgentId: string,
+  departmentId?: string
+): Promise<TransferRequest> {
+  const res = await api.post<ApiResponse<TransferRequest>>(`/candidates/${candidateId}/transfer-request`, {
+    toAgentId,
+    ...(departmentId ? { departmentId } : {}),
+  });
   return res.data;
 }
 

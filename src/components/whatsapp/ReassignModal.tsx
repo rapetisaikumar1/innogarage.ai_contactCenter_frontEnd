@@ -2,12 +2,13 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useAgents, type Agent } from '@/hooks/useAgents';
-import { reassignConversation } from '@/hooks/useWhatsApp';
+import { assignConversationToAgent, reassignConversation } from '@/hooks/useWhatsApp';
 
 interface Props {
   conversationId: string;
   candidateName: string;
   currentAgentId: string | null;
+  mode?: 'assign' | 'reassign';
   onClose: () => void;
   onReassigned: () => void;
 }
@@ -26,28 +27,48 @@ const AVAIL_LABEL: Record<Agent['availability'], string> = {
   OFFLINE: 'Offline',
 };
 
+const ALL_DEPARTMENTS = 'ALL';
+
 export default function ReassignModal({
   conversationId,
   candidateName,
   currentAgentId,
+  mode = 'reassign',
   onClose,
   onReassigned,
 }: Props) {
   const { agents, loading, error } = useAgents();
   const [search, setSearch] = useState('');
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState(ALL_DEPARTMENTS);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const actionLabel = mode === 'assign' ? 'Assign' : 'Reassign';
+  const submittingLabel = mode === 'assign' ? 'Assigning…' : 'Reassigning…';
+
+  const departments = useMemo(() => {
+    const byId = new Map<string, string>();
+    agents.forEach((agent) => {
+      if (agent.department) byId.set(agent.department.id, agent.department.name);
+    });
+    return Array.from(byId, ([id, name]) => ({ id, name })).sort((left, right) =>
+      left.name.localeCompare(right.name)
+    );
+  }, [agents]);
 
   // Eligible: active agents only, exclude the current assignee
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     return agents
       .filter((a) => a.isActive && a.id !== currentAgentId)
+      .filter((a) => selectedDepartmentId === ALL_DEPARTMENTS || a.departmentId === selectedDepartmentId)
       .filter((a) =>
         !term
           ? true
-          : a.name.toLowerCase().includes(term) || a.email.toLowerCase().includes(term)
+          : a.name.toLowerCase().includes(term) ||
+            a.email.toLowerCase().includes(term) ||
+            (a.department?.name.toLowerCase().includes(term) ?? false)
       )
       .sort((a, b) => {
         // Available first, then by lowest workload
@@ -57,7 +78,9 @@ export default function ReassignModal({
         if (ao !== bo) return ao - bo;
         return a.assignedConversationCount - b.assignedConversationCount;
       });
-  }, [agents, search, currentAgentId]);
+  }, [agents, search, currentAgentId, selectedDepartmentId]);
+
+  const selectedAgent = filtered.find((agent) => agent.id === selectedId) ?? null;
 
   // Close on Escape
   useEffect(() => {
@@ -69,15 +92,20 @@ export default function ReassignModal({
   }, [onClose, submitting]);
 
   async function handleConfirm() {
-    if (!selectedId || submitting) return;
+    if (!selectedAgent || submitting) return;
     setSubmitting(true);
     setSubmitError(null);
     try {
-      await reassignConversation(conversationId, selectedId);
+      const departmentId = selectedDepartmentId === ALL_DEPARTMENTS ? undefined : selectedDepartmentId;
+      if (mode === 'assign') {
+        await assignConversationToAgent(conversationId, selectedAgent.id, departmentId);
+      } else {
+        await reassignConversation(conversationId, selectedAgent.id, departmentId);
+      }
       onReassigned();
       onClose();
     } catch (e) {
-      setSubmitError(e instanceof Error ? e.message : 'Reassignment failed');
+      setSubmitError(e instanceof Error ? e.message : `${actionLabel} failed`);
     } finally {
       setSubmitting(false);
     }
@@ -95,9 +123,9 @@ export default function ReassignModal({
         {/* Header */}
         <div className="px-5 py-4 border-b border-slate-100 flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-base font-semibold text-slate-900">Reassign conversation</h2>
+            <h2 className="text-base font-semibold text-slate-900">{actionLabel} mentor</h2>
             <p className="text-xs text-slate-500 mt-0.5 truncate">
-              {candidateName ? `Candidate: ${candidateName}` : 'Pick a new agent'}
+              {candidateName ? `Candidate: ${candidateName}` : 'Pick a mentor'}
             </p>
           </div>
           <button
@@ -112,8 +140,27 @@ export default function ReassignModal({
           </button>
         </div>
 
-        {/* Search */}
-        <div className="px-5 py-3 border-b border-slate-100">
+        {/* Department and search */}
+        <div className="px-5 py-3 border-b border-slate-100 space-y-3">
+          <div>
+            <label htmlFor="mentor-department" className="block text-xs font-semibold text-slate-600 mb-1">
+              Department
+            </label>
+            <select
+              id="mentor-department"
+              value={selectedDepartmentId}
+              onChange={(event) => {
+                setSelectedDepartmentId(event.target.value);
+                setSelectedId(null);
+              }}
+              className="w-full px-3 py-2 text-sm bg-slate-100 border-0 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
+            >
+              <option value={ALL_DEPARTMENTS}>All departments</option>
+              {departments.map((department) => (
+                <option key={department.id} value={department.id}>{department.name}</option>
+              ))}
+            </select>
+          </div>
           <div className="relative">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -122,7 +169,7 @@ export default function ReassignModal({
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search agents…"
+              placeholder="Search mentors…"
               className="w-full pl-9 pr-3 py-2 text-sm bg-slate-100 border-0 rounded-lg placeholder-slate-400 text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
             />
           </div>
@@ -131,11 +178,11 @@ export default function ReassignModal({
         {/* Agent list */}
         <div className="max-h-80 overflow-y-auto">
           {loading ? (
-            <div className="p-5 text-sm text-slate-400">Loading agents…</div>
+            <div className="p-5 text-sm text-slate-400">Loading mentors…</div>
           ) : error ? (
             <div className="p-5 text-sm text-red-500">{error}</div>
           ) : filtered.length === 0 ? (
-            <div className="p-5 text-sm text-slate-400 text-center">No matching agents</div>
+            <div className="p-5 text-sm text-slate-400 text-center">No matching mentors</div>
           ) : (
             <ul className="divide-y divide-slate-100">
               {filtered.map((agent) => {
@@ -163,7 +210,7 @@ export default function ReassignModal({
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-semibold text-slate-900 truncate">{agent.name}</p>
                         <p className="text-xs text-slate-500 truncate">
-                          {AVAIL_LABEL[agent.availability]} · {agent.assignedConversationCount} active
+                          {agent.department?.name ?? 'No department'} · {AVAIL_LABEL[agent.availability]} · {agent.assignedConversationCount} active
                         </p>
                       </div>
                       {/* Selection indicator */}
@@ -200,10 +247,10 @@ export default function ReassignModal({
           </button>
           <button
             onClick={handleConfirm}
-            disabled={!selectedId || submitting}
+            disabled={!selectedAgent || submitting}
             className="px-4 py-2 text-sm font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {submitting ? 'Reassigning…' : 'Reassign'}
+            {submitting ? submittingLabel : actionLabel}
           </button>
         </div>
       </div>

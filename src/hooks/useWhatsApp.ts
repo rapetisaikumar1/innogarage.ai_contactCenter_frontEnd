@@ -129,12 +129,28 @@ export async function assignConversationToSelf(conversationId: string): Promise<
   await api.post(`/whatsapp/conversations/${conversationId}/assign`, {});
 }
 
+// ─── Assign conversation to a specific mentor (admin/manager only) ───────────
+export async function assignConversationToAgent(
+  conversationId: string,
+  agentId: string,
+  departmentId?: string
+): Promise<void> {
+  await api.post(`/whatsapp/conversations/${conversationId}/assign`, {
+    agentId,
+    ...(departmentId ? { departmentId } : {}),
+  });
+}
+
 // ─── Reassign conversation to a specific agent (admin/manager only) ──────────
 export async function reassignConversation(
   conversationId: string,
-  newAgentId: string
+  newAgentId: string,
+  departmentId?: string
 ): Promise<void> {
-  await api.post(`/whatsapp/conversations/${conversationId}/reassign`, { newAgentId });
+  await api.post(`/whatsapp/conversations/${conversationId}/reassign`, {
+    newAgentId,
+    ...(departmentId ? { departmentId } : {}),
+  });
 }
 
 // ─── Unassign conversation (admin/manager only) ──────────────────────────────

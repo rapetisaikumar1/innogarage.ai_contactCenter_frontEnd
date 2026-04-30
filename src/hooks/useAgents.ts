@@ -10,8 +10,11 @@ export interface Agent {
   name: string;
   email: string;
   role: string;
+  departmentId: string | null;
+  department: { id: string; name: string } | null;
   isActive: boolean;
   availability: Availability;
+  voiceStatus?: 'IDLE' | 'IN_CALL';
   assignedConversationCount: number;
 }
 

@@ -222,6 +222,9 @@ export default function InboxPage() {
 
   const isConversationAssignable =
     conversation?.status === 'UNASSIGNED' && !isAdmin;
+  const canAdminManageAssignment =
+    isAdmin && (conversation?.status === 'UNASSIGNED' || conversation?.status === 'ASSIGNED');
+  const assignmentActionLabel = conversation?.status === 'UNASSIGNED' ? 'Assign' : 'Reassign';
 
   return (
     <div className="flex h-full overflow-hidden">
@@ -381,15 +384,6 @@ export default function InboxPage() {
                         {assigning === conversation.conversationId ? 'Assigning…' : 'Assign to me'}
                       </button>
                     )}
-                    {/* Reassign button — admins/managers only on ASSIGNED conversations */}
-                    {isAdmin && conversation?.status === 'ASSIGNED' && (
-                      <button
-                        onClick={() => setReassignOpen(true)}
-                        className="px-3 py-1.5 text-xs font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
-                      >
-                        Reassign
-                      </button>
-                    )}
                     {/* Transfer controls — agents only on their own assigned conversations */}
                     {!isAdmin && conversation?.status === 'ASSIGNED' && conversation.assignedAgentId === user?.id && !pendingTransfer && (
                       <button
@@ -446,6 +440,15 @@ export default function InboxPage() {
                         </svg>
                       </button>
                     )}
+                    {/* Admin/manager assignment controls */}
+                    {canAdminManageAssignment && (
+                      <button
+                        onClick={() => setReassignOpen(true)}
+                        className="px-3 py-1.5 text-xs font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
+                      >
+                        {assignmentActionLabel}
+                      </button>
+                    )}
                     <Link
                       href={`/candidates/${selectedId}`}
                       className="text-xs font-medium text-slate-600 hover:text-slate-900 border border-slate-200 px-2.5 py-1 rounded-lg hover:bg-slate-50 transition-colors"
@@ -488,12 +491,13 @@ export default function InboxPage() {
         )}
       </main>
 
-      {/* ── Reassign modal (admin/manager only) ──────────────────────── */}
-      {reassignOpen && conversation && conversation.status === 'ASSIGNED' && (
+      {/* ── Assign/Reassign modal (admin/manager only) ───────────────── */}
+      {reassignOpen && canAdminManageAssignment && conversation && (
         <ReassignModal
           conversationId={conversation.conversationId}
           candidateName={conversation.candidateName ?? 'Candidate'}
           currentAgentId={conversation.assignedAgentId ?? null}
+          mode={conversation.status === 'UNASSIGNED' ? 'assign' : 'reassign'}
           onClose={() => setReassignOpen(false)}
           onReassigned={() => refetch()}
         />
