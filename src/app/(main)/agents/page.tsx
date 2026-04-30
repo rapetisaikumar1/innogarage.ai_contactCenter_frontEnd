@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ChangeEvent } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useAgents, useAgentCandidates, Availability, Agent, AgentCandidate } from '@/hooks/useAgents';
 
@@ -193,14 +193,21 @@ export default function AgentsPage() {
   const canAccessMentors = canManageMentors || Boolean(user?.canAccessMentors);
   const { agents, loading, error } = useAgents(canAccessMentors);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [availabilityFilter, setAvailabilityFilter] = useState<Availability | ''>('');
 
   const isAdmin = canManageMentors;
-  const selectedAgent = agents.find((a) => a.id === selectedId) ?? null;
+  const filteredAgents = availabilityFilter ? agents.filter((agent) => agent.availability === availabilityFilter) : agents;
+  const selectedAgent = filteredAgents.find((a) => a.id === selectedId) ?? null;
 
   const statuses: Availability[] = ['AVAILABLE', 'BUSY', 'AWAY', 'OFFLINE'];
 
   function toggle(id: string) {
     setSelectedId((prev) => (prev === id ? null : id));
+  }
+
+  function handleAvailabilityFilterChange(event: ChangeEvent<HTMLSelectElement>) {
+    setAvailabilityFilter(event.target.value as Availability | '');
+    setSelectedId(null);
   }
 
   if (!canAccessMentors) {
@@ -218,11 +225,26 @@ export default function AgentsPage() {
     <div className="p-6 max-w-7xl mx-auto">
 
       {/* ── Page header ──────────────────────────────────────────── */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-slate-900">Mentors</h1>
-        <p className="text-sm text-slate-500 mt-1 max-w-2xl">
-          {isAdmin ? 'View all mentors, their availability and assigned candidates.' : 'Your team\'s current availability.'}
-        </p>
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Mentors</h1>
+          <p className="text-sm text-slate-500 mt-1 max-w-2xl">
+            {isAdmin ? 'View all mentors, their availability and assigned candidates.' : 'Your team\'s current availability.'}
+          </p>
+        </div>
+        <label className="flex w-full flex-col gap-1.5 sm:w-56">
+          <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Availability</span>
+          <select
+            value={availabilityFilter}
+            onChange={handleAvailabilityFilterChange}
+            className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10"
+          >
+            <option value="">All mentors</option>
+            {statuses.map((status) => (
+              <option key={status} value={status}>{AVAIL[status].label}</option>
+            ))}
+          </select>
+        </label>
       </div>
 
       {/* ── Stat cards ───────────────────────────────────────────── */}
@@ -247,12 +269,13 @@ export default function AgentsPage() {
               <div className="w-5 h-5 border-2 border-slate-300 border-t-slate-900 rounded-full animate-spin" />
               Loading mentors...
             </div>
-          ) : agents.length === 0 ? (
+          ) : filteredAgents.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-48 gap-2 text-slate-400">
               <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.3} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
               <p className="text-sm">No mentors found</p>
+              {availabilityFilter && <p className="text-xs">Try another availability filter</p>}
             </div>
           ) : (
             <table className="w-full">
@@ -265,7 +288,7 @@ export default function AgentsPage() {
                 </tr>
               </thead>
               <tbody>
-                {agents.map((agent) => (
+                {filteredAgents.map((agent) => (
                   <AgentRow
                     key={agent.id}
                     agent={agent}

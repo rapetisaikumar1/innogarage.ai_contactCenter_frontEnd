@@ -106,7 +106,7 @@ export default function DashboardPage() {
       {/* ── Welcome message ──────────────────────────────────────────── */}
       <div className="flex-shrink-0 px-6 py-4 border-b border-slate-100 bg-white">
         <h2 className="text-xl font-bold text-slate-900">
-          Welcome back, <span className="text-sky-700 bg-sky-50 px-2 py-0.5 rounded-lg ring-1 ring-sky-100">{user?.name ?? 'there'}</span>! 👋
+          Welcome back, <span className="text-sky-700">{user?.name ?? 'there'}</span>! 👋
         </h2>
         <p className="text-sm text-slate-500 mt-0.5">Here&apos;s what&apos;s happening with your contact center today.</p>
       </div>

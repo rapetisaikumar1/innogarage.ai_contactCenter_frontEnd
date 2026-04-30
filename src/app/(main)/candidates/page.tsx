@@ -162,7 +162,7 @@ export default function CandidatesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {data.candidates.map((c, idx) => (
+                {data.candidates.map((c) => (
                   <tr key={c.id} className="hover:bg-slate-50/80 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -173,7 +173,6 @@ export default function CandidatesPage() {
                           <Link href={`/candidates/${c.id}`} className="font-semibold text-slate-800 hover:text-slate-900 transition-colors text-sm">
                             {c.fullName}
                           </Link>
-                          <p className="text-xs text-slate-400 mt-0.5">#C{String(idx + 1).padStart(3, '0')}</p>
                         </div>
                       </div>
                     </td>
@@ -184,7 +183,7 @@ export default function CandidatesPage() {
                       <span className="text-sm text-slate-600">{c.preferredRole ?? <span className="text-slate-300">—</span>}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <StatusBadge status={c.status as CandidateStatus} />
+                      <StatusBadge status={c.status as CandidateStatus} variant="text" />
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
