@@ -80,10 +80,6 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const { data, isLoading, error, refetch } = useDashboard();
 
-  const activePipeline = data?.candidatesByStatus
-    .filter(s => s.status !== 'STARTED_WORKING')
-    .reduce((a, b) => a + b.count, 0) ?? 0;
-
   return (
     <div className="h-full flex flex-col overflow-hidden bg-slate-50">
 
@@ -109,7 +105,9 @@ export default function DashboardPage() {
 
       {/* ── Welcome message ──────────────────────────────────────────── */}
       <div className="flex-shrink-0 px-6 py-4 border-b border-slate-100 bg-white">
-        <h2 className="text-xl font-bold text-slate-900">Welcome back, {user?.name}! 👋</h2>
+        <h2 className="text-xl font-bold text-slate-900">
+          Welcome back, <span className="text-sky-700 bg-sky-50 px-2 py-0.5 rounded-lg ring-1 ring-sky-100">{user?.name ?? 'there'}</span>! 👋
+        </h2>
         <p className="text-sm text-slate-500 mt-0.5">Here&apos;s what&apos;s happening with your contact center today.</p>
       </div>
 
@@ -118,9 +116,9 @@ export default function DashboardPage() {
       )}
 
       {/* ── KPI row ───────────────────────────────────────────────────────── */}
-      <div className="flex-shrink-0 px-5 py-3 grid grid-cols-6 gap-3">
+      <div className="flex-shrink-0 px-5 py-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {isLoading ? (
-          Array.from({ length: 6 }).map((_, i) => (
+          Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="bg-white rounded-xl border border-slate-200 animate-pulse" />
           ))
         ) : data ? (
@@ -131,17 +129,11 @@ export default function DashboardPage() {
             <StatCard label="Today's Follow-ups" value={data.todayFollowUps} sub="Due today" iconBg="bg-sky-50" href="/follow-ups"
               icon={<svg className="w-4 h-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
             />
-            <StatCard label="Overdue" value={data.overdueFollowUps} sub="Needs attention" iconBg="bg-amber-50" href="/follow-ups"
-              icon={<svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
-            />
             <StatCard label="Calls Today" value={data.totalCallsToday} sub="Logged today" iconBg="bg-emerald-50" href="/calls"
               icon={<svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>}
             />
             <StatCard label="Messages Today" value={data.totalMessagesToday} sub="WhatsApp" iconBg="bg-green-50" href="/inbox"
               icon={<svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3v-3z" /></svg>}
-            />
-            <StatCard label="Active Pipeline" value={activePipeline} sub="Excl. closed" iconBg="bg-violet-50" href="/candidates"
-              icon={<svg className="w-4 h-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>}
             />
           </>
         ) : null}

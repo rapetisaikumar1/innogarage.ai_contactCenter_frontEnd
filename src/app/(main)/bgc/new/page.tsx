@@ -127,7 +127,12 @@ function BgcFormScreen({
     <div className="mx-auto max-w-7xl p-6">
       <div className="mb-5 flex items-center justify-between gap-4">
         <div>
-          <Link href="/bgc" className="text-sm font-semibold text-slate-500 hover:text-slate-900">Back to BGC</Link>
+          <Link href="/bgc" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-900">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to BGC
+          </Link>
           <h1 className="mt-2 text-2xl font-bold text-slate-950">{title}</h1>
           <p className="mt-1 text-sm text-slate-500">Capture candidate details, employment history, references, and supporting documents.</p>
           <p className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">All fields are required except reference fields.</p>
@@ -280,7 +285,10 @@ export default function NewBgcRecordPage() {
         <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
           <h1 className="text-xl font-bold text-slate-950">BGC record not found</h1>
           <p className="mt-2 text-sm text-slate-500">{error ?? 'The selected BGC record could not be loaded for editing.'}</p>
-          <Link href="/bgc" className="mt-5 inline-flex rounded-xl bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800">
+          <Link href="/bgc" className="mt-5 inline-flex items-center gap-1.5 rounded-xl bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
             Back to BGC
           </Link>
         </div>

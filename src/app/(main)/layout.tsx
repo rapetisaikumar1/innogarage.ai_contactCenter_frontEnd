@@ -105,7 +105,7 @@ function SidebarBottom() {
 }
 
 // ─── Top navbar ───────────────────────────────────────────────────────────────
-function TopNav({ user }: { user: User }) {
+function TopNav({ user, pathname }: { user: User; pathname: string }) {
   const { logout } = useAuth();
   const { data: profile } = useProfile();
   const router     = useRouter();
@@ -118,6 +118,7 @@ function TopNav({ user }: { user: User }) {
   const profileRole = profile?.role ?? user.role;
   const roleLabel = profileRole === 'AGENT' ? 'Mentor' : profileRole === 'ADMIN' ? 'Admin' : 'Manager';
   const departmentLabel = profileRole === 'AGENT' ? profile?.department?.name ?? 'Not assigned' : null;
+  const showNotificationBell = !pathname.startsWith('/candidates/');
 
   async function handleAvailabilityChange(next: Availability) {
     if (next === availability || updatingAvailability) return;
@@ -156,7 +157,7 @@ function TopNav({ user }: { user: User }) {
 
       <div className="flex items-center gap-2 flex-shrink-0">
         {/* Bell */}
-        <NotificationBell />
+        {showNotificationBell && <NotificationBell />}
 
         {/* Profile dropdown */}
         <div className="relative" ref={dropdownRef}>
@@ -309,7 +310,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
 
         {/* ── Right: topnav + page content ─────────────────────────────── */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          <TopNav user={user} />
+          <TopNav user={user} pathname={pathname} />
           <main className="flex-1 overflow-y-auto bg-slate-50">{children}</main>
         </div>
 

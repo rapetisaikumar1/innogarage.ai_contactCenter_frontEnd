@@ -32,7 +32,7 @@ function candidateStatusChip(status: string) {
 function AvailChip({ value }: { value: Availability }) {
   const cfg = AVAIL[value] ?? AVAIL.OFFLINE;
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ring-1 ${cfg.chip}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ring-1 ${cfg.chip}`}>
       <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${cfg.dot}`} />
       {cfg.label}
     </span>
@@ -42,7 +42,7 @@ function AvailChip({ value }: { value: Availability }) {
 function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md' }) {
   const dim = size === 'sm' ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-sm';
   return (
-    <div className={`${dim} rounded-full bg-slate-900 flex items-center justify-center text-white font-bold flex-shrink-0`}>
+    <div className={`${dim} rounded-full bg-slate-800 flex items-center justify-center text-white font-semibold flex-shrink-0 shadow-sm`}>
       {name.charAt(0).toUpperCase()}
     </div>
   );
@@ -52,11 +52,11 @@ function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md' }) {
 function StatCard({ avail, count }: { avail: Availability; count: number }) {
   const cfg = AVAIL[avail];
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-4 flex items-center gap-3">
-      <span className={`w-3 h-3 rounded-full flex-shrink-0 ${cfg.dot}`} />
+    <div className="bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-3 shadow-sm">
+      <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${cfg.dot}`} />
       <div>
-        <p className="text-2xl font-bold text-slate-900 leading-none">{count}</p>
-        <p className="text-xs text-slate-500 mt-0.5">{cfg.label}</p>
+        <p className="text-xl font-semibold text-slate-900 leading-none">{count}</p>
+        <p className="text-sm text-slate-500 mt-1">{cfg.label}</p>
       </div>
     </div>
   );
@@ -77,31 +77,31 @@ function AgentRow({
   return (
     <tr
       onClick={isAdmin ? onClick : undefined}
-      className={`border-b border-slate-100 transition-colors duration-100 ${
+      className={`group border-b border-slate-100 transition-colors duration-100 ${
         isAdmin ? 'cursor-pointer hover:bg-slate-50' : ''
-      } ${isSelected ? 'bg-slate-100 hover:bg-slate-100' : ''}`}
+      } ${isSelected ? 'bg-sky-50 hover:bg-sky-50' : ''}`}
     >
-      <td className="px-5 py-3.5">
+      <td className="px-5 py-4">
         <div className="flex items-center gap-3">
           <Avatar name={agent.name} />
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-slate-900 truncate">{agent.name}</p>
+            <p className="text-sm font-medium text-slate-900 truncate">{agent.name}</p>
             <p className="text-xs text-slate-500 truncate">{agent.email}</p>
           </div>
         </div>
       </td>
-      <td className="px-5 py-3.5">
+      <td className="px-5 py-4">
         <AvailChip value={agent.availability} />
       </td>
-      <td className="px-5 py-3.5 text-sm text-slate-600 font-medium">
+      <td className="px-5 py-4 text-sm text-slate-600 font-medium">
         {agent.assignedConversationCount}
       </td>
       {isAdmin && (
-        <td className="px-5 py-3.5 text-right">
+        <td className="px-5 py-4 text-right">
           {isSelected ? (
-            <span className="text-[11px] font-semibold text-slate-700 bg-slate-200 px-2.5 py-1 rounded-full">Viewing</span>
+            <span className="text-xs font-medium text-sky-700 bg-sky-100 px-2.5 py-1 rounded-full">Viewing</span>
           ) : (
-            <span className="text-[11px] text-slate-400 group-hover:text-slate-600">View candidates →</span>
+            <span className="text-xs text-slate-400 group-hover:text-slate-600">View candidates →</span>
           )}
         </td>
       )}
@@ -120,13 +120,13 @@ function CandidatesPanel({
   const { candidates, loading, error } = useAgentCandidates(agent.id);
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 flex flex-col overflow-hidden">
+    <div className="bg-white rounded-xl border border-slate-200 flex flex-col overflow-hidden shadow-sm">
       {/* Panel header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 flex-shrink-0">
         <div className="flex items-center gap-3">
           <Avatar name={agent.name} size="sm" />
           <div>
-            <p className="text-sm font-bold text-slate-900">{agent.name}</p>
+            <p className="text-sm font-medium text-slate-900">{agent.name}</p>
             <div className="flex items-center gap-1.5 mt-0.5">
               <AvailChip value={agent.availability} />
               <span className="text-[11px] text-slate-400">{agent.assignedConversationCount} assigned</span>
@@ -170,10 +170,10 @@ function CandidatesPanel({
                 <div key={c.candidateId} className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors">
                   <Avatar name={c.fullName} size="sm" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-slate-900 truncate">{c.fullName}</p>
+                    <p className="text-sm font-medium text-slate-900 truncate">{c.fullName}</p>
                     <p className="text-xs text-slate-500 truncate">{c.whatsappNumber ?? c.phoneNumber ?? '—'}</p>
                   </div>
-                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold ring-1 ${cls} whitespace-nowrap`}>
+                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ring-1 ${cls} whitespace-nowrap`}>
                     {label}
                   </span>
                 </div>
@@ -219,8 +219,8 @@ export default function AgentsPage() {
 
       {/* ── Page header ──────────────────────────────────────────── */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Mentors</h1>
-        <p className="text-sm text-slate-500 mt-1">
+        <h1 className="text-2xl font-semibold text-slate-900">Mentors</h1>
+        <p className="text-sm text-slate-500 mt-1 max-w-2xl">
           {isAdmin ? 'View all mentors, their availability and assigned candidates.' : 'Your team\'s current availability.'}
         </p>
       </div>
@@ -241,7 +241,7 @@ export default function AgentsPage() {
       <div className={`gap-5 ${isAdmin && selectedAgent ? 'grid grid-cols-[1fr_360px]' : 'block'}`}>
 
         {/* Agents table */}
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
           {loading ? (
             <div className="flex items-center justify-center h-48 text-slate-400 text-sm gap-2">
               <div className="w-5 h-5 border-2 border-slate-300 border-t-slate-900 rounded-full animate-spin" />
@@ -257,10 +257,10 @@ export default function AgentsPage() {
           ) : (
             <table className="w-full">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-100">
-                  <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Mentor</th>
-                  <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                  <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Assigned</th>
+                <tr className="bg-slate-50/80 border-b border-slate-100">
+                  <th className="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Mentor</th>
+                  <th className="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Status</th>
+                  <th className="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Assigned</th>
                   {isAdmin && <th className="px-5 py-3" />}
                 </tr>
               </thead>

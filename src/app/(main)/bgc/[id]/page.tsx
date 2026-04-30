@@ -50,7 +50,12 @@ export default function SavedBgcRecordPage() {
     <div className="mx-auto max-w-6xl p-6">
       <div className="mb-5">
         <div>
-          <Link href="/bgc" className="text-sm font-semibold text-slate-500 hover:text-slate-900">Back to BGC</Link>
+          <Link href="/bgc" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-900">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to BGC
+          </Link>
           <h1 className="mt-2 text-2xl font-bold text-slate-950">BGC Record Preview</h1>
           <p className="mt-1 text-sm text-slate-500">View the full saved BGC record and open documents in a new tab.</p>
         </div>
